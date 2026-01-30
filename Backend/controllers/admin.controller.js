@@ -1,7 +1,7 @@
 const Document = require("../models/document.model");
 const Activity = require("../models/activity.model");
 
-// 🔹 Fetch pending documents
+//  Fetch pending documents
 exports.pendingDocs = async (req, res) => {
   try {
     const pendingDocs = await Document.find({ status: "Pending" })
@@ -15,7 +15,7 @@ exports.pendingDocs = async (req, res) => {
   }
 };
 
-// 🔹 Fetch single document
+//  Fetch single document
 exports.getDocument = async (req, res) => {
   const doc = await Document.findById(req.params.id)
     .populate("uploadedBy", "username email");
@@ -23,7 +23,7 @@ exports.getDocument = async (req, res) => {
   res.json(doc);
 };
 
-// 🔹 Approve
+//  Approve
 exports.approveDoc = async (req, res) => {
   const doc = await Document.findByIdAndUpdate(
     req.params.id,
@@ -41,7 +41,7 @@ exports.approveDoc = async (req, res) => {
   res.json({ success: true, status: "Approved" });
 };
 
-// 🔹 Reject
+//  Reject
 exports.rejectDoc = async (req, res) => {
   const { comment } = req.body;
 
@@ -62,7 +62,7 @@ exports.rejectDoc = async (req, res) => {
   res.json({ success: true, status: "Rejected" });
 };
 
-// 🔹 Request changes
+//  Request changes
 exports.requestChanges = async (req, res) => {
   const { comment } = req.body;
 
@@ -87,7 +87,7 @@ exports.requestChanges = async (req, res) => {
     const { comment } = req.body;
     const { id } = req.params;
 
-    // ❌ Comment mandatory
+    //  Comment mandatory
     if (!comment || comment.trim() === "") {
       return res.status(400).json({
         success: false,
@@ -95,7 +95,7 @@ exports.requestChanges = async (req, res) => {
       });
     }
 
-    // 🔍 Find document
+    //  Find document
     const doc = await Document.findById(id);
 
     if (!doc) {
@@ -105,12 +105,12 @@ exports.requestChanges = async (req, res) => {
       });
     }
 
-    // 📝 Update status
+    //  Update status
     doc.status = "Changes Requested";
     doc.reviewComment = comment; // optional field
     await doc.save();
 
-    // 📜 Activity log
+    
     await Activity.create({
       user: req.userId,
       action: "Requested changes",
