@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+
+<html lang="en" class="dark">
+
+
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>User Dashboard - KMRL DIS</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        :root {
+
+            --primary-bg: #111827;
+
+            --secondary-bg: #1f2937;
+
+            --tertiary-bg: #374151;
+
+            --border-color: #374151;
+
+            --text-primary: #d1d5db;
+
+            --text-secondary: #9ca3af;
+
+            --text-white: #ffffff;
+
+            --accent-blue: #3b82f6;
+
+            --accent-cyan: #06b6d4;
+
+        }
+
+        body {
+
+            font-family: 'Inter', sans-serif;
+
+            background-color: var(--primary-bg);
+
+            color: var(--text-primary);
+
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+
+        ::-webkit-scrollbar-track { background: var(--secondary-bg); }
+
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+
+        .app-container { display: flex; height: 100vh; }
+
+        #sidebar {
+
+            background-color: var(--secondary-bg);
+
+            color: var(--text-primary);
+
+            width: 16rem;
+
+            display: flex;
+
+            flex-direction: column;
+
+            z-index: 20;
+
+            transition: width 0.3s ease-in-out;
+
+        }
+
+        #sidebar.collapsed { width: 5rem; }
+
+        .sidebar-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 1rem;
+
+            height: 4rem;
+
+            border-bottom: 1px solid var(--border-color);
+
+        }
+
+        .sidebar-header .logo-container { display: flex; align-items: center; }
+
+        .sidebar-header .logo { width: 2rem; height: 2rem; margin-right: 0.5rem; filter: brightness(0) invert(1); }
+
+        #sidebar-title { font-weight: 700; font-size: 1.25rem; color: var(--text-white); white-space: nowrap; }
+
+        #sidebar-toggle { color: var(--text-secondary); transition: transform 0.3s; }
+
+        #sidebar-toggle:hover { color: var(--text-white); }
+
+        #sidebar-toggle.rotated { transform: rotate(180deg); }
+
+        #sidebar-nav { margin-top: 1rem; flex-grow: 1; }
+
+        .sidebar-link {
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0.75rem 1.5rem;
+
+            margin: 0.5rem 0.5rem 0;
+
+            color: var(--text-secondary);
+
+            border-radius: 0.5rem;
+
+            transition: color 0.2s, background-color 0.2s;
+
+            cursor: pointer;
+
+        }
+
+        .sidebar-link:hover { background-color: var(--tertiary-bg); color: var(--text-white); }
+
+        .sidebar-link .sidebar-text { margin-left: 1rem; white-space: nowrap; }
+
+        .sidebar-active-link {
+
+            color: var(--text-white);
+
+            background-image: linear-gradient(to right, var(--accent-blue), var(--accent-cyan));
+
+            background-size: 200% auto;
+
+            transition: background-position 0.5s ease;
+
+            margin: 0.5rem 0 0 0;
+
+        }
+
+        .sidebar-active-link:hover { background-position: right center; background-color: transparent; }
+
+        .sidebar-footer { padding: 1rem; border-top: 1px solid var(--border-color); }
+
+        .user-profile { display: flex; align-items: center; }
+
+        .user-avatar { width: 2.5rem; height: 2.5rem; border-radius: 9999px; }
+
+        .user-info { margin-left: 0.75rem; }
+
+        .user-name { font-weight: 600; font-size: 0.875rem; color: var(--text-white); }
+
+        .user-role { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .main-content-wrapper { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        .main-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 1rem;
+
+            background-color: var(--secondary-bg);
+
+            border-bottom: 1px solid var(--border-color);
+
+            height: 4rem;
+
+        }
+
+        .search-bar { position: relative; width: 100%; max-width: 28rem; }
+
+        .search-bar svg { position: absolute; top: 50%; left: 0.75rem; transform: translateY(-50%); color: var(--text-secondary); }
+
+        .search-input { width: 100%; padding-left: 2.5rem; padding-right: 1rem; padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 9999px; background-color: var(--tertiary-bg); color: var(--text-primary); }
+
+        .search-input:focus { outline: none; box-shadow: 0 0 0 2px var(--accent-blue); }
+
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+
+        .header-actions button { position: relative; padding: 0.5rem; border-radius: 9999px; color: var(--text-secondary); }
+
+        .header-actions button:hover { background-color: var(--tertiary-bg); color: var(--text-white); }
+
+        .notification-badge { position: absolute; top: 0.25rem; right: 0.25rem; height: 0.625rem; width: 0.625rem; background-color: #ef4444; border-radius: 9999px; border: 2px solid var(--secondary-bg); }
+
+        #theme-toggle .dark-icon { display: none; }
+
+        .dark #theme-toggle .dark-icon { display: block; }
+
+        .dark #theme-toggle .light-icon { display: none; }
+
+        .content-area { flex-grow: 1; overflow-x: hidden; overflow-y: auto; padding: 1.5rem; }
+
+        .page-title { font-size: 1.875rem; font-weight: 700; color: var(--text-white); margin-bottom: 1.5rem; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
+
+        @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        @media (min-width: 1024px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        .stat-card { background-color: var(--secondary-bg); border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); padding: 1.5rem; transition: transform 0.3s; }
+
+        .stat-card:hover { transform: translateY(-0.5rem); }
+
+        .stat-card-content { display: flex; align-items: center; }
+
+        .stat-card-icon { padding: 0.75rem; border-radius: 9999px; margin-right: 1rem; }
+
+        .stat-card-info .label { font-size: 0.875rem; color: var(--text-secondary); }
+
+        .stat-card-info .value { font-size: 1.5rem; font-weight: 700; color: var(--text-white); }
+
+        .icon-bg-blue { background-color: #1e3a8a; } .icon-text-blue { color: #60a5fa; }
+
+        .icon-bg-green { background-color: #14532d; } .icon-text-green { color: #4ade80; }
+
+        .icon-bg-yellow { background-color: #713f12; } .icon-text-yellow { color: #facc15; }
+
+        .icon-bg-red { background-color: #7f1d1d; } .icon-text-red { color: #f87171; }
+
+        .charts-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1.5rem; }
+
+        @media (min-width: 1024px) { .charts-grid { grid-template-columns: repeat(3, 1fr); } .chart-card-large { grid-column: span 2 / span 2; } }
+
+        .chart-card { background-color: var(--secondary-bg); border-radius: 1rem; padding: 1.5rem; }
+
+        .chart-title { font-size: 1.125rem; font-weight: 600; color: var(--text-white); margin-bottom: 1rem; }
+
+        .chart-container { height: 20rem; }
+
+        .page-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;}
+
+        .btn { display: inline-flex; align-items: center; font-weight: 700; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: background-color 0.2s; cursor: pointer; }
+
+        .btn-primary { background-color: #2563eb; color: var(--text-white); }
+
+        .btn-primary:hover { background-color: #1d4ed8; }
+
+        .btn-secondary { background-color: #4b5563; color: var(--text-white); }
+
+        .btn-secondary:hover { background-color: var(--tertiary-bg); }
+
+        .table-container { background-color: var(--secondary-bg); border-radius: 1rem; padding: 1.5rem; overflow-x: auto;}
+
+        .data-table { width: 100%; text-align: left; }
+
+        .data-table th, .data-table td { padding: 1rem; white-space: nowrap; }
+
+        .data-table thead tr { border-bottom: 1px solid var(--border-color); }
+
+        .data-table tbody tr { border-bottom: 1px solid var(--border-color); transition: background-color 0.2s; }
+
+        .data-table tbody tr:last-child { border-bottom: none; }
+
+        .data-table tbody tr:hover { background-color: rgba(55, 65, 81, 0.5); }
+
+        .data-table .doc-name-cell { color: var(--text-white); font-weight: 500; cursor: pointer; display: flex; align-items: center; }
+
+        .data-table .doc-name-cell:hover { color: var(--accent-blue); }
+
+        .data-table .actions-cell button { color: var(--text-secondary); margin: 0 0.25rem; }
+
+        .data-table .actions-cell button:hover { color: var(--accent-blue); }
+
+        .placeholder-card { background-color: var(--secondary-bg); border-radius: 1rem; padding: 1.5rem; text-align: center; }
+
+        .modal { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 50; }
+
+        .modal-content { background-color: var(--secondary-bg); border-radius: 1rem; padding: 2rem; width: 100%; max-width: 32rem; transform: scale(0.95); transition: transform 0.3s; }
+
+        .modal:not(.hidden) .modal-content { transform: scale(1); }
+
+        .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--text-white); margin-bottom: 1.5rem; }
+
+        #dropzone { border: 2px dashed #4b5563; border-radius: 0.5rem; padding: 2.5rem; text-align: center; cursor: pointer; transition: border-color 0.2s; }
+
+        #dropzone:hover, .dropzone-active { border-color: var(--accent-blue); }
+
+        .modal-actions { margin-top: 1.5rem; display: flex; justify-content: flex-end; }
+
+        .filters { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+
+        .filter-select { background-color: var(--tertiary-bg); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.5rem; color: var(--text-primary); }
+
+
+
+
+       /* Kanban Specific Styles */
+.kanban-column {
+    transition: background-color 0.2s;
+    min-width: 280px;
+}
+.kanban-dropzone {
+    transition: background-color 0.2s;
+}
+.kanban-card {
+    cursor: grab;
+}
+.kanban-card:active {
+    cursor: grabbing;
+}
+/* Custom Scrollbar for columns */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+
+    <div class="app-container">
+
+        <aside id="sidebar">
+
+            <div class="sidebar-header">
+
+                <div class="logo-container">
+
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Kochi_Metro_logo.svg/1200px-Kochi_Metro_logo.svg.png" alt="KMRL Logo" class="logo">
+
+                    <span id="sidebar-title">KMRL DIS</span>
+
+                </div>
+
+                <button id="sidebar-toggle"><i data-feather="chevrons-left"></i></button>
+
+            </div>
+
+            <nav id="sidebar-nav">
+
+                <a class="sidebar-link sidebar-active-link" data-target="dashboard"><i data-feather="bar-chart-2"></i><span class="sidebar-text">Dashboard</span></a>
+
+                <a class="sidebar-link" data-target="documents"><i data-feather="file-text"></i><span class="sidebar-text">Documents</span></a>
+
+                <a class="sidebar-link" data-target="workflows"><i data-feather="git-merge"></i><span class="sidebar-text">Workflows</span></a>
+                <a href="/admin/pending" class="menu-item">
+  <span class="icon">📄</span>
+  <span>Documents Approval</span>
+</a>
+
+
+                <a class="sidebar-link" data-target="settings"><i data-feather="settings"></i><span class="sidebar-text">Settings</span></a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+
+                <div class="user-profile">
+
+                    <img src="https://placehold.co/40x40/a78bfa/4c1d95?text=UU" alt="User Avatar" class="user-avatar">
+
+                    <div class="user-info sidebar-text">
+
+                        <p class="user-name">Standard User</p>
+
+                        <p class="user-role">Document Contributor</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+
+        <div class="main-content-wrapper">
+
+            <header class="main-header">
+
+                <div class="search-bar">
+
+                    <i data-feather="search" style="width:1.25rem; height:1.25rem;"></i>
+
+                    <input type="text" id="searchInput" placeholder="Search content, filename, tags..." class="search-input">
+
+                </div>
+
+                <div class="header-actions">
+
+                    <button><i data-feather="bell"></i><span class="notification-badge"></span></button>
+
+                    <button id="theme-toggle"><i data-feather="moon" class="light-icon"></i><i data-feather="sun" class="dark-icon"></i></button>
+
+                </div>
+
+            </header>
+
+           
+
+            <main class="content-area">
+
+                <div id="dashboard" class="page-content">
+
+                    <h1 class="page-title">User Dashboard</h1>
+
+                    <div class="stats-grid">
+
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.1s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-blue"><i data-feather="file-text" class="icon-text-blue"></i></div><div class="stat-card-info"><p class="label">Total Documents</p><p class="value" id="totalDocs">0</p></div></div></div>
+
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.2s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-green"><i data-feather="upload-cloud" class="icon-text-green"></i></div><div class="stat-card-info"><p class="label">Uploaded Today</p><p class="value" id="uploadedToday">0</p></div></div></div>
+
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.3s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-yellow"><i data-feather="alert-circle" class="icon-text-yellow"></i></div><div class="stat-card-info"><p class="label">Pending Approval</p><p class="value" id="pendingApproval">0</p></div></div></div>
+
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.4s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-red"><i data-feather="archive" class="icon-text-red"></i></div><div class="stat-card-info"><p class="label">Archived</p><p class="value" id="archivedDocs">0</p></div></div></div>
+
+                    </div>
+
+                    <div class="charts-grid">
+
+                        <div class="chart-card chart-card-large fade-in-up" style="animation-delay: 0.5s;"><h3 class="chart-title">Monthly Document Activity</h3><div class="chart-container"><canvas id="activityChart"></canvas></div></div>
+
+                        <div class="chart-card fade-in-up"   class="recent-activity"    style="animation-delay: 0.6s;"><h3 class="chart-title">Recent Activity</h3><ul id="activityList"></ul></div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div id="documents" class="page-content hidden">
+
+                    <div class="page-actions">
+
+                        <h1 class="page-title" style="margin-bottom: 0;">Documents</h1>
+
+                        <button id="upload-btn" class="btn btn-primary"><i data-feather="upload" class="mr-2"></i> Upload Document</button>
+
+                    </div>
+
+                    <div class="filters">
+  <select id="statusFilter" class="filter-select">
+    <option value="all">All Statuses</option>
+    <option value="Approved">Approved</option>
+    <option value="Pending">Pending</option>
+    <option value="In Review">In Review</option>
+    <option value="Rejected">Rejected</option>
+  </select>
+
+  <select id="typeFilter" class="filter-select">
+    <option value="all">All Types</option>
+    <option value="PDF">PDF</option>
+    <option value="DOCX">DOCX</option>
+    <option value="XLSX">XLSX</option>
+  </select>
+
+  <input type="date" id="dateFilter" class="filter-select">
+</div>
+
+
+                    <div class="table-container">
+
+                        <table class="data-table">
+
+                            <thead><tr><th>File Name</th><th>Type</th><th>Status</th><th>Tags</th><th>Last Modified</th><th>Actions</th></tr></thead>
+
+                            <tbody id="documents-table-body"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+
+                <div id="workflows" class="page-content hidden">
+
+                    <div id="workflows" class="page-content hidden h-full flex flex-col">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="page-title mb-1">Approval Workflows</h1>
+            <p class="text-gray-400 text-sm">Drag and drop documents to move them through the approval lifecycle.</p>
+        </div>
+        <div class="flex gap-3">
+            <button class="btn btn-secondary text-sm"><i data-feather="filter" class="w-4 h-4 mr-2"></i>Filter</button>
+            <button class="btn btn-primary text-sm" onclick="createNewWorkflow()"><i data-feather="plus" class="w-4 h-4 mr-2"></i>New Workflow</button>
+        </div>
+    </div>
+
+    <div class="flex-grow overflow-x-auto overflow-y-hidden">
+        <div class="flex h-full gap-6 min-w-[1200px] pb-4">
+            
+            <div class="kanban-column flex flex-col w-1/4 bg-gray-900/50 rounded-xl border border-gray-800 h-full">
+                <div class="p-4 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-gray-900/50 backdrop-blur-md rounded-t-xl z-10">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-gray-500"></div>
+                        <h3 class="font-semibold text-gray-200 text-sm tracking-wide">PENDING</h3>
+                        <span class="bg-gray-800 text-xs px-2 py-0.5 rounded text-gray-400" id="count-pending">0</span>
+                    </div>
+                </div>
+                <div class="kanban-dropzone flex-grow p-3 space-y-3 overflow-y-auto custom-scrollbar" data-status="pending" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    </div>
+            </div>
+
+            <div class="kanban-column flex flex-col w-1/4 bg-gray-900/50 rounded-xl border border-gray-800 h-full">
+                <div class="p-4 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-gray-900/50 backdrop-blur-md rounded-t-xl z-10">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
+                        <h3 class="font-semibold text-gray-200 text-sm tracking-wide">AI PROCESSING</h3>
+                        <span class="bg-gray-800 text-xs px-2 py-0.5 rounded text-gray-400" id="count-processing">0</span>
+                    </div>
+                </div>
+                <div class="kanban-dropzone flex-grow p-3 space-y-3 overflow-y-auto custom-scrollbar" data-status="processing" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            </div>
+
+            <div class="kanban-column flex flex-col w-1/4 bg-gray-900/50 rounded-xl border border-gray-800 h-full">
+                <div class="p-4 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-gray-900/50 backdrop-blur-md rounded-t-xl z-10">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <h3 class="font-semibold text-gray-200 text-sm tracking-wide">IN REVIEW</h3>
+                        <span class="bg-gray-800 text-xs px-2 py-0.5 rounded text-gray-400" id="count-review">0</span>
+                    </div>
+                </div>
+                <div class="kanban-dropzone flex-grow p-3 space-y-3 overflow-y-auto custom-scrollbar" data-status="review" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            </div>
+
+            <div class="kanban-column flex flex-col w-1/4 bg-gray-900/50 rounded-xl border border-gray-800 h-full">
+                <div class="p-4 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-gray-900/50 backdrop-blur-md rounded-t-xl z-10">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <h3 class="font-semibold text-gray-200 text-sm tracking-wide">APPROVED</h3>
+                        <span class="bg-gray-800 text-xs px-2 py-0.5 rounded text-gray-400" id="count-approved">0</span>
+                    </div>
+                </div>
+                <div class="kanban-dropzone flex-grow p-3 space-y-3 overflow-y-auto custom-scrollbar" data-status="approved" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+                    
+
+                </div>
+
+
+
+                <div id="settings" class="page-content hidden">
+
+                    <h1 class="page-title">Settings</h1>
+
+                    <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
+
+                         <h2 class="text-xl font-semibold text-white border-b border-gray-700 pb-4 mb-4">Integrations</h2>
+
+                         <p class="text-gray-400 mb-4">Connect with other services.</p>
+
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </div>
+
+   
+
+    <div id="upload-modal" class="modal hidden"><div class="modal-content"><h2 class="modal-title">Upload New Document</h2><div id="dropzone"><i data-feather="upload-cloud" class="w-16 h-16 mx-auto text-gray-500"></i><p class="mt-4 text-white">Drag & drop files here or <span class="text-blue-400 font-semibold">browse</span></p><input type="file" id="file-input" class="hidden" multiple></div><div id="upload-progress-container" class="mt-4"></div><div class="modal-actions"><button id="close-upload-modal-btn" class="btn btn-secondary">Close</button></div></div></div>
+
+    <div id="details-modal" class="modal hidden"><div class="modal-content"><h2 id="details-title" class="modal-title">Document Details</h2><div id="details-content"></div><div class="modal-actions"><button id="close-details-modal-btn" class="btn btn-secondary">Close</button></div></div></div>
+
+
+
+    
+      
+
+   
+
+</body>
+<script>
+/* ================= ICONS ================= */
+feather.replace();
+
+/* ================= ELEMENTS ================= */
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebarTitle = document.getElementById('sidebar-title');
+const sidebarTexts = document.querySelectorAll('.sidebar-text');
+const themeToggle = document.getElementById('theme-toggle');
+const sidebarNav = document.getElementById('sidebar-nav');
+const pageContents = document.querySelectorAll('.page-content');
+const documentsTableBody = document.getElementById('documents-table-body');
+
+const uploadModal = document.getElementById('upload-modal');
+const uploadBtn = document.getElementById('upload-btn');
+const closeUploadModalBtn = document.getElementById('close-upload-modal-btn');
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('file-input');
+
+/* ================= SIDEBAR ================= */
+function navigate(targetId) {
+  document.querySelectorAll('.sidebar-link').forEach(l =>
+    l.classList.remove('sidebar-active-link')
+  );
+  document
+    .querySelector(`.sidebar-link[data-target='${targetId}']`)
+    .classList.add('sidebar-active-link');
+
+  pageContents.forEach(p => p.classList.add('hidden'));
+  document.getElementById(targetId).classList.remove('hidden');
+}
+
+sidebarToggle.addEventListener('click', () => {
+  sidebar.classList.toggle('collapsed');
+  sidebarTitle.classList.toggle('hidden');
+  sidebarToggle.classList.toggle('rotated');
+  sidebarTexts.forEach(t => t.classList.toggle('hidden'));
+});
+
+themeToggle.addEventListener('click', () => {
+  document.documentElement.classList.toggle('dark');
+});
+
+sidebarNav.addEventListener('click', e => {
+  const link = e.target.closest('.sidebar-link');
+  if (link) {
+    e.preventDefault();
+    navigate(link.dataset.target);
+  }
+});
+
+/* ================= MODAL ================= */
+function toggleModal(modal, show) {
+  show ? modal.classList.remove('hidden') : modal.classList.add('hidden');
+}
+
+uploadBtn.addEventListener('click', () => toggleModal(uploadModal, true));
+closeUploadModalBtn.addEventListener('click', () => toggleModal(uploadModal, false));
+dropzone.addEventListener('click', () => fileInput.click());
+
+/* ================= FILE UPLOAD ================= */
+fileInput.addEventListener("change", async () => {
+  const files = fileInput.files;
+  if (!files.length) return alert("No files selected");
+
+  const formData = new FormData();
+  for (let file of files) {
+    formData.append("documents", file);
+  }
+
+  try {
+    const res = await fetch("/documents/upload", {
+      method: "POST",
+      body: formData,
+      credentials: "include"
+    });
+
+    if (!res.ok) {
+      alert(await res.text());
+      return;
+    }
+
+    toggleModal(uploadModal, false);
+
+    // 🔥 IMPORTANT refresh
+    loadDocuments();
+    loadDashboardStats();
+    loadRecentActivity();
+
+  } catch (err) {
+    console.error(err);
+    alert("Upload failed");
+  }
+});
+
+/* ================= DOCUMENT TABLE ================= */
+async function loadDocuments() {
+  try {
+    const res = await fetch("/documents/my", { credentials: "include" });
+    if (!res.ok) return;
+
+    const docs = await res.json();
+    renderDocuments(docs);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderDocuments(docs) {
+  documentsTableBody.innerHTML = "";
+
+  if (!docs || docs.length === 0) {
+    documentsTableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center text-gray-400 py-4">
+          No documents found
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  docs.forEach(doc => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td class="doc-name-cell">
+        <i data-feather="file-text" class="w-4 h-4 mr-2 inline"></i>
+        ${doc.fileName}
+      </td>
+
+      <td>${doc.fileType?.toUpperCase() || "-"}</td>
+
+      <td>
+        <span class="bg-yellow-500 text-xs px-2 py-1 rounded">
+          ${doc.status}
+        </span>
+      </td>
+
+      <td>-</td>
+
+      <td>${new Date(doc.createdAt).toLocaleDateString()}</td>
+
+      <td class="actions-cell">
+        <a href="/${doc.filePath}" target="_blank" class="text-blue-400">
+          View
+        </a>
+      </td>
+    `;
+
+    documentsTableBody.appendChild(row);
+  });
+
+  feather.replace();
+}
+
+
+/* ================= DASHBOARD STATS + CHART ================= */
+let activityChart;
+
+async function loadDashboardStats() {
+  try {
+    const res = await fetch("/documents/stats", {
+      credentials: "include"
+    });
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    document.getElementById("totalDocs").innerText = data.total;
+    document.getElementById("uploadedToday").innerText = data.today;
+    document.getElementById("pendingApproval").innerText = data.pending;
+    document.getElementById("archivedDocs").innerText = data.archived;
+
+    renderChart(data.monthly);
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderChart(monthly) {
+  const ctx = document.getElementById("activityChart").getContext("2d");
+
+  if (activityChart) activityChart.destroy(); // 🔥 prevent duplicate chart
+
+  activityChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+      datasets: [{
+        label: "Documents Uploaded",
+        data: monthly,
+        backgroundColor: "rgba(59,130,246,0.2)",
+        borderColor: "#3b82f6",
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+/* ================= RECENT ACTIVITY ================= */
+async function loadRecentActivity() {
+  try {
+    const res = await fetch("/documents/recent", {
+      credentials: "include"
+    });
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const container = document.getElementById("recent-activity-feed");
+
+    container.innerHTML = data.map(item => `
+      <p>
+        <span class="font-semibold text-white">You</span> uploaded
+        <span class="text-blue-400">${item.document}</span>
+        <span class="text-gray-500 float-right">
+          ${new Date(item.time).toLocaleDateString()}
+        </span>
+      </p>
+    `).join("");
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+/* ================= INIT ================= */
+document.addEventListener("DOMContentLoaded", () => {
+  loadDocuments();
+  loadDashboardStats();
+  loadRecentActivity();
+});
+
+const searchInput = document.getElementById("searchInput");
+const statusFilter = document.getElementById("statusFilter");
+const typeFilter = document.getElementById("typeFilter");
+const dateFilter = document.getElementById("dateFilter");
+
+let debounceTimer = null;
+
+function triggerSearch() {
+  clearTimeout(debounceTimer);
+
+  debounceTimer = setTimeout(async () => {
+    const q = searchInput.value.trim();
+    const status = statusFilter.value;
+    const type = typeFilter.value;
+    const date = dateFilter.value;
+
+    // 🔥 If no search + no filters → load all documents
+    if (!q && status === "all" && type === "all" && !date) {
+      loadDocuments();
+      return;
+    }
+
+    const params = new URLSearchParams();
+
+    if (q) params.append("q", q);
+    if (status && status !== "all") params.append("status", status);
+    if (type && type !== "all") params.append("type", type);
+    if (date) params.append("date", date);
+
+    try {
+      const res = await fetch(`/documents/search?${params.toString()}`, {
+        credentials: "include"
+      });
+
+      if (!res.ok) {
+        console.error("Search API failed");
+        return;
+      }
+
+      const docs = await res.json();
+      renderDocuments(docs);
+
+    } catch (err) {
+      console.error("Search/filter error", err);
+    }
+  }, 300);
+}
+
+// 🔄 Events
+searchInput.addEventListener("input", triggerSearch);
+statusFilter.addEventListener("change", triggerSearch);
+typeFilter.addEventListener("change", triggerSearch);
+dateFilter.addEventListener("change", triggerSearch);
+
+
+
+/* ================= WORKFLOW KANBAN BOARD ================= */
+
+// Mock Data for Visual Simulation (Replace with API fetch in production)
+let workflowItems = [
+    { id: 'doc-1', title: 'Q3_Financial_Report.pdf', type: 'PDF', status: 'pending', priority: 'High', aiConfidence: 98, assignee: 'AS' },
+    { id: 'doc-2', title: 'Metro_Safety_Audit_v2.docx', type: 'DOCX', status: 'processing', priority: 'Medium', aiConfidence: 45, assignee: 'JD' },
+    { id: 'doc-3', title: 'Vendor_Contract_778.pdf', type: 'PDF', status: 'review', priority: 'High', aiConfidence: 89, assignee: 'AS' },
+    { id: 'doc-4', title: 'HR_Policy_Update.pdf', type: 'PDF', status: 'approved', priority: 'Low', aiConfidence: 99, assignee: 'System' },
+    { id: 'doc-5', title: 'Invoice_#9901.png', type: 'IMG', status: 'pending', priority: 'Medium', aiConfidence: 0, assignee: 'Unassigned' }
+];
+
+// Initialize Board
+function initWorkflowBoard() {
+    renderKanbanColumns();
+    updateWorkflowCounts();
+}
+
+function renderKanbanColumns() {
+    // Clear all columns
+    document.querySelectorAll('.kanban-dropzone').forEach(el => el.innerHTML = '');
+
+    workflowItems.forEach(item => {
+        const cardHTML = createKanbanCard(item);
+        const column = document.querySelector(`.kanban-dropzone[data-status="${item.status}"]`);
+        if (column) {
+            column.insertAdjacentHTML('beforeend', cardHTML);
+        }
+    });
+    
+    // Re-initialize icons for newly added elements
+    feather.replace();
+}
+
+function createKanbanCard(item) {
+    // Style determination based on priority and AI score
+    const priorityColor = item.priority === 'High' ? 'text-red-400 bg-red-400/10' : 
+                          item.priority === 'Medium' ? 'text-yellow-400 bg-yellow-400/10' : 'text-blue-400 bg-blue-400/10';
+    
+    const aiBadge = item.aiConfidence > 0 
+        ? `<div class="flex items-center gap-1 text-xs font-medium ${item.aiConfidence > 80 ? 'text-green-400' : 'text-yellow-400'}">
+             <i data-feather="cpu" class="w-3 h-3"></i> ${item.aiConfidence}% AI Match
+           </div>` 
+        : '';
+
+    return `
+    <div id="${item.id}" draggable="true" ondragstart="drag(event)" class="kanban-card group bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg transition-all cursor-move select-none relative">
+        <div class="flex justify-between items-start mb-2">
+            <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${priorityColor}">
+                ${item.priority}
+            </span>
+            <button class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"><i data-feather="more-horizontal" class="w-4 h-4"></i></button>
+        </div>
+        
+        <h4 class="text-gray-200 font-medium text-sm mb-1 truncate" title="${item.title}">${item.title}</h4>
+        
+        <div class="flex items-center justify-between mt-3">
+            ${aiBadge}
+            <div class="h-6 w-6 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-bold text-white border-2 border-gray-800" title="Assigned to ${item.assignee}">
+                ${item.assignee}
+            </div>
+        </div>
+        
+        <div class="mt-3 w-full bg-gray-700 h-1 rounded-full overflow-hidden">
+             <div class="bg-blue-500 h-full" style="width: ${getProgressBarWidth(item.status)}%"></div>
+        </div>
+    </div>
+    `;
+}
+
+function getProgressBarWidth(status) {
+    switch(status) {
+        case 'pending': return 10;
+        case 'processing': return 40;
+        case 'review': return 75;
+        case 'approved': return 100;
+        default: return 0;
+    }
+}
+
+function updateWorkflowCounts() {
+    const statuses = ['pending', 'processing', 'review', 'approved'];
+    statuses.forEach(status => {
+        const count = workflowItems.filter(i => i.status === status).length;
+        const el = document.getElementById(`count-${status}`);
+        if(el) el.innerText = count;
+    });
+}
+
+/* ================= DRAG AND DROP LOGIC ================= */
+function allowDrop(ev) {
+    ev.preventDefault();
+    ev.currentTarget.classList.add('bg-gray-800/50'); // Highlight drop zone
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+    ev.target.classList.add('opacity-50'); // Visual feedback while dragging
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    const data = ev.dataTransfer.getData("text");
+    const card = document.getElementById(data);
+    
+    // Find drop target (handle dropping inside a card vs on the column)
+    let dropZone = ev.target.closest('.kanban-dropzone');
+    
+    if (dropZone && card) {
+        // Remove highlight from all zones
+        document.querySelectorAll('.kanban-dropzone').forEach(el => el.classList.remove('bg-gray-800/50'));
+        card.classList.remove('opacity-50');
+        
+        dropZone.appendChild(card);
+        
+        // Update Data Model
+        const newStatus = dropZone.getAttribute('data-status');
+        const itemIndex = workflowItems.findIndex(i => i.id === data);
+        if(itemIndex > -1) {
+            workflowItems[itemIndex].status = newStatus;
+            
+            // Re-render card to update progress bar and styles
+            card.outerHTML = createKanbanCard(workflowItems[itemIndex]);
+            feather.replace(); // Refresh icons
+            updateWorkflowCounts();
+            
+            // Optional: Trigger API call to save new status here
+            // saveStatusChange(workflowItems[itemIndex].id, newStatus);
+        }
+    }
+}
+
+// Hook into existing event listeners
+document.addEventListener("DOMContentLoaded", () => {
+    // ... existing init code ...
+    initWorkflowBoard();
+});
+async function loadRecentActivity() {
+    const res = await fetch("/activities/recent");
+    const activities = await res.json();
+
+    const list = document.getElementById("activityList");
+    list.innerHTML = "";
+
+    if (activities.length === 0) {
+      list.innerHTML = "<li>No recent activity</li>";
+      return;
+    }
+
+    activities.forEach(act => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>${act.user.username}</strong>
+        ${act.action}
+        <span>${act.entityName || ""}</span>
+        <small>${new Date(act.createdAt).toLocaleString()}</small>
+      `;
+      list.appendChild(li);
+    });
+  }
+
+  loadRecentActivity();
+
+
+</script>
+
+</html>

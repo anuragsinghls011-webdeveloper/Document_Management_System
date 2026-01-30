@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Designer - KMRL DIS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #111827;
+            --bg-panel: #1f2937;
+            --grid-color: #374151;
+            --accent: #3b82f6;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #e5e7eb;
+            overflow: hidden;
+        }
+        
+        /* Grid Background pattern */
+        #canvas-container {
+            background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: -1px -1px;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+        }
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        /* Nodes */
+        .node {
+            position: absolute;
+            width: 240px;
+            background: var(--bg-panel);
+            border: 1px solid #4b5563;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            user-select: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            z-index: 10;
+        }
+        .node:hover {
+            border-color: #6b7280;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+        .node.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        }
+
+        .node-header {
+            padding: 12px;
+            border-bottom: 1px solid #374151;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 8px 8px 0 0;
+            cursor: move; /* Indicates drag area */
+        }
+        
+        /* Header Colors by Type */
+        .node-trigger .node-header { background: rgba(16, 185, 129, 0.1); border-bottom-color: rgba(16, 185, 129, 0.2); }
+        .node-trigger .icon-box { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        
+        .node-action .node-header { background: rgba(59, 130, 246, 0.1); border-bottom-color: rgba(59, 130, 246, 0.2); }
+        .node-action .icon-box { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        
+        .node-condition .node-header { background: rgba(245, 158, 11, 0.1); border-bottom-color: rgba(245, 158, 11, 0.2); }
+        .node-condition .icon-box { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+        .node-body {
+            padding: 12px;
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+
+        /* Ports (Connection Points) */
+        .port {
+            width: 12px;
+            height: 12px;
+            background: #9ca3af;
+            border: 2px solid var(--bg-panel);
+            border-radius: 50%;
+            position: absolute;
+            cursor: crosshair;
+            transition: background 0.2s, transform 0.2s;
+            z-index: 20;
+        }
+        .port:hover {
+            background: var(--accent);
+            transform: scale(1.2);
+        }
+        .port-input { top: -6px; left: 50%; transform: translateX(-50%); }
+        .port-output { bottom: -6px; left: 50%; transform: translateX(-50%); }
+        
+        /* Sidebar */
+        .sidebar-item {
+            cursor: grab;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .sidebar-item:hover {
+            background: #374151;
+            transform: translateX(4px);
+        }
+        .sidebar-item:active {
+            cursor: grabbing;
+        }
+
+        /* SVG Connections */
+        #connections-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Let clicks pass through to canvas */
+            z-index: 1;
+        }
+        .connection-line {
+            fill: none;
+            stroke: #6b7280;
+            stroke-width: 2px;
+            pointer-events: visibleStroke; /* Allow clicking the line itself */
+            cursor: pointer;
+        }
+        .connection-line:hover {
+            stroke: var(--accent);
+            stroke-width: 3px;
+        }
+        .connection-line.selected {
+            stroke: #ef4444; /* Red for deletion */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="flex h-screen">
+        
+        <!-- Sidebar Palette -->
+        <aside class="w-64 bg-gray-900 border-r border-gray-800 flex flex-col z-30 shadow-xl">
+            <div class="p-4 border-b border-gray-800">
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                        <i data-feather="git-branch" class="text-white w-5 h-5"></i>
+                    </div>
+                    <h1 class="font-bold text-lg tracking-tight">Workflow</h1>
+                </div>
+                <p class="text-xs text-gray-500">Drag nodes to the canvas</p>
+            </div>
+            
+            <div class="flex-grow p-4 space-y-3 overflow-y-auto">
+                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Triggers</div>
+                
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'trigger')">
+                    <div class="w-8 h-8 rounded bg-green-500/20 text-green-400 flex items-center justify-center">
+                        <i data-feather="play" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">Start Process</div>
+                        <div class="text-[10px] text-gray-500">Initiates the workflow</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'trigger-doc')">
+                    <div class="w-8 h-8 rounded bg-green-500/20 text-green-400 flex items-center justify-center">
+                        <i data-feather="file-text" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">Doc Uploaded</div>
+                        <div class="text-[10px] text-gray-500">Trigger on new file</div>
+                    </div>
+                </div>
+
+                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-6">Actions</div>
+
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'action-ai')">
+                    <div class="w-8 h-8 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                        <i data-feather="cpu" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">AI Extraction</div>
+                        <div class="text-[10px] text-gray-500">Extract fields from doc</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'action-approval')">
+                    <div class="w-8 h-8 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                        <i data-feather="user-check" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">Approval</div>
+                        <div class="text-[10px] text-gray-500">Wait for human review</div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'action-email')">
+                    <div class="w-8 h-8 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                        <i data-feather="mail" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">Send Email</div>
+                        <div class="text-[10px] text-gray-500">Notify stakeholders</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'action-db')">
+                    <div class="w-8 h-8 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                        <i data-feather="database" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">Update DB</div>
+                        <div class="text-[10px] text-gray-500">Save records to database</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'action-slack')">
+                    <div class="w-8 h-8 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                        <i data-feather="message-square" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">Slack Notify</div>
+                        <div class="text-[10px] text-gray-500">Send message to channel</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'action-delay')">
+                    <div class="w-8 h-8 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                        <i data-feather="clock" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">Delay</div>
+                        <div class="text-[10px] text-gray-500">Wait for duration</div>
+                    </div>
+                </div>
+
+                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-6">Logic</div>
+
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'condition')">
+                    <div class="w-8 h-8 rounded bg-yellow-500/20 text-yellow-400 flex items-center justify-center">
+                        <i data-feather="git-merge" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">Condition</div>
+                        <div class="text-[10px] text-gray-500">If/Else branching</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'logic-switch')">
+                    <div class="w-8 h-8 rounded bg-yellow-500/20 text-yellow-400 flex items-center justify-center">
+                        <i data-feather="shuffle" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">Switch</div>
+                        <div class="text-[10px] text-gray-500">Multi-path routing</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-item bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3" draggable="true" ondragstart="startDrag(event, 'logic-merge')">
+                    <div class="w-8 h-8 rounded bg-yellow-500/20 text-yellow-400 flex items-center justify-center">
+                        <i data-feather="minimize-2" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium">Merge</div>
+                        <div class="text-[10px] text-gray-500">Join branches</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-800">
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-medium text-sm transition-colors" onclick="saveWorkflow()">
+                    Save Workflow
+                </button>
+            </div>
+        </aside>
+
+        <!-- Canvas Area -->
+        <main class="flex-grow relative overflow-hidden" id="main-area">
+            
+            <!-- Toolbar -->
+            <div class="absolute top-4 left-4 right-4 z-20 pointer-events-none flex justify-between">
+                <div class="bg-gray-800/80 backdrop-blur border border-gray-700 rounded-lg p-2 pointer-events-auto flex gap-2">
+                    <button class="p-2 hover:bg-gray-700 rounded text-gray-400 hover:text-white" title="Undo" onclick="alert('Undo')"><i data-feather="rotate-ccw" class="w-4 h-4"></i></button>
+                    <button class="p-2 hover:bg-gray-700 rounded text-gray-400 hover:text-white" title="Redo" onclick="alert('Redo')"><i data-feather="rotate-cw" class="w-4 h-4"></i></button>
+                    <div class="w-px bg-gray-600 mx-1"></div>
+                    <button class="p-2 hover:bg-gray-700 rounded text-gray-400 hover:text-white" title="Zoom In" onclick="zoom(0.1)"><i data-feather="zoom-in" class="w-4 h-4"></i></button>
+                    <button class="p-2 hover:bg-gray-700 rounded text-gray-400 hover:text-white" title="Zoom Out" onclick="zoom(-0.1)"><i data-feather="zoom-out" class="w-4 h-4"></i></button>
+                    <button class="p-2 hover:bg-gray-700 rounded text-gray-400 hover:text-white" title="Fit to Screen" onclick="resetZoom()"><i data-feather="maximize" class="w-4 h-4"></i></button>
+                </div>
+                
+                <div class="bg-gray-800/80 backdrop-blur border border-gray-700 rounded-lg px-4 py-2 pointer-events-auto">
+                    <span class="text-sm text-gray-300">Invoice Approval Flow v2</span>
+                </div>
+            </div>
+
+            <!-- The Infinite Canvas -->
+            <div id="canvas-container" class="w-full h-full" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <svg id="connections-layer"></svg>
+                <!-- Nodes will be injected here -->
+            </div>
+
+        </main>
+
+        <!-- Properties Panel (Right) -->
+        <aside class="w-72 bg-gray-900 border-l border-gray-800 z-30 transform transition-transform duration-300 translate-x-full absolute right-0 top-0 bottom-0" id="properties-panel">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                <h2 class="font-bold text-sm">Node Properties</h2>
+                <button onclick="closePanel()" class="text-gray-500 hover:text-white"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4" id="properties-content">
+                <p class="text-sm text-gray-500">Select a node to edit its properties.</p>
+            </div>
+        </aside>
+
+    </div>
+
+<script>
+    feather.replace();
+
+    /* --- STATE --- */
+    const state = {
+        nodes: [],
+        connections: [],
+        scale: 1,
+        pan: { x: 0, y: 0 },
+        isDragging: false,
+        dragStart: { x: 0, y: 0 },
+        dragNodeId: null,
+        connecting: { active: false, startNodeId: null, startX: 0, startY: 0 },
+        nextNodeId: 1
+    };
+
+    const canvas = document.getElementById('canvas-container');
+    const svgLayer = document.getElementById('connections-layer');
+    const propertiesPanel = document.getElementById('properties-panel');
+
+    /* --- DRAG & DROP FROM SIDEBAR --- */
+    function allowDrop(ev) { ev.preventDefault(); }
+    function startDrag(ev, type) { ev.dataTransfer.setData("type", type); }
+
+    function drop(ev) {
+        ev.preventDefault();
+        const type = ev.dataTransfer.getData("type");
+        if (!type) return; // Not a sidebar item
+
+        const rect = canvas.getBoundingClientRect();
+        // Calculate position relative to canvas pan/zoom
+        const x = (ev.clientX - rect.left - state.pan.x) / state.scale;
+        const y = (ev.clientY - rect.top - state.pan.y) / state.scale;
+
+        createNode(type, x, y);
+    }
+
+    /* --- NODE CREATION --- */
+    function createNode(type, x, y) {
+        const id = `node-${state.nextNodeId++}`;
+        
+        let config = getNodeConfig(type);
+        
+        const nodeData = {
+            id,
+            type,
+            x: x - 120, // Center on mouse
+            y: y - 30,
+            title: config.title,
+            icon: config.icon,
+            colorClass: config.colorClass,
+            inputs: config.inputs, // boolean
+            outputs: config.outputs // boolean
+        };
+
+        state.nodes.push(nodeData);
+        renderNode(nodeData);
+    }
+
+    function getNodeConfig(type) {
+        switch(type) {
+            case 'trigger': return { title: 'Start Process', icon: 'play', colorClass: 'node-trigger', inputs: false, outputs: true };
+            case 'trigger-doc': return { title: 'Document Uploaded', icon: 'file-text', colorClass: 'node-trigger', inputs: false, outputs: true };
+            case 'action-ai': return { title: 'AI Extraction', icon: 'cpu', colorClass: 'node-action', inputs: true, outputs: true };
+            case 'action-approval': return { title: 'Human Approval', icon: 'user-check', colorClass: 'node-action', inputs: true, outputs: true };
+            case 'action-email': return { title: 'Send Email', icon: 'mail', colorClass: 'node-action', inputs: true, outputs: true };
+            case 'action-db': return { title: 'Update Database', icon: 'database', colorClass: 'node-action', inputs: true, outputs: true };
+            case 'action-slack': return { title: 'Slack Notify', icon: 'message-square', colorClass: 'node-action', inputs: true, outputs: true };
+            case 'action-delay': return { title: 'Delay / Wait', icon: 'clock', colorClass: 'node-action', inputs: true, outputs: true };
+            case 'condition': return { title: 'Check Condition', icon: 'git-merge', colorClass: 'node-condition', inputs: true, outputs: true };
+            case 'logic-switch': return { title: 'Switch / Split', icon: 'shuffle', colorClass: 'node-condition', inputs: true, outputs: true };
+            case 'logic-merge': return { title: 'Merge Branches', icon: 'minimize-2', colorClass: 'node-condition', inputs: true, outputs: true };
+            default: return { title: 'Unknown', icon: 'box', colorClass: '', inputs: true, outputs: true };
+        }
+    }
+
+    function renderNode(data) {
+        const el = document.createElement('div');
+        el.id = data.id;
+        el.className = `node ${data.colorClass}`;
+        el.style.transform = `translate(${data.x}px, ${data.y}px)`;
+        
+        el.innerHTML = `
+            ${data.inputs ? `<div class="port port-input" onmousedown="startConnection(event, '${data.id}', 'input')"></div>` : ''}
+            <div class="node-header">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded icon-box flex items-center justify-center">
+                        <i data-feather="${data.icon}" class="w-3 h-3"></i>
+                    </div>
+                    <span class="font-semibold text-sm text-gray-200">${data.title}</span>
+                </div>
+                <button class="text-gray-500 hover:text-white" onclick="deleteNode('${data.id}')"><i data-feather="x" class="w-3 h-3"></i></button>
+            </div>
+            <div class="node-body">
+                <div class="flex justify-between items-center">
+                    <span>Status</span>
+                    <span class="text-xs bg-gray-800 px-2 py-0.5 rounded">Configured</span>
+                </div>
+            </div>
+            ${data.outputs ? `<div class="port port-output" onmousedown="startConnection(event, '${data.id}', 'output')"></div>` : ''}
+        `;
+
+        // Event Listeners for Moving
+        const header = el.querySelector('.node-header');
+        header.addEventListener('mousedown', (e) => startNodeDrag(e, data.id));
+        el.addEventListener('click', (e) => selectNode(e, data.id));
+
+        canvas.appendChild(el);
+        feather.replace();
+    }
+
+    /* --- CANVAS PANNING --- */
+    canvas.addEventListener('mousedown', (e) => {
+        if(e.target === canvas || e.target.id === 'connections-layer') {
+            state.isDragging = true;
+            state.dragStart = { x: e.clientX, y: e.clientY };
+        }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (state.isDragging) {
+            const dx = e.clientX - state.dragStart.x;
+            const dy = e.clientY - state.dragStart.y;
+            state.pan.x += dx;
+            state.pan.y += dy;
+            state.dragStart = { x: e.clientX, y: e.clientY };
+            updateCanvasTransform();
+        } else if (state.dragNodeId) {
+            // Dragging a node
+            const node = state.nodes.find(n => n.id === state.dragNodeId);
+            if(node) {
+                const dx = (e.clientX - state.dragStart.x) / state.scale;
+                const dy = (e.clientY - state.dragStart.y) / state.scale;
+                node.x += dx;
+                node.y += dy;
+                
+                // Snap to grid (optional)
+                // node.x = Math.round(node.x / 20) * 20;
+                // node.y = Math.round(node.y / 20) * 20;
+
+                const el = document.getElementById(state.dragNodeId);
+                el.style.transform = `translate(${node.x}px, ${node.y}px)`;
+                
+                state.dragStart = { x: e.clientX, y: e.clientY };
+                updateConnections();
+            }
+        } else if (state.connecting.active) {
+            drawTempConnection(e);
+        }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+        state.isDragging = false;
+        state.dragNodeId = null;
+        
+        if (state.connecting.active) {
+            // Check if dropped on a valid port
+            const target = document.elementFromPoint(e.clientX, e.clientY);
+            if (target && target.classList.contains('port')) {
+                // Logic to finalize connection would go here
+                // We simplify by just ending it for this demo or finding the node ID
+                // Note: Real implementation needs to detect if input/output logic is valid
+            }
+            // Reset temp line
+            const temp = document.getElementById('temp-line');
+            if(temp) temp.remove();
+            state.connecting.active = false;
+        }
+    });
+
+    function updateCanvasTransform() {
+        // Move all nodes container or use background position?
+        // For this DOM-based implementation, we need a wrapper div inside canvas for nodes
+        // But here we are using absolute on nodes directly.
+        // Let's update background position for visual effect
+        canvas.style.backgroundPosition = `${state.pan.x}px ${state.pan.y}px`;
+        
+        // Update all nodes visual position
+        state.nodes.forEach(n => {
+            const el = document.getElementById(n.id);
+            // Visual position = (Node Logical Pos * Scale) + Pan
+            // But complex to mix transform with scale/pan on container vs elements
+            // Simplest for this demo: Apply Pan to a container.
+            // Let's refactor slightly to put nodes in a container div if we want true pan.
+            // For now, let's just shift nodes:
+            // Actually, best practice: a 'world' div inside 'canvas'
+        });
+        
+        // Apply transform to a "World" layer we should create
+        // Creating world layer dynamically for robustness
+        let world = document.getElementById('world-layer');
+        if(!world) {
+            world = document.createElement('div');
+            world.id = 'world-layer';
+            world.style.transformOrigin = '0 0';
+            world.style.position = 'absolute';
+            world.style.top = '0'; 
+            world.style.left = '0';
+            world.style.width = '100%';
+            world.style.height = '100%';
+            world.style.pointerEvents = 'none'; // allow clicks to pass to canvas bg
+            
+            // Move existing nodes into world
+            Array.from(canvas.children).forEach(c => {
+                if(c.id !== 'world-layer') world.appendChild(c);
+            });
+            canvas.appendChild(world);
+            
+            // Fix pointer events on nodes
+            const style = document.createElement('style');
+            style.innerHTML = '.node, .port, #connections-layer { pointer-events: auto; }';
+            document.head.appendChild(style);
+        }
+        
+        world.style.transform = `translate(${state.pan.x}px, ${state.pan.y}px) scale(${state.scale})`;
+    }
+
+    function zoom(delta) {
+        state.scale = Math.min(Math.max(0.5, state.scale + delta), 2);
+        updateCanvasTransform();
+    }
+    
+    function resetZoom() {
+        state.scale = 1;
+        state.pan = { x: 0, y: 0 };
+        updateCanvasTransform();
+    }
+
+    /* --- NODE DRAGGING --- */
+    function startNodeDrag(e, id) {
+        e.stopPropagation(); // Don't pan canvas
+        state.dragNodeId = id;
+        state.dragStart = { x: e.clientX, y: e.clientY };
+        selectNode(e, id);
+    }
+
+    /* --- CONNECTIONS --- */
+    function startConnection(e, nodeId, type) {
+        e.stopPropagation();
+        e.preventDefault(); // prevent text selection
+        if (type !== 'output') return; // For now only draw from output to input
+
+        const node = state.nodes.find(n => n.id === nodeId);
+        // Calculate start point relative to world
+        const startX = node.x + 120; // center width
+        const startY = node.y + 80;  // bottom (approx)
+        
+        state.connecting = { active: true, startNodeId: nodeId, startX, startY };
+        
+        // Create temp line
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.id = 'temp-line';
+        path.setAttribute('stroke', '#3b82f6');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke-dasharray', '5,5');
+        svgLayer.appendChild(path);
+    }
+
+    function drawTempConnection(e) {
+        const rect = canvas.getBoundingClientRect();
+        // Calculate mouse pos in World coordinates
+        const mouseX = (e.clientX - rect.left - state.pan.x) / state.scale;
+        const mouseY = (e.clientY - rect.top - state.pan.y) / state.scale;
+        
+        const d = `M ${state.connecting.startX} ${state.connecting.startY} C ${state.connecting.startX} ${state.connecting.startY + 50}, ${mouseX} ${mouseY - 50}, ${mouseX} ${mouseY}`;
+        const line = document.getElementById('temp-line');
+        if(line) line.setAttribute('d', d);
+    }
+
+    // Creating initial dummy connections
+    function createConnection(fromId, toId) {
+        state.connections.push({ from: fromId, to: toId });
+        renderConnections();
+    }
+
+    function renderConnections() {
+        // Clear existing static lines (keep temp line)
+        const lines = Array.from(svgLayer.children).filter(el => el.id !== 'temp-line');
+        lines.forEach(l => l.remove());
+
+        state.connections.forEach(conn => {
+            const n1 = state.nodes.find(n => n.id === conn.from);
+            const n2 = state.nodes.find(n => n.id === conn.to);
+            if (!n1 || !n2) return;
+
+            const x1 = n1.x + 120; 
+            const y1 = n1.y + 70; // Bottom of body (approx) + header
+            const x2 = n2.x + 120;
+            const y2 = n2.y - 6; // Top input port
+
+            // Bezier Curve
+            const d = `M ${x1} ${y1} C ${x1} ${y1 + 50}, ${x2} ${y2 - 50}, ${x2} ${y2}`;
+            
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', d);
+            path.setAttribute('class', 'connection-line');
+            path.addEventListener('click', (e) => {
+                e.stopPropagation();
+                path.classList.toggle('selected');
+            });
+            svgLayer.appendChild(path);
+        });
+    }
+
+    function updateConnections() {
+        // Simple re-render
+        renderConnections();
+    }
+
+    /* --- NODE ACTIONS --- */
+    function selectNode(e, id) {
+        e.stopPropagation();
+        document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
+        document.getElementById(id).classList.add('selected');
+        
+        // Open properties
+        const node = state.nodes.find(n => n.id === id);
+        propertiesPanel.classList.remove('translate-x-full');
+        document.getElementById('properties-content').innerHTML = `
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Node Type</label>
+                    <input type="text" disabled value="${node.type}" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm text-gray-400">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Label</label>
+                    <input type="text" value="${node.title}" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none" oninput="updateNodeTitle('${id}', this.value)">
+                </div>
+                <div class="pt-4 border-t border-gray-800">
+                    <button class="w-full bg-red-900/30 text-red-400 border border-red-900/50 py-1 rounded text-xs hover:bg-red-900/50" onclick="deleteNode('${id}')">Delete Node</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function updateNodeTitle(id, val) {
+        const node = state.nodes.find(n => n.id === id);
+        if(node) node.title = val;
+        const el = document.getElementById(id);
+        el.querySelector('span').innerText = val;
+    }
+
+    function deleteNode(id) {
+        state.nodes = state.nodes.filter(n => n.id !== id);
+        state.connections = state.connections.filter(c => c.from !== id && c.to !== id);
+        document.getElementById(id).remove();
+        renderConnections();
+        closePanel();
+    }
+
+    function closePanel() {
+        propertiesPanel.classList.add('translate-x-full');
+    }
+    
+    function saveWorkflow() {
+        console.log(JSON.stringify(state.nodes));
+        console.log(JSON.stringify(state.connections));
+        alert('Workflow saved to console! (Simulated)');
+    }
+
+    /* --- INITIALIZATION --- */
+    // Add "World" layer wrapper implicitly by running update once
+    updateCanvasTransform();
+
+    // Add some demo nodes
+    createNode('trigger', 400, 100);
+    createNode('action-ai', 400, 250);
+    createConnection('node-1', 'node-2');
+
+</script>
+</body>
+</html>

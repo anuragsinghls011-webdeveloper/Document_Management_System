@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Approval System</title>
+    <link rel="stylesheet" href="approval-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>  
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="header-title">Document Approval System</h1>
+                <div class="header-actions">
+                    <button class="btn-icon" id="refreshBtn" aria-label="Refresh">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+           
+                        </svg>
+                    </button>
+                    <button class="btn-icon" id="settingsBtn" aria-label="Settings">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Document Info Card -->
+            <div class="document-card">
+                <div class="document-header">
+                    <div class="document-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                    </div>
+                    <div class="document-info">
+                        <h2 class="document-title" id="documentTitle">Annual Financial Report 2024</h2>
+                        <div class="document-meta">
+                            <span class="meta-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                Submitted: <span id="submittedDate">Jan 15, 2024</span>
+                            </span>
+                            <span class="meta-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                By: <span id="submittedBy">John Anderson</span>
+                            </span>
+                            <span class="meta-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                                    <polyline points="13 2 13 9 20 9"/>
+                                </svg>
+                                Size: <span id="fileSize">2.4 MB</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="status-badge" id="statusBadge">
+                        <span class="status-dot"></span>
+                        Pending Review
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="content-grid">
+                <!-- Left Column: AI Summary -->
+                <section class="ai-summary-section">
+                    <div class="section-header">
+                        <div class="section-title-wrapper">
+                            <div class="ai-badge">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                                AI Generated
+                            </div>
+                            <h3 class="section-title">Document Summary</h3>
+                        </div>
+                        <button class="btn-secondary" id="regenerateSummary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                            </svg>
+                            Regenerate
+                        </button>
+                    </div>
+
+                    <div class="summary-content">
+                        <div class="summary-loading" id="summaryLoading" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <p>AI is analyzing the document...</p>
+                        </div>
+
+                        <div id="summaryText" class="summary-text">
+                            <p class="summary-paragraph">This comprehensive financial report provides a detailed analysis of the company's fiscal performance for the year 2024. The document encompasses revenue streams, expenditure breakdowns, and strategic financial initiatives undertaken during the reporting period.</p>
+                            
+                            <div class="key-points">
+                                <h4 class="key-points-title">Key Highlights</h4>
+                                <ul class="key-points-list">
+                                    <li>Total revenue increased by 23% year-over-year, reaching $45.2 million</li>
+                                    <li>Operating expenses maintained at 18% of total revenue</li>
+                                    <li>Net profit margin improved from 12% to 15.8%</li>
+                                    <li>Successfully completed three major acquisitions totaling $8.5 million</li>
+                                    <li>R&D investment increased by 35% to support innovation initiatives</li>
+                                </ul>
+                            </div>
+
+                            <div class="extracted-entities">
+                                <h4 class="entities-title">Extracted Entities</h4>
+                                <div class="entity-tags">
+                                    <span class="entity-tag">Financial Year: 2024</span>
+                                    <span class="entity-tag">Department: Finance</span>
+                                    <span class="entity-tag">Category: Annual Report</span>
+                                    <span class="entity-tag">Confidentiality: Internal</span>
+                                    <span class="entity-tag">Pages: 47</span>
+                                </div>
+                            </div>
+
+                            <div class="sentiment-analysis">
+                                <h4 class="sentiment-title">Sentiment Analysis</h4>
+                                <div class="sentiment-bar">
+                                    <div class="sentiment-fill" style="width: 78%"></div>
+                                </div>
+                                <p class="sentiment-label">Positive (78% confidence)</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Right Column: Approval Features -->
+                <section class="approval-section">
+                    <div class="section-header">
+                        <h3 class="section-title">Approval Actions</h3>
+                    </div>
+
+                    <!-- Document Preview -->
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <h4 class="feature-title">Document Preview</h4>
+                        </div>
+                        <div class="preview-container">
+                            <div class="preview-placeholder">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                </svg>
+                                <p>Click to view full document</p>
+                            </div>
+                            <button class="btn-link" id="viewDocumentBtn">View Full Document</button>
+                        </div>
+                    </div>
+
+                    <!-- Version History -->
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            <h4 class="feature-title">Version History</h4>
+                        </div>
+                        <div class="version-list">
+                            <div class="version-item active">
+                                <div class="version-dot"></div>
+                                <div class="version-info">
+                                    <span class="version-number">v3.0 (Current)</span>
+                                    <span class="version-date">Jan 15, 2024 - 2:30 PM</span>
+                                </div>
+                            </div>
+                            <div class="version-item">
+                                <div class="version-dot"></div>
+                                <div class="version-info">
+                                    <span class="version-number">v2.1</span>
+                                    <span class="version-date">Jan 12, 2024 - 4:15 PM</span>
+                                </div>
+                            </div>
+                            <div class="version-item">
+                                <div class="version-dot"></div>
+                                <div class="version-info">
+                                    <span class="version-number">v2.0</span>
+                                    <span class="version-date">Jan 10, 2024 - 10:00 AM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comments & Annotations -->
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <h4 class="feature-title">Comments & Feedback</h4>
+                        </div>
+                        <div class="comments-container">
+                            <div class="comment-item">
+                                <div class="comment-avatar">JD</div>
+                                <div class="comment-content">
+                                    <div class="comment-header">
+                                        <span class="comment-author">Jane Doe</span>
+                                        <span class="comment-time">2 hours ago</span>
+                                    </div>
+                                    <p class="comment-text">Please verify the Q4 revenue figures on page 23.</p>
+                                </div>
+                            </div>
+                            <div class="comment-item">
+                                <div class="comment-avatar">MS</div>
+                                <div class="comment-content">
+                                    <div class="comment-header">
+                                        <span class="comment-author">Mike Smith</span>
+                                        <span class="comment-time">5 hours ago</span>
+                                    </div>
+                                    <p class="comment-text">Looks good overall. Minor formatting issue on page 15.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comment-input-wrapper">
+                            <textarea class="comment-input" placeholder="Add your comment..." id="commentInput"></textarea>
+                            <button class="btn-primary btn-sm" id="addCommentBtn">Post Comment</button>
+                        </div>
+                    </div>
+
+                    <!-- Approval Checklist -->
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            <h4 class="feature-title">Approval Checklist</h4>
+                        </div>
+                        <div class="checklist">
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="checkbox-input" id="check1" checked>
+                                <span class="checkbox-label">Content accuracy verified</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="checkbox-input" id="check2" checked>
+                                <span class="checkbox-label">Financial data cross-referenced</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="checkbox-input" id="check3">
+                                <span class="checkbox-label">Legal compliance reviewed</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="checkbox-input" id="check4">
+                                <span class="checkbox-label">Stakeholder approval obtained</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" class="checkbox-input" id="check5">
+                                <span class="checkbox-label">Final formatting complete</span>
+                            </label>
+                        </div>
+                        <div class="checklist-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width: 40%"></div>
+                            </div>
+                            <span class="progress-text" id="progressText">2 of 5 completed</span>
+                        </div>
+                    </div>
+
+                    <!-- Approval Workflow -->
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"/>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                            <h4 class="feature-title">Approval Workflow</h4>
+                        </div>
+                        <div class="workflow-steps">
+                            <div class="workflow-step completed">
+                                <div class="step-indicator">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                </div>
+                                <div class="step-content">
+                                    <span class="step-title">Submitted</span>
+                                    <span class="step-user">John Anderson</span>
+                                </div>
+                            </div>
+                            <div class="workflow-step completed">
+                                <div class="step-indicator">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                </div>
+                                <div class="step-content">
+                                    <span class="step-title">Department Review</span>
+                                    <span class="step-user">Sarah Johnson</span>
+                                </div>
+                            </div>
+                            <div class="workflow-step active">
+                                <div class="step-indicator">
+                                    <div class="pulse-dot"></div>
+                                </div>
+                                <div class="step-content">
+                                    <span class="step-title">Manager Approval</span>
+                                    <span class="step-user">You</span>
+                                </div>
+                            </div>
+                            <div class="workflow-step">
+                                <div class="step-indicator"></div>
+                                <div class="step-content">
+                                    <span class="step-title">Executive Approval</span>
+                                    <span class="step-user">Pending</span>
+                                </div>
+                            </div>
+                            <div class="workflow-step">
+                                <div class="step-indicator"></div>
+                                <div class="step-content">
+                                    <span class="step-title">Final Publication</span>
+                                    <span class="step-user">Pending</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Decision Actions -->
+                    <div class="feature-card decision-card">
+                        <div class="feature-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4"/>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                            </svg>
+                            <h4 class="feature-title">Make Decision</h4>
+                        </div>
+                        <div class="decision-notes">
+                            <label for="decisionNotes" class="input-label">Decision Notes (Optional)</label>
+                            <textarea id="decisionNotes" class="decision-textarea" placeholder="Add any notes or conditions for your decision..."></textarea>
+                        </div>
+                        <div class="decision-actions">
+                            <button class="btn-approve" id="approveBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                Approve Document
+                            </button>
+                            <button class="btn-reject" id="rejectBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="15" y1="9" x2="9" y2="15"/>
+                                    <line x1="9" y1="9" x2="15" y2="15"/>
+                                </svg>
+                                Reject Document
+                            </button>
+                            <button class="btn-secondary" id="requestChangesBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                                Request Changes
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for notifications -->
+    <div class="modal" id="notificationModal">
+        <div class="modal-content">
+            <div class="modal-icon" id="modalIcon"></div>
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <p class="modal-message" id="modalMessage"></p>
+            <button class="btn-primary" id="modalCloseBtn">Close</button>
+        </div>
+    </div>
+
+    <script src="approval-script.js"></script>
+</body>
+</html>

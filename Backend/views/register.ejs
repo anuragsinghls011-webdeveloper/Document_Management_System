@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Registration Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .background-animation span {
+            width: 20vmin;
+            height: 20vmin;
+            border-radius: 4vmin;
+            backface-visibility: hidden;
+            position: absolute;
+            animation: move linear infinite;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .background-animation span:nth-child(0) {
+            color: #84a98c;
+            top: 68%;
+            left: 77%;
+            animation-duration: 35s;
+            animation-delay: -2s;
+            transform-origin: -15vw -1vh;
+            box-shadow: -40vmin 0 5.1119958913vmin currentColor;
+        }
+        .background-animation span:nth-child(1) {
+            color: #cad2c5;
+            top: 81%;
+            left: 88%;
+            animation-duration: 25s;
+            animation-delay: -11s;
+            transform-origin: -11vw 24vh;
+            box-shadow: 40vmin 0 5.897391942vmin currentColor;
+        }
+        .background-animation span:nth-child(2) {
+            color: #84a98c;
+            top: 52%;
+            left: 77%;
+            animation-duration: 47s;
+            animation-delay: -18s;
+            transform-origin: 11vw 12vh;
+            box-shadow: -40vmin 0 5.4801331189vmin currentColor;
+        }
+        .background-animation span:nth-child(3) {
+            color: #84a98c;
+            top: 51%;
+            left: 21%;
+            animation-duration: 24s;
+            animation-delay: -32s;
+            transform-origin: -16vw -1vh;
+            box-shadow: 40vmin 0 5.467475137vmin currentColor;
+        }
+        .background-animation span:nth-child(4) {
+            color: #52796f;
+            top: 38%;
+            left: 81%;
+            animation-duration: 42s;
+            animation-delay: -25s;
+            transform-origin: -15vw 12vh;
+            box-shadow: 40vmin 0 5.867916964vmin currentColor;
+        }
+        .background-animation span:nth-child(5) {
+            color: #cad2c5;
+            top: 54%;
+            left: 95%;
+            animation-duration: 26s;
+            animation-delay: -21s;
+            transform-origin: -11vw 19vh;
+            box-shadow: -40vmin 0 5.4419953256vmin currentColor;
+        }
+        .background-animation span:nth-child(6) {
+            color: #52796f;
+            top: 73%;
+            left: 7%;
+            animation-duration: 47s;
+            animation-delay: -26s;
+            transform-origin: -17vw -11vh;
+            box-shadow: -40vmin 0 5.1762283944vmin currentColor;
+        }
+
+        @keyframes move {
+            100% {
+                transform: translate3d(0, 0, 1px) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="background-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-white/20">
+                <div class="text-center">
+                    <h1 class="text-3xl font-bold tracking-tight">Create Your Account</h1>
+                    <p class="text-gray-300 mt-2">Get started by creating a new account.</p>
+                </div>
+
+                
+
+                <form class="space-y-6" action="/register" method="POST">
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-gray-300">Full Name</label>
+                        <div class="mt-1">
+                            <input id="fullName" name="username" type="text" autocomplete="name" required
+                                class="w-full bg-white/10 border border-white/20 rounded-lg py-3 px-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-300">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300">Email Address</label>
+                        <div class="mt-1">
+                            <input id="email" name="email" type="email" autocomplete="email" required
+                                class="w-full bg-white/10 border border-white/20 rounded-lg py-3 px-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-300">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+                        <div class="mt-1">
+                            <input id="password" name="password" type="password" autocomplete="new-password" required
+                                class="w-full bg-white/10 border border-white/20 rounded-lg py-3 px-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-300">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="confirm-password" class="block text-sm font-medium text-gray-300">Confirm Password</label>
+                        <div class="mt-1">
+                            <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required
+                                class="w-full bg-white/10 border border-white/20 rounded-lg py-3 px-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-300">
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit"
+                           class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transform hover:scale-105 transition duration-300">
+                            Create Account
+                        </button>
+                    </div>
+                </form>
+
+                <div class="flex items-center justify-center space-x-2">
+                    <span class="h-px w-16 bg-gray-500"></span>
+                    <span class="text-gray-400 font-normal">or continue with</span>
+                    <span class="h-px w-16 bg-gray-500"></span>
+                </div>
+
+                <div class="flex justify-center space-x-4">
+                    <button class="flex items-center justify-center w-12 h-12 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition duration-300 transform hover:scale-110">
+                        <svg class="w-6 h-6" viewBox="0 0 48 48">
+                            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C42.021,35.596,44,30.138,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                        </svg>
+                    </button>
+                    <button class="flex items-center justify-center w-12 h-12 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition duration-300 transform hover:scale-110">
+                        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.378.203 2.398.1 2.65.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                     <button class="flex items-center justify-center w-12 h-12 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition duration-300 transform hover:scale-110">
+                        <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <p class="text-center text-gray-400 text-sm">
+                    Already have an account? 
+                    <a href="/login" class="font-medium text-green-400 hover:text-green-300 transition duration-300">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

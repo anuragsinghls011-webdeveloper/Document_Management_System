@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Intelligent Document Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0A102A;
+        }
+        .main-container {
+            background-image: radial-gradient(circle at 50% 30%, rgba(19, 36, 122, 0.5) 0%, #0A102A 40%);
+            overflow: hidden;
+        }
+        .glow-effect {
+            filter: drop-shadow(0 0 15px rgba(77, 135, 255, 0.6));
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(77, 135, 255, 0.5);
+        }
+        .card-bg {
+            background-color: rgba(10, 25, 80, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(56, 95, 226, 0.4);
+        }
+        .nav-link {
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+        }
+        .login-btn {
+             transition: all 0.3s ease;
+        }
+        .login-btn:hover {
+            background-color: #3B82F6;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+        }
+        .cta-btn {
+            transition: all 0.3s ease;
+        }
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+        }
+        /* Background particles simulation */
+        .particle {
+            position: absolute;
+            background-color: rgba(77, 135, 255, 0.5);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+            opacity: 0;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); opacity: 0; }
+            25% { opacity: 0.7; }
+            50% { transform: translateY(-100px); opacity: 0.3; }
+            75% { opacity: 0.7; }
+            100% { transform: translateY(0); opacity: 0; }
+        }
+        /* Animated Gradient Text */
+        .animated-gradient-text {
+            background-image: linear-gradient(90deg, #818cf8, #3b82f6, #67e8f9, #3b82f6, #818cf8);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient-flow 6s linear infinite;
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 200% center; }
+            100% { background-position: 0% center; }
+        }
+    </style>
+</head>
+<body class="text-gray-300">
+
+    <div class="relative min-h-screen w-full main-container">
+        <!-- Background decorative elements -->
+        <div class="absolute inset-0 z-0 opacity-50">
+            <div class="particle" style="width: 2px; height: 2px; top: 10%; left: 15%; animation-delay: -2s;"></div>
+            <div class="particle" style="width: 3px; height: 3px; top: 25%; left: 80%; animation-delay: -5s;"></div>
+            <div class="particle" style="width: 1px; height: 1px; top: 70%; left: 50%; animation-delay: -8s;"></div>
+            <div class="particle" style="width: 2px; height: 2px; top: 80%; left: 20%; animation-delay: -12s;"></div>
+            <div class="particle" style="width: 3px; height: 3px; top: 50%; left: 95%; animation-delay: -15s;"></div>
+        </div>
+
+        <!-- Header -->
+        <header class="absolute top-0 left-0 right-0 z-20">
+            <nav class="container mx-auto px-6 py-6 flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2 border-2 border-gray-500 rounded-md p-2">
+                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-white">
+                        <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 7L12 12L22 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 22V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17 4.5L7 9.5" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                    <span class="text-white font-bold text-sm">KMRL</span>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="hidden md:flex space-x-10 text-gray-400 font-medium text-sm font-weight=600">
+                    <a href="#about" class="nav-link">ABOUT</a>
+                    <a href="/dashboard" class="nav-link">DASHBOARD</a>
+                    <a href="#contact" class="nav-link">CONTACT US</a>
+                </div>
+
+                <!-- Login Button -->
+                 <a href="/register" class="login-btn border border-gray-500 rounded-md px-6 py-2 text-gray-300 font-semibold margin-left-4">
+                    Register
+                </a>
+                <a href="/login" class="login-btn border border-gray-500 rounded-md px-6 py-2 text-gray-300 font-semibold text-sm">
+                    LOGIN
+                </a>
+                
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="relative z-10 flex flex-col items-center justify-center min-h-screen pt-24 pb-12 px-4">
+            
+            <!-- Digital Brain Graphic -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[120%] md:-translate-y-[110%] w-64 h-64 md:w-96 md:h-96 glow-effect z-0">
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <defs>
+                        <radialGradient id="brainGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                            <stop offset="0%" style="stop-color:rgba(129, 172, 255, 0.8)" />
+                            <stop offset="100%" style="stop-color:rgba(59, 130, 246, 0.4)" />
+                        </radialGradient>
+                        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <g filter="url(#glow)" fill="url(#brainGradient)">
+                        <!-- Simplified brain-like shape -->
+                        <path d="M100 20 C40 20, 20 60, 20 100 C20 150, 60 180, 100 180 C140 180, 180 150, 180 100 C180 60, 160 20, 100 20 Z" fill-opacity="0.1"/>
+                        <!-- Lines suggesting brain folds -->
+                        <path d="M100,22 C110,40 125,50 140,55 C150,80 145,110 130,130 C110,150 80,155 60,140 C40,120 45,80 65,60 C80,45 90,30 100,22 Z" stroke="rgba(191, 219, 254, 0.7)" stroke-width="1" fill="none"/>
+                        <path d="M100,100 C80,90 70,75 65,60" stroke="rgba(191, 219, 254, 0.7)" stroke-width="1" fill="none"/>
+                        <path d="M100,100 C120,110 130,125 135,140" stroke="rgba(191, 219, 254, 0.7)" stroke-width="1" fill="none"/>
+                        <path d="M70,110 C80,120 90,125 100,122" stroke="rgba(191, 219, 254, 0.5)" stroke-width="0.5" fill="none"/>
+                        <path d="M130,90 C120,80 110,75 100,78" stroke="rgba(191, 219, 254, 0.5)" stroke-width="0.5" fill="none"/>
+                    </g>
+                </svg>
+            </div>
+            
+            <!-- Digital Road Graphic -->
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 z-0" style="transform-origin: bottom center;">
+                <svg viewBox="0 0 1000 400" preserveAspectRatio="none" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="rgba(59, 130, 246, 0.4)" />
+                            <stop offset="100%" stop-color="rgba(59, 130, 246, 0)" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M-100,400 Q200,100 500,200 T1100,400" fill="url(#pathGradient)" stroke="rgba(77, 135, 255, 0.5)" stroke-width="2"/>
+                </svg>
+            </div>
+
+
+            <div class="text-center max-w-4xl mx-auto z-10">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight text-glow animated-gradient-text">
+                    AI-POWERED INTELLIGENT DOCUMENT MANAGEMENT
+                </h1>
+                <p class="mt-6 text-lg md:text-xl text-blue-200">
+                    Transforming Information Into Action
+                </p>
+            </div>
+
+            <div class="mt-12 w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-center z-10 px-4">
+                <!-- Left Card -->
+                <div class="card-bg rounded-2xl p-6 md:p-8 space-y-8 h-full">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-blue-900/50 p-3 rounded-lg border border-blue-600/50">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <span class="font-semibold text-white">AUTOMATED DATA EXTRACTION</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-blue-900/50 p-3 rounded-lg border border-blue-600/50">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <span class="font-semibold text-white">SMART WORKFLOW AUTOMATION</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-blue-900/50 p-3 rounded-lg border border-blue-600/50">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                        </div>
+                        <span class="font-semibold text-white">INSTANT SEARCH & INSIGHTS</span>
+                    </div>
+                </div>
+
+                <!-- Center Button -->
+                <div class="text-center">
+                    <a href="#"  name=""  id="anurag"   class="cta-btn bg-blue-600 text-white font-bold py-4 px-10 rounded-lg text-lg shadow-2xl shadow-blue-500/50">
+                        START FREE TRIAL
+                    </a>
+                </div>
+
+                <!-- Right Card -->
+                <div class="card-bg rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center space-y-4 h-full">
+                    <div class="glow-effect">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <span class="font-semibold text-white text-lg">BANK-GRADE SECURITY</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+<Script>
+    document.getElementById('anurag').addEventListener('click',()=>{
+        window.location.href("/register")
+    });
+</Script>
+</html>

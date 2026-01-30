@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <table>
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>User</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="admin-docs"></tbody>
+</table>
+
+</body>
+<script>
+    async function loadPendingDocs() {
+  const res = await fetch("/admin/pending", { credentials: "include" });
+  const docs = await res.json();
+
+  const tbody = document.getElementById("admin-docs");
+  tbody.innerHTML = "";
+
+  docs.forEach(doc => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${doc.fileName}</td>
+      <td>${doc.userId.email}</td>
+      <td>${doc.status}</td>
+      <td>
+        <button onclick="approve('${doc._id}')">✅</button>
+        <button onclick="reject('${doc._id}')">❌</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+async function approve(id) {
+  await fetch(`/admin/approve/${id}`, {
+    method: "POST",
+    credentials: "include"
+  });
+  loadPendingDocs();
+}
+
+async function reject(id) {
+  const reason = prompt("Rejection reason?");
+  await fetch(`/admin/reject/${id}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reason }),
+    credentials: "include"
+  });
+  loadPendingDocs();
+}
+
+loadPendingDocs();
+
+</script>
+</html>
