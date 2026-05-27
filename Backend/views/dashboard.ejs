@@ -1,1060 +1,3260 @@
 <!DOCTYPE html>
-
 <html lang="en" class="dark">
 
-
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>User Dashboard - KMRL DIS</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-
-        :root {
-
-            --primary-bg: #111827;
-
-            --secondary-bg: #1f2937;
-
-            --tertiary-bg: #374151;
-
-            --border-color: #374151;
-
-            --text-primary: #d1d5db;
-
-            --text-secondary: #9ca3af;
-
-            --text-white: #ffffff;
-
-            --accent-blue: #3b82f6;
-
-            --accent-cyan: #06b6d4;
-
-        }
-
-        body {
-
-            font-family: 'Inter', sans-serif;
-
-            background-color: var(--primary-bg);
-
-            color: var(--text-primary);
-
-        }
-
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-
-        ::-webkit-scrollbar-track { background: var(--secondary-bg); }
-
-        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
-
-        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
-
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-
-        .app-container { display: flex; height: 100vh; }
-
-        #sidebar {
-
-            background-color: var(--secondary-bg);
-
-            color: var(--text-primary);
-
-            width: 16rem;
-
-            display: flex;
-
-            flex-direction: column;
-
-            z-index: 20;
-
-            transition: width 0.3s ease-in-out;
-
-        }
-
-        #sidebar.collapsed { width: 5rem; }
-
-        .sidebar-header {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            padding: 1rem;
-
-            height: 4rem;
-
-            border-bottom: 1px solid var(--border-color);
-
-        }
-
-        .sidebar-header .logo-container { display: flex; align-items: center; }
-
-        .sidebar-header .logo { width: 2rem; height: 2rem; margin-right: 0.5rem; filter: brightness(0) invert(1); }
-
-        #sidebar-title { font-weight: 700; font-size: 1.25rem; color: var(--text-white); white-space: nowrap; }
-
-        #sidebar-toggle { color: var(--text-secondary); transition: transform 0.3s; }
-
-        #sidebar-toggle:hover { color: var(--text-white); }
-
-        #sidebar-toggle.rotated { transform: rotate(180deg); }
-
-        #sidebar-nav { margin-top: 1rem; flex-grow: 1; }
-
-        .sidebar-link {
-
-            display: flex;
-
-            align-items: center;
-
-            padding: 0.75rem 1.5rem;
-
-            margin: 0.5rem 0.5rem 0;
-
-            color: var(--text-secondary);
-
-            border-radius: 0.5rem;
-
-            transition: color 0.2s, background-color 0.2s;
-
-            cursor: pointer;
-
-        }
-
-        .sidebar-link:hover { background-color: var(--tertiary-bg); color: var(--text-white); }
-
-        .sidebar-link .sidebar-text { margin-left: 1rem; white-space: nowrap; }
-
-        .sidebar-active-link {
-
-            color: var(--text-white);
-
-            background-image: linear-gradient(to right, var(--accent-blue), var(--accent-cyan));
-
-            background-size: 200% auto;
-
-            transition: background-position 0.5s ease;
-
-            margin: 0.5rem 0 0 0;
-
-        }
-
-        .sidebar-active-link:hover { background-position: right center; background-color: transparent; }
-
-        .sidebar-footer { padding: 1rem; border-top: 1px solid var(--border-color); }
-
-        .user-profile { display: flex; align-items: center; }
-
-        .user-avatar { width: 2.5rem; height: 2.5rem; border-radius: 9999px; }
-
-        .user-info { margin-left: 0.75rem; }
-
-        .user-name { font-weight: 600; font-size: 0.875rem; color: var(--text-white); }
-
-        .user-role { font-size: 0.75rem; color: var(--text-secondary); }
-
-        .main-content-wrapper { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-        .main-header {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            padding: 1rem;
-
-            background-color: var(--secondary-bg);
-
-            border-bottom: 1px solid var(--border-color);
-
-            height: 4rem;
-
-        }
-
-        .search-bar { position: relative; width: 100%; max-width: 28rem; }
-
-        .search-bar svg { position: absolute; top: 50%; left: 0.75rem; transform: translateY(-50%); color: var(--text-secondary); }
-
-        .search-input { width: 100%; padding-left: 2.5rem; padding-right: 1rem; padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 9999px; background-color: var(--tertiary-bg); color: var(--text-primary); }
-
-        .search-input:focus { outline: none; box-shadow: 0 0 0 2px var(--accent-blue); }
-
-        .header-actions { display: flex; align-items: center; gap: 1rem; }
-
-        .header-actions button { position: relative; padding: 0.5rem; border-radius: 9999px; color: var(--text-secondary); }
-
-        .header-actions button:hover { background-color: var(--tertiary-bg); color: var(--text-white); }
-
-        .notification-badge { position: absolute; top: 0.25rem; right: 0.25rem; height: 0.625rem; width: 0.625rem; background-color: #ef4444; border-radius: 9999px; border: 2px solid var(--secondary-bg); }
-
-        #theme-toggle .dark-icon { display: none; }
-
-        .dark #theme-toggle .dark-icon { display: block; }
-
-        .dark #theme-toggle .light-icon { display: none; }
-
-        .content-area { flex-grow: 1; overflow-x: hidden; overflow-y: auto; padding: 1.5rem; }
-
-        .page-title { font-size: 1.875rem; font-weight: 700; color: var(--text-white); margin-bottom: 1.5rem; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
-
-        @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-
-        @media (min-width: 1024px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
-
-        .stat-card { background-color: var(--secondary-bg); border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); padding: 1.5rem; transition: transform 0.3s; }
-
-        .stat-card:hover { transform: translateY(-0.5rem); }
-
-        .stat-card-content { display: flex; align-items: center; }
-
-        .stat-card-icon { padding: 0.75rem; border-radius: 9999px; margin-right: 1rem; }
-
-        .stat-card-info .label { font-size: 0.875rem; color: var(--text-secondary); }
-
-        .stat-card-info .value { font-size: 1.5rem; font-weight: 700; color: var(--text-white); }
-
-        .icon-bg-blue { background-color: #1e3a8a; } .icon-text-blue { color: #60a5fa; }
-
-        .icon-bg-green { background-color: #14532d; } .icon-text-green { color: #4ade80; }
-
-        .icon-bg-yellow { background-color: #713f12; } .icon-text-yellow { color: #facc15; }
-
-        .icon-bg-red { background-color: #7f1d1d; } .icon-text-red { color: #f87171; }
-
-        .charts-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1.5rem; }
-
-        @media (min-width: 1024px) { .charts-grid { grid-template-columns: repeat(3, 1fr); } .chart-card-large { grid-column: span 2 / span 2; } }
-
-        .chart-card { background-color: var(--secondary-bg); border-radius: 1rem; padding: 1.5rem; }
-
-        .chart-title { font-size: 1.125rem; font-weight: 600; color: var(--text-white); margin-bottom: 1rem; }
-
-        .chart-container { height: 20rem; }
-
-        .page-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;}
-
-        .btn { display: inline-flex; align-items: center; font-weight: 700; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: background-color 0.2s; cursor: pointer; }
-
-        .btn-primary { background-color: #2563eb; color: var(--text-white); }
-
-        .btn-primary:hover { background-color: #1d4ed8; }
-
-        .btn-secondary { background-color: #4b5563; color: var(--text-white); }
-
-        .btn-secondary:hover { background-color: var(--tertiary-bg); }
-
-        .table-container { background-color: var(--secondary-bg); border-radius: 1rem; padding: 1.5rem; overflow-x: auto;}
-
-        .data-table { width: 100%; text-align: left; }
-
-        .data-table th, .data-table td { padding: 1rem; white-space: nowrap; }
-
-        .data-table thead tr { border-bottom: 1px solid var(--border-color); }
-
-        .data-table tbody tr { border-bottom: 1px solid var(--border-color); transition: background-color 0.2s; }
-
-        .data-table tbody tr:last-child { border-bottom: none; }
-
-        .data-table tbody tr:hover { background-color: rgba(55, 65, 81, 0.5); }
-
-        .data-table .doc-name-cell { color: var(--text-white); font-weight: 500; cursor: pointer; display: flex; align-items: center; }
-
-        .data-table .doc-name-cell:hover { color: var(--accent-blue); }
-
-        .data-table .actions-cell button { color: var(--text-secondary); margin: 0 0.25rem; }
-
-        .data-table .actions-cell button:hover { color: var(--accent-blue); }
-
-        .placeholder-card { background-color: var(--secondary-bg); border-radius: 1rem; padding: 1.5rem; text-align: center; }
-
-        .modal { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 50; }
-
-        .modal-content { background-color: var(--secondary-bg); border-radius: 1rem; padding: 2rem; width: 100%; max-width: 32rem; transform: scale(0.95); transition: transform 0.3s; }
-
-        .modal:not(.hidden) .modal-content { transform: scale(1); }
-
-        .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--text-white); margin-bottom: 1.5rem; }
-
-        #dropzone { border: 2px dashed #4b5563; border-radius: 0.5rem; padding: 2.5rem; text-align: center; cursor: pointer; transition: border-color 0.2s; }
-
-        #dropzone:hover, .dropzone-active { border-color: var(--accent-blue); }
-
-        .modal-actions { margin-top: 1.5rem; display: flex; justify-content: flex-end; }
-
-        .filters { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-
-        .filter-select { background-color: var(--tertiary-bg); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.5rem; color: var(--text-primary); }
-
-
-
-
-       /* Kanban Specific Styles */
-.kanban-column {
-    transition: background-color 0.2s;
-    min-width: 280px;
-}
-.kanban-dropzone {
-    transition: background-color 0.2s;
-}
-.kanban-card {
-    cursor: grab;
-}
-.kanban-card:active {
-    cursor: grabbing;
-}
-/* Custom Scrollbar for columns */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #4b5563;
-    border-radius: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-    </style>
-
-</head>
-
-
-
-<body>
-
-
-
-    <div class="app-container">
-
-        <aside id="sidebar">
-
-            <div class="sidebar-header">
-
-                <div class="logo-container">
-
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Kochi_Metro_logo.svg/1200px-Kochi_Metro_logo.svg.png" alt="KMRL Logo" class="logo">
-
-                    <span id="sidebar-title">KMRL DIS</span>
-
-                </div>
-
-                <button id="sidebar-toggle"><i data-feather="chevrons-left"></i></button>
-
-            </div>
-
-            <nav id="sidebar-nav">
-
-                <a class="sidebar-link sidebar-active-link" data-target="dashboard"><i data-feather="bar-chart-2"></i><span class="sidebar-text">Dashboard</span></a>
-
-                <a class="sidebar-link" data-target="documents"><i data-feather="file-text"></i><span class="sidebar-text">Documents</span></a>
-
-                <a class="sidebar-link" data-target="workflows"><i data-feather="git-merge"></i><span class="sidebar-text">Workflows</span></a>
-                <a href="/admin/pending-docs" class="menu-item">
-  <span class="icon">📄</span>
-  <span>Documents Approval</span>
-</a>
-
-
-                <a class="sidebar-link" data-target="settings"><i data-feather="settings"></i><span class="sidebar-text">Settings</span></a>
-
-            </nav>
-
-            <div class="sidebar-footer">
-
-                <div class="user-profile">
-
-                    <img src="https://placehold.co/40x40/a78bfa/4c1d95?text=UU" alt="User Avatar" class="user-avatar">
-
-                    <div class="user-info sidebar-text">
-
-                        <p class="user-name">Standard User</p>
-
-                        <p class="user-role">Document Contributor</p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </aside>
-
-
-
-        <div class="main-content-wrapper">
-
-            <header class="main-header">
-
-                <div class="search-bar">
-
-                    <i data-feather="search" style="width:1.25rem; height:1.25rem;"></i>
-
-                    <input type="text" id="searchInput" placeholder="Search content, filename, tags..." class="search-input">
-
-                </div>
-
-                <div class="header-actions">
-
-                    <button><i data-feather="bell"></i><span class="notification-badge"></span></button>
-
-                    <button id="theme-toggle"><i data-feather="moon" class="light-icon"></i><i data-feather="sun" class="dark-icon"></i></button>
-
-                </div>
-
-            </header>
-
-           
-
-            <main class="content-area">
-
-                <div id="dashboard" class="page-content">
-
-                    <h1 class="page-title">User Dashboard</h1>
-
-                    <div class="stats-grid">
-
-                        <div class="stat-card fade-in-up" style="animation-delay: 0.1s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-blue"><i data-feather="file-text" class="icon-text-blue"></i></div><div class="stat-card-info"><p class="label">Total Documents</p><p class="value" id="totalDocs">0</p></div></div></div>
-
-                        <div class="stat-card fade-in-up" style="animation-delay: 0.2s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-green"><i data-feather="upload-cloud" class="icon-text-green"></i></div><div class="stat-card-info"><p class="label">Uploaded Today</p><p class="value" id="uploadedToday">0</p></div></div></div>
-
-                        <div class="stat-card fade-in-up" style="animation-delay: 0.3s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-yellow"><i data-feather="alert-circle" class="icon-text-yellow"></i></div><div class="stat-card-info"><p class="label">Pending Approval</p><p class="value" id="pendingApproval">0</p></div></div></div>
-
-                        <div class="stat-card fade-in-up" style="animation-delay: 0.4s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-red"><i data-feather="archive" class="icon-text-red"></i></div><div class="stat-card-info"><p class="label">Archived</p><p class="value" id="archivedDocs">0</p></div></div></div>
-
-                    </div>
-
-                    <div class="charts-grid">
-
-                        <div class="chart-card chart-card-large fade-in-up" style="animation-delay: 0.5s;"><h3 class="chart-title">Monthly Document Activity</h3><div class="chart-container"><canvas id="activityChart"></canvas></div></div>
-
-                        <div class="chart-card fade-in-up recent-activity" style="animation-delay: 0.6s;"><h3 class="chart-title">Recent Activity</h3><ul id="activityList"></ul></div>
-
-                    </div>
-
-                </div>
-
-
-
-                <div id="documents" class="page-content hidden">
-
-                    <div class="page-actions">
-
-                        <h1 class="page-title" style="margin-bottom: 0;">Documents</h1>
-
-                        <button id="upload-btn" class="btn btn-primary"><i data-feather="upload" class="mr-2"></i> Upload Document</button>
-
-                    </div>
-
-                    <div class="filters">
-  <select id="statusFilter" class="filter-select">
-    <option value="all">All Statuses</option>
-    <option value="approved">Approved</option>
-    <option value="pending">Pending</option>
-    <option value="review">In Review</option>
-    <option value="rejected">Rejected</option>
-  </select>
-
-  <select id="typeFilter" class="filter-select">
-    <option value="all">All Types</option>
-    <option value="PDF">PDF</option>
-    <option value="DOCX">DOCX</option>
-    <option value="XLSX">XLSX</option>
-  </select>
-
-  <input type="date" id="dateFilter" class="filter-select">
-</div>
-
-
-                    <div class="table-container">
-
-                        <table class="data-table">
-
-                            <thead><tr><th>File Name</th><th>Type</th><th>Status</th><th>Tags</th><th>Last Modified</th><th>Actions</th></tr></thead>
-
-                            <tbody id="documents-table-body"></tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-
-
-                <div id="workflows" class="page-content hidden">
-
-                    <div id="workflows" class="page-content hidden h-full flex flex-col">
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="page-title mb-1">Approval Workflows</h1>
-            <p class="text-gray-400 text-sm">Drag and drop documents to move them through the approval lifecycle.</p>
-        </div>
-        <div class="flex gap-3">
-            <button class="btn btn-secondary text-sm"><i data-feather="filter" class="w-4 h-4 mr-2"></i>Filter</button>
-            <button class="btn btn-primary text-sm" onclick="createNewWorkflow()"><i data-feather="plus" class="w-4 h-4 mr-2"></i>New Workflow</button>
-        </div>
-    </div>
-
-    <div class="flex-grow overflow-x-auto overflow-y-hidden">
-        <div class="flex h-full gap-6 min-w-[1200px] pb-4">
-            
-            <div class="kanban-column flex flex-col w-1/4 bg-gray-900/50 rounded-xl border border-gray-800 h-full">
-                <div class="p-4 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-gray-900/50 backdrop-blur-md rounded-t-xl z-10">
-                    <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-gray-500"></div>
-                        <h3 class="font-semibold text-gray-200 text-sm tracking-wide">PENDING</h3>
-                        <span class="bg-gray-800 text-xs px-2 py-0.5 rounded text-gray-400" id="count-pending">0</span>
-                    </div>
-                </div>
-                <div class="kanban-dropzone flex-grow p-3 space-y-3 overflow-y-auto custom-scrollbar" data-status="pending" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    </div>
-            </div>
-
-            <div class="kanban-column flex flex-col w-1/4 bg-gray-900/50 rounded-xl border border-gray-800 h-full">
-                <div class="p-4 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-gray-900/50 backdrop-blur-md rounded-t-xl z-10">
-                    <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
-                        <h3 class="font-semibold text-gray-200 text-sm tracking-wide">AI PROCESSING</h3>
-                        <span class="bg-gray-800 text-xs px-2 py-0.5 rounded text-gray-400" id="count-processing">0</span>
-                    </div>
-                </div>
-                <div class="kanban-dropzone flex-grow p-3 space-y-3 overflow-y-auto custom-scrollbar" data-status="processing" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-            </div>
-
-            <div class="kanban-column flex flex-col w-1/4 bg-gray-900/50 rounded-xl border border-gray-800 h-full">
-                <div class="p-4 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-gray-900/50 backdrop-blur-md rounded-t-xl z-10">
-                    <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                        <h3 class="font-semibold text-gray-200 text-sm tracking-wide">IN REVIEW</h3>
-                        <span class="bg-gray-800 text-xs px-2 py-0.5 rounded text-gray-400" id="count-review">0</span>
-                    </div>
-                </div>
-                <div class="kanban-dropzone flex-grow p-3 space-y-3 overflow-y-auto custom-scrollbar" data-status="review" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-            </div>
-
-            <div class="kanban-column flex flex-col w-1/4 bg-gray-900/50 rounded-xl border border-gray-800 h-full">
-                <div class="p-4 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-gray-900/50 backdrop-blur-md rounded-t-xl z-10">
-                    <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                        <h3 class="font-semibold text-gray-200 text-sm tracking-wide">APPROVED</h3>
-                        <span class="bg-gray-800 text-xs px-2 py-0.5 rounded text-gray-400" id="count-approved">0</span>
-                    </div>
-                </div>
-                <div class="kanban-dropzone flex-grow p-3 space-y-3 overflow-y-auto custom-scrollbar" data-status="approved" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-                    
-
-                </div>
-
-
-
-                <div id="settings" class="page-content hidden">
-
-                    <h1 class="page-title">Settings</h1>
-
-                    <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
-
-                         <h2 class="text-xl font-semibold text-white border-b border-gray-700 pb-4 mb-4">Integrations</h2>
-
-                         <p class="text-gray-400 mb-4">Connect with other services.</p>
-
-                    </div>
-
-                </div>
-
-            </main>
-
-        </div>
-
-    </div>
-
-   
-
-    <div id="upload-modal" class="modal hidden"><div class="modal-content"><h2 class="modal-title">Upload New Document</h2><div id="dropzone"><i data-feather="upload-cloud" class="w-16 h-16 mx-auto text-gray-500"></i><p class="mt-4 text-white">Drag & drop files here or <span class="text-blue-400 font-semibold">browse</span></p><input type="file" id="file-input" class="hidden" multiple></div><div id="upload-progress-container" class="mt-4"></div><div class="modal-actions"><button id="close-upload-modal-btn" class="btn btn-secondary">Close</button></div></div></div>
-
-    <div id="details-modal" class="modal hidden"><div class="modal-content"><h2 id="details-title" class="modal-title">Document Details</h2><div id="details-content"></div><div class="modal-actions"><button id="close-details-modal-btn" class="btn btn-secondary">Close</button></div></div></div>
-
-
-
-    
-      
-
-   
-
-</body>
-<script>
-/* ================= ICONS ================= */
-feather.replace();
-
-/* ================= ELEMENTS ================= */
-const sidebar = document.getElementById('sidebar');
-const sidebarToggle = document.getElementById('sidebar-toggle');
-const sidebarTitle = document.getElementById('sidebar-title');
-const sidebarTexts = document.querySelectorAll('.sidebar-text');
-const themeToggle = document.getElementById('theme-toggle');
-const sidebarNav = document.getElementById('sidebar-nav');
-const pageContents = document.querySelectorAll('.page-content');
-const documentsTableBody = document.getElementById('documents-table-body');
-
-const uploadModal = document.getElementById('upload-modal');
-const uploadBtn = document.getElementById('upload-btn');
-const closeUploadModalBtn = document.getElementById('close-upload-modal-btn');
-const dropzone = document.getElementById('dropzone');
-const fileInput = document.getElementById('file-input');
-
-/* ================= SIDEBAR ================= */
-function navigate(targetId) {
-  document.querySelectorAll('.sidebar-link').forEach(l =>
-    l.classList.remove('sidebar-active-link')
-  );
-  document
-    .querySelector(`.sidebar-link[data-target='${targetId}']`)
-    .classList.add('sidebar-active-link');
-
-  pageContents.forEach(p => p.classList.add('hidden'));
-  document.getElementById(targetId).classList.remove('hidden');
-}
-
-sidebarToggle.addEventListener('click', () => {
-  sidebar.classList.toggle('collapsed');
-  sidebarTitle.classList.toggle('hidden');
-  sidebarToggle.classList.toggle('rotated');
-  sidebarTexts.forEach(t => t.classList.toggle('hidden'));
-});
-
-themeToggle.addEventListener('click', () => {
-  document.documentElement.classList.toggle('dark');
-});
-
-sidebarNav.addEventListener('click', e => {
-  const link = e.target.closest('.sidebar-link');
-  if (link) {
-    e.preventDefault();
-    navigate(link.dataset.target);
-  }
-});
-
-/* ================= MODAL ================= */
-function toggleModal(modal, show) {
-  show ? modal.classList.remove('hidden') : modal.classList.add('hidden');
-}
-
-uploadBtn.addEventListener('click', () => toggleModal(uploadModal, true));
-closeUploadModalBtn.addEventListener('click', () => toggleModal(uploadModal, false));
-dropzone.addEventListener('click', () => fileInput.click());
-
-/* ================= FILE UPLOAD ================= */
-fileInput.addEventListener("change", async () => {
-  const files = fileInput.files;
-  if (!files.length) return alert("No files selected");
-
-  const formData = new FormData();
-  for (let file of files) {
-    formData.append("documents", file);
-  }
-
-  try {
-    const res = await fetch("/documents/upload", {
-      method: "POST",
-      body: formData,
-      credentials: "include"
-    });
-
-    if (!res.ok) {
-      alert(await res.text());
-      return;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Powered Intelligent Document Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #081120;
+      --bg-2: #0B1220;
+      --bg-3: #111827;
+      --surface: rgba(23, 32, 51, 0.74);
+      --surface-strong: rgba(30, 41, 59, 0.88);
+      --surface-soft: rgba(15, 23, 42, 0.7);
+      --border: rgba(148, 163, 184, 0.14);
+      --border-strong: rgba(148, 163, 184, 0.24);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --muted-2: #64748b;
+      --blue: #38bdf8;
+      --blue-strong: #2563eb;
+      --violet: #8b5cf6;
+      --cyan: #22d3ee;
+      --emerald: #34d399;
+      --orange: #fb923c;
+      --pink: #ec4899;
+      --danger: #fb7185;
+      --shadow: 0 24px 80px rgba(2, 8, 23, 0.5);
+      --glass: saturate(140%) blur(18px);
     }
 
-    toggleModal(uploadModal, false);
-
-    // 🔥 IMPORTANT refresh
-    loadDocuments();
-    loadDashboardStats();
-    loadRecentActivity();
-
-  } catch (err) {
-    console.error(err);
-    alert("Upload failed");
-  }
-});
-
-/* ================= DOCUMENT TABLE ================= */
-async function loadDocuments() {
-  try {
-    const res = await fetch("/documents/my", { credentials: "include" });
-    if (!res.ok) return;
-
-    const docs = await res.json();
-    renderDocuments(docs);
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function renderDocuments(docs) {
-  documentsTableBody.innerHTML = "";
-
-  if (!docs || docs.length === 0) {
-    documentsTableBody.innerHTML = `
-      <tr>
-        <td colspan="6" class="text-center text-gray-400 py-4">
-          No documents found
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  docs.forEach(doc => {
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td class="doc-name-cell">
-        <i data-feather="file-text" class="w-4 h-4 mr-2 inline"></i>
-        ${doc.fileName}
-      </td>
-
-      <td>${doc.fileType?.toUpperCase() || "-"}</td>
-
-      <td>
-        <span class="bg-yellow-500 text-xs px-2 py-1 rounded">
-          ${doc.status}
-        </span>
-      </td>
-
-      <td>-</td>
-
-      <td>${new Date(doc.createdAt).toLocaleDateString()}</td>
-
-      <td class="actions-cell">
-        <a href="/${doc.filePath}" target="_blank" class="text-blue-400">
-          View
-        </a>
-      </td>
-    `;
-
-    documentsTableBody.appendChild(row);
-  });
-
-  feather.replace();
-}
-
-
-/* ================= DASHBOARD STATS + CHART ================= */
-let activityChart;
-
-async function loadDashboardStats() {
-  try {
-    const res = await fetch("/documents/stats", {
-      credentials: "include"
-    });
-
-    if (!res.ok) return;
-
-    const data = await res.json();
-
-    document.getElementById("totalDocs").innerText = data.total;
-    document.getElementById("uploadedToday").innerText = data.today;
-    document.getElementById("pendingApproval").innerText = data.pending;
-    document.getElementById("archivedDocs").innerText = data.archived;
-
-    renderChart(data.monthly);
-
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function renderChart(monthly) {
-  const ctx = document.getElementById("activityChart").getContext("2d");
-
-  if (activityChart) activityChart.destroy(); // 🔥 prevent duplicate chart
-
-  activityChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-      datasets: [{
-        label: "Documents Uploaded",
-        data: monthly,
-        backgroundColor: "rgba(59,130,246,0.2)",
-        borderColor: "#3b82f6",
-        tension: 0.4,
-        fill: true
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } }
-    }
-  });
-}
-
-/* ================= INIT ================= */
-document.addEventListener("DOMContentLoaded", () => {
-  loadDocuments();
-  loadDashboardStats();
-  loadRecentActivity();
-});
-
-const searchInput = document.getElementById("searchInput");
-const statusFilter = document.getElementById("statusFilter");
-const typeFilter = document.getElementById("typeFilter");
-const dateFilter = document.getElementById("dateFilter");
-
-let debounceTimer = null;
-
-function triggerSearch() {
-  clearTimeout(debounceTimer);
-
-  debounceTimer = setTimeout(async () => {
-    const q = searchInput.value.trim();
-    const status = statusFilter.value;
-    const type = typeFilter.value;
-    const date = dateFilter.value;
-
-    // 🔥 If no search + no filters → load all documents
-    if (!q && status === "all" && type === "all" && !date) {
-      loadDocuments();
-      return;
+    * {
+      box-sizing: border-box;
     }
 
-    const params = new URLSearchParams();
+    html {
+      scroll-behavior: smooth;
+    }
 
-    if (q) params.append("q", q);
-    if (status && status !== "all") params.append("status", status);
-    if (type && type !== "all") params.append("type", type);
-    if (date) params.append("date", date);
+    body {
+      min-height: 100vh;
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+      background:
+        radial-gradient(1100px 620px at 10% -10%, rgba(56, 189, 248, 0.16), transparent 62%),
+        radial-gradient(1000px 640px at 88% 8%, rgba(139, 92, 246, 0.13), transparent 64%),
+        linear-gradient(135deg, var(--bg), var(--bg-2) 48%, var(--bg-3));
+      color: var(--text);
+      overflow-x: hidden;
+    }
 
-    try {
-      const res = await fetch(`/documents/search?${params.toString()}`, {
-        credentials: "include"
-      });
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 78%);
+      z-index: -1;
+    }
 
-      if (!res.ok) {
-        console.error("Search API failed");
-        return;
+    body.focus-theme {
+      --surface: rgba(17, 24, 39, 0.78);
+      --surface-strong: rgba(15, 23, 42, 0.94);
+      --border: rgba(125, 211, 252, 0.18);
+    }
+
+    ::selection {
+      background: rgba(34, 211, 238, 0.26);
+      color: var(--text);
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.45), rgba(139, 92, 246, 0.45));
+      border: 2px solid rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 288px minmax(0, 1fr);
+      gap: 16px;
+      min-height: 100vh;
+      padding: 16px;
+      transition: grid-template-columns 0.28s ease;
+    }
+
+    .app-shell.sidebar-collapsed {
+      grid-template-columns: 92px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 16px;
+      height: calc(100vh - 32px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(23, 32, 51, 0.9), rgba(8, 17, 32, 0.82)),
+        rgba(15, 23, 42, 0.82);
+      box-shadow: var(--shadow);
+      backdrop-filter: var(--glass);
+      z-index: 30;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .ai-logo {
+      position: relative;
+      display: grid;
+      width: 46px;
+      height: 46px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.95), rgba(37, 99, 235, 0.95) 48%, rgba(139, 92, 246, 0.95));
+      box-shadow: 0 18px 46px rgba(37, 99, 235, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    }
+
+    .ai-logo::after {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border: 1px solid rgba(34, 211, 238, 0.36);
+      border-radius: 20px;
+      opacity: 0;
+      animation: logoPulse 2.8s ease-in-out infinite;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% {
+        transform: scale(0.96);
+        opacity: 0;
+      }
+      42% {
+        transform: scale(1.06);
+        opacity: 0.9;
+      }
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: 0;
+      line-height: 1.1;
+    }
+
+    .brand-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .icon-button {
+      position: relative;
+      display: inline-grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.48);
+      color: #cbd5e1;
+      transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .icon-button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.38);
+      color: white;
+      background: rgba(30, 41, 59, 0.8);
+      box-shadow: 0 18px 40px rgba(8, 145, 178, 0.13);
+    }
+
+    .nav {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 6px;
+      padding: 14px 12px;
+      overflow-y: auto;
+    }
+
+    .nav-link {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 46px;
+      padding: 0 14px;
+      border: 1px solid transparent;
+      border-radius: 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 650;
+      text-decoration: none;
+      transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .nav-link i,
+    .nav-link svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .nav-link:hover {
+      color: white;
+      border-color: rgba(56, 189, 248, 0.22);
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(139, 92, 246, 0.08));
+      transform: translateX(3px);
+      box-shadow: 0 12px 32px rgba(8, 145, 178, 0.08);
+    }
+
+    .nav-link.active {
+      color: white;
+      border-color: rgba(34, 211, 238, 0.34);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.24), rgba(34, 211, 238, 0.11), rgba(139, 92, 246, 0.18));
+      box-shadow: inset 3px 0 0 rgba(34, 211, 238, 0.82), 0 20px 52px rgba(37, 99, 235, 0.13);
+    }
+
+    .sidebar.collapsed .brand-copy,
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .user-meta,
+    .sidebar.collapsed .assist-label,
+    .sidebar.collapsed .role-badge,
+    .sidebar.collapsed .assistant-action span {
+      display: none;
+    }
+
+    .sidebar.collapsed .brand {
+      justify-content: center;
+      padding-inline: 12px;
+    }
+
+    .sidebar.collapsed .brand-lockup {
+      justify-content: center;
+    }
+
+    .sidebar.collapsed .nav-link {
+      justify-content: center;
+      padding-inline: 0;
+    }
+
+    .sidebar.collapsed .nav-link::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%) translateX(-4px);
+      width: max-content;
+      max-width: 180px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.94);
+      color: white;
+      font-size: 0.78rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 12px 32px rgba(2, 8, 23, 0.42);
+    }
+
+    .sidebar.collapsed .nav-link:hover::after {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+
+    .sidebar-footer {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.13);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.48);
+    }
+
+    .avatar {
+      position: relative;
+      display: grid;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(34, 211, 238, 0.72));
+      color: white;
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    }
+
+    .avatar.online::after {
+      content: "";
+      position: absolute;
+      right: -1px;
+      bottom: -1px;
+      width: 11px;
+      height: 11px;
+      border: 2px solid #0f172a;
+      border-radius: 999px;
+      background: var(--emerald);
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.7);
+    }
+
+    .user-meta {
+      min-width: 0;
+    }
+
+    .user-name {
+      margin: 0;
+      overflow: hidden;
+      color: white;
+      font-size: 0.86rem;
+      font-weight: 750;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .user-role {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .role-badge {
+      margin-left: auto;
+      padding: 4px 8px;
+      border: 1px solid rgba(52, 211, 153, 0.24);
+      border-radius: 999px;
+      background: rgba(52, 211, 153, 0.09);
+      color: #a7f3d0;
+      font-size: 0.67rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .assistant-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 42px;
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.11), rgba(139, 92, 246, 0.12));
+      color: white;
+      font-size: 0.83rem;
+      font-weight: 750;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .assistant-action:hover {
+      transform: translateY(-2px);
+      border-color: rgba(34, 211, 238, 0.44);
+      box-shadow: 0 18px 42px rgba(37, 99, 235, 0.16);
+    }
+
+    .main-shell {
+      min-width: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 76px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: rgba(8, 17, 32, 0.74);
+      box-shadow: 0 18px 54px rgba(2, 8, 23, 0.28);
+      backdrop-filter: var(--glass);
+      z-index: 20;
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+
+    .ai-search {
+      position: relative;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .ai-search i,
+    .ai-search svg {
+      position: absolute;
+      top: 50%;
+      left: 16px;
+      width: 18px;
+      height: 18px;
+      transform: translateY(-50%);
+      color: var(--cyan);
+      pointer-events: none;
+    }
+
+    .ai-search input {
+      width: 100%;
+      height: 48px;
+      padding: 0 84px 0 46px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 16px;
+      outline: none;
+      background: rgba(15, 23, 42, 0.72);
+      color: white;
+      font-size: 0.92rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .ai-search input:focus {
+      border-color: rgba(34, 211, 238, 0.55);
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.08), 0 0 34px rgba(37, 99, 235, 0.22);
+    }
+
+    .shortcut {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      padding: 4px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 9px;
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 42px;
+      padding: 0 14px;
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.68);
+      color: #e2e8f0;
+      font-size: 0.86rem;
+      font-weight: 750;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    button,
+    a {
+      cursor: pointer;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.35);
+      background: rgba(30, 41, 59, 0.9);
+      box-shadow: 0 18px 44px rgba(2, 8, 23, 0.24);
+    }
+
+    .button.primary {
+      border-color: rgba(34, 211, 238, 0.34);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(34, 211, 238, 0.72));
+      color: white;
+      box-shadow: 0 18px 44px rgba(37, 99, 235, 0.24);
+    }
+
+    .notification-dot {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 9px;
+      height: 9px;
+      border: 2px solid #0f172a;
+      border-radius: 999px;
+      background: var(--orange);
+      box-shadow: 0 0 14px rgba(251, 146, 60, 0.75);
+    }
+
+    .content {
+      padding: 18px 0 0;
+    }
+
+    .page-content {
+      animation: reveal 0.46s ease both;
+    }
+
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.8fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .hero-panel,
+    .glass-card,
+    .panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background:
+        linear-gradient(145deg, rgba(30, 41, 59, 0.84), rgba(8, 17, 32, 0.74)),
+        var(--surface);
+      box-shadow: 0 22px 70px rgba(2, 8, 23, 0.3);
+      backdrop-filter: var(--glass);
+    }
+
+    .hero-panel {
+      min-height: 294px;
+      padding: clamp(22px, 3vw, 34px);
+      isolation: isolate;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, rgba(34, 211, 238, 0.18), transparent 34%),
+        linear-gradient(300deg, rgba(236, 72, 153, 0.12), transparent 36%);
+      z-index: -2;
+    }
+
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      inset: auto 24px 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.6), transparent);
+      opacity: 0.7;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 8px 11px;
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      border-radius: 999px;
+      background: rgba(8, 47, 73, 0.22);
+      color: #a5f3fc;
+      font-size: 0.78rem;
+      font-weight: 750;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--emerald);
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.72);
+      animation: pulseDot 2.2s infinite;
+    }
+
+    @keyframes pulseDot {
+      70% {
+        box-shadow: 0 0 0 10px rgba(52, 211, 153, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+      }
+    }
+
+    .hero-title {
+      max-width: 780px;
+      margin: 0;
+      font-size: clamp(2.1rem, 4vw, 4rem);
+      line-height: 0.98;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #f8fafc, #a5f3fc 34%, #c4b5fd 68%, #fbcfe8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-copy {
+      max-width: 650px;
+      margin: 18px 0 0;
+      color: #cbd5e1;
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .summary-panel {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .summary-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.58);
+    }
+
+    .summary-chip span {
+      color: var(--muted);
+      font-size: 0.79rem;
+      font-weight: 700;
+    }
+
+    .summary-chip strong {
+      display: block;
+      margin-top: 5px;
+      color: white;
+      font-size: 1.08rem;
+      font-weight: 850;
+    }
+
+    .chip-icon {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(139, 92, 246, 0.14));
+      color: var(--cyan);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .metric-card {
+      min-height: 176px;
+      padding: 16px;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .metric-card:hover {
+      transform: perspective(800px) translateY(-5px) rotateX(1deg);
+      border-color: rgba(34, 211, 238, 0.32);
+      box-shadow: 0 26px 70px rgba(8, 145, 178, 0.12);
+    }
+
+    .metric-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .metric-icon {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 14px;
+      color: white;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.88), rgba(37, 99, 235, 0.88));
+      box-shadow: 0 14px 32px rgba(37, 99, 235, 0.24);
+    }
+
+    .metric-icon.violet {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.92), rgba(37, 99, 235, 0.86));
+      box-shadow: 0 14px 32px rgba(139, 92, 246, 0.22);
+    }
+
+    .metric-icon.emerald {
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.9), rgba(20, 184, 166, 0.84));
+      box-shadow: 0 14px 32px rgba(20, 184, 166, 0.18);
+    }
+
+    .metric-icon.orange {
+      background: linear-gradient(135deg, rgba(251, 146, 60, 0.9), rgba(236, 72, 153, 0.76));
+      box-shadow: 0 14px 32px rgba(251, 146, 60, 0.18);
+    }
+
+    .trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(52, 211, 153, 0.1);
+      color: #86efac;
+      font-size: 0.72rem;
+      font-weight: 850;
+    }
+
+    .trend.warn {
+      background: rgba(251, 146, 60, 0.11);
+      color: #fdba74;
+    }
+
+    .metric-label {
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 750;
+    }
+
+    .metric-value {
+      margin: 6px 0 0;
+      color: white;
+      font-size: 2rem;
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    .sparkline {
+      width: 100%;
+      height: 38px;
+      margin-top: 14px;
+      overflow: visible;
+    }
+
+    .sparkline path {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 3;
+      filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.35));
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .span-8 {
+      grid-column: span 8;
+    }
+
+    .span-7 {
+      grid-column: span 7;
+    }
+
+    .span-6 {
+      grid-column: span 6;
+    }
+
+    .span-5 {
+      grid-column: span 5;
+    }
+
+    .span-4 {
+      grid-column: span 4;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .panel-title {
+      margin: 0;
+      color: white;
+      font-size: 1rem;
+      font-weight: 820;
+    }
+
+    .panel-subtitle {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .panel-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      border-radius: 999px;
+      background: rgba(8, 47, 73, 0.24);
+      color: #a5f3fc;
+      font-size: 0.72rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .chart-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 170px;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .chart-wrap {
+      min-height: 310px;
+    }
+
+    .heatmap {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      align-content: end;
+      padding: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.42);
+    }
+
+    .heat-cell {
+      aspect-ratio: 1;
+      border-radius: 7px;
+      background: rgba(56, 189, 248, var(--heat, 0.12));
+      box-shadow: 0 0 18px rgba(34, 211, 238, calc(var(--heat, 0.12) * 0.28));
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .heat-cell:hover {
+      transform: scale(1.14);
+      background: rgba(52, 211, 153, 0.58);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      max-height: 450px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .timeline-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.46);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .timeline-item:hover {
+      transform: translateX(3px);
+      border-color: rgba(56, 189, 248, 0.22);
+      background: rgba(30, 41, 59, 0.58);
+    }
+
+    .timeline-avatar {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.78), rgba(139, 92, 246, 0.8));
+      color: white;
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .timeline-title {
+      margin: 0;
+      color: #f8fafc;
+      font-size: 0.86rem;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+
+    .timeline-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      padding: 5px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.64);
+      color: #cbd5e1;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: capitalize;
+      white-space: nowrap;
+    }
+
+    .badge.approved {
+      border-color: rgba(52, 211, 153, 0.22);
+      background: rgba(52, 211, 153, 0.1);
+      color: #bbf7d0;
+    }
+
+    .badge.pending,
+    .badge.review,
+    .badge.processing {
+      border-color: rgba(251, 146, 60, 0.22);
+      background: rgba(251, 146, 60, 0.1);
+      color: #fed7aa;
+    }
+
+    .badge.rejected,
+    .badge.changes_requested {
+      border-color: rgba(251, 113, 133, 0.22);
+      background: rgba(251, 113, 133, 0.1);
+      color: #fecdd3;
+    }
+
+    .badge.archived {
+      color: #cbd5e1;
+    }
+
+    .insights-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .insight-item {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid rgba(148, 163, 184, 0.11);
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(139, 92, 246, 0.07));
+    }
+
+    .insight-icon {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 13px;
+      background: rgba(34, 211, 238, 0.11);
+      color: var(--cyan);
+    }
+
+    .insight-title {
+      margin: 0;
+      color: white;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .insight-copy {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 0.77rem;
+      line-height: 1.5;
+    }
+
+    .workflow-map {
+      position: relative;
+      min-height: 318px;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 20px;
+      background:
+        linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+        rgba(15, 23, 42, 0.38);
+      background-size: 28px 28px;
+      overflow: hidden;
+    }
+
+    .workflow-lines {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.8;
+    }
+
+    .workflow-lines path {
+      fill: none;
+      stroke: rgba(34, 211, 238, 0.45);
+      stroke-width: 2;
+      stroke-dasharray: 8 10;
+      animation: dashFlow 12s linear infinite;
+      filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.34));
+    }
+
+    @keyframes dashFlow {
+      to {
+        stroke-dashoffset: -160;
+      }
+    }
+
+    .node {
+      position: absolute;
+      width: 148px;
+      padding: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 16px 40px rgba(2, 8, 23, 0.28);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .node:hover {
+      transform: translateY(-4px);
+      border-color: rgba(34, 211, 238, 0.38);
+    }
+
+    .node small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.67rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .node strong {
+      display: block;
+      margin-top: 4px;
+      color: white;
+      font-size: 0.86rem;
+      line-height: 1.25;
+    }
+
+    .node .node-dot {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--cyan);
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.82);
+    }
+
+    .node.input {
+      left: 7%;
+      top: 16%;
+    }
+
+    .node.ai {
+      left: 40%;
+      top: 10%;
+    }
+
+    .node.review {
+      left: 38%;
+      top: 60%;
+    }
+
+    .node.approval {
+      right: 8%;
+      top: 31%;
+    }
+
+    .table-tools {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .filter-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .input,
+    .select {
+      min-height: 42px;
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 14px;
+      outline: none;
+      background: rgba(15, 23, 42, 0.62);
+      color: #e2e8f0;
+      font-size: 0.85rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .input {
+      width: min(320px, 100%);
+      padding: 0 13px;
+    }
+
+    .select {
+      padding: 0 12px;
+    }
+
+    .input:focus,
+    .select:focus {
+      border-color: rgba(34, 211, 238, 0.5);
+      box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.08);
+      background: rgba(15, 23, 42, 0.88);
+    }
+
+    .table-wrap {
+      max-width: 100%;
+      overflow: auto;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.36);
+    }
+
+    .data-table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: separate;
+      border-spacing: 0;
+      text-align: left;
+    }
+
+    .data-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 13px 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      background: rgba(15, 23, 42, 0.96);
+      color: #94a3b8;
+      font-size: 0.72rem;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .sort-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: inherit;
+      font: inherit;
+    }
+
+    .data-table td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+      color: #dbeafe;
+      font-size: 0.84rem;
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr {
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .data-table tbody tr:hover {
+      background: rgba(56, 189, 248, 0.055);
+    }
+
+    .doc-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .file-glyph {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.16), rgba(139, 92, 246, 0.14));
+      color: var(--cyan);
+    }
+
+    .doc-title {
+      display: block;
+      max-width: 260px;
+      overflow: hidden;
+      color: white;
+      font-weight: 800;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .doc-sub {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .confidence {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+    }
+
+    .confidence-bar {
+      width: 72px;
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.14);
+    }
+
+    .confidence-bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--emerald), var(--cyan));
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.4);
+    }
+
+    .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .empty-state,
+    .skeleton-state {
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .skeleton-line {
+      display: block;
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(148, 163, 184, 0.08), rgba(148, 163, 184, 0.2), rgba(148, 163, 184, 0.08));
+      background-size: 240% 100%;
+      animation: skeleton 1.4s ease-in-out infinite;
+    }
+
+    @keyframes skeleton {
+      to {
+        background-position: -240% 0;
+      }
+    }
+
+    .page-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: rgba(8, 17, 32, 0.62);
+      backdrop-filter: var(--glass);
+    }
+
+    .page-heading h1 {
+      margin: 0;
+      color: white;
+      font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .page-heading p {
+      max-width: 720px;
+      margin: 7px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .kanban {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(260px, 1fr));
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .kanban-column {
+      min-height: 520px;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.48);
+    }
+
+    .kanban-head {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      background: rgba(15, 23, 42, 0.88);
+      border-radius: 20px 20px 0 0;
+    }
+
+    .kanban-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      font-size: 0.78rem;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--cyan);
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.7);
+    }
+
+    .kanban-dropzone {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      min-height: 450px;
+      padding: 12px;
+      transition: background 0.2s ease;
+    }
+
+    .kanban-dropzone.is-over {
+      background: rgba(34, 211, 238, 0.06);
+    }
+
+    .kanban-card {
+      cursor: grab;
+      padding: 13px;
+      border: 1px solid rgba(148, 163, 184, 0.13);
+      border-radius: 16px;
+      background: rgba(8, 17, 32, 0.78);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .kanban-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(34, 211, 238, 0.32);
+      box-shadow: 0 18px 44px rgba(2, 8, 23, 0.24);
+    }
+
+    .kanban-card:active {
+      cursor: grabbing;
+    }
+
+    .kanban-card.dragging {
+      opacity: 0.55;
+      transform: rotate(1deg) scale(0.98);
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.14);
+    }
+
+    .progress-track span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--emerald));
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(2, 8, 23, 0.74);
+      backdrop-filter: blur(18px);
+      z-index: 80;
+      animation: fadeIn 0.2s ease both;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      width: min(680px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      border: 1px solid var(--border-strong);
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.94), rgba(8, 17, 32, 0.96));
+      box-shadow: 0 34px 100px rgba(2, 8, 23, 0.6);
+      animation: modalIn 0.24s ease both;
+    }
+
+    @keyframes modalIn {
+      from {
+        transform: translateY(16px) scale(0.98);
+      }
+      to {
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      margin: 0;
+      color: white;
+      font-size: 1rem;
+      font-weight: 850;
+    }
+
+    .modal-body {
+      padding: 18px;
+    }
+
+    .dropzone {
+      display: grid;
+      min-height: 220px;
+      place-items: center;
+      padding: 24px;
+      border: 1px dashed rgba(56, 189, 248, 0.38);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(139, 92, 246, 0.08));
+      color: #cbd5e1;
+      text-align: center;
+      transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+      cursor: pointer;
+    }
+
+    .dropzone:hover,
+    .dropzone.dropzone-active {
+      transform: translateY(-2px);
+      border-color: rgba(34, 211, 238, 0.72);
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.13), rgba(139, 92, 246, 0.11));
+    }
+
+    .search-modal-input {
+      width: 100%;
+      height: 58px;
+      padding: 0 18px;
+      border: 1px solid rgba(34, 211, 238, 0.28);
+      border-radius: 18px;
+      outline: none;
+      background: rgba(15, 23, 42, 0.75);
+      color: white;
+      font-size: 1rem;
+      box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.06);
+    }
+
+    .suggestions {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .suggestion-button {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.5);
+      color: #e2e8f0;
+      text-align: left;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .suggestion-button:hover,
+    .suggestion-button:focus {
+      transform: translateY(-2px);
+      border-color: rgba(34, 211, 238, 0.32);
+      background: rgba(30, 41, 59, 0.7);
+      outline: none;
+    }
+
+    .drawer {
+      position: fixed;
+      inset: 0;
+      z-index: 75;
+      pointer-events: none;
+    }
+
+    .drawer::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 8, 23, 0);
+      transition: background 0.2s ease;
+    }
+
+    .drawer.open {
+      pointer-events: auto;
+    }
+
+    .drawer.open::before {
+      background: rgba(2, 8, 23, 0.48);
+      backdrop-filter: blur(8px);
+    }
+
+    .drawer-panel {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      bottom: 16px;
+      width: min(460px, calc(100vw - 32px));
+      overflow: auto;
+      padding: 18px;
+      border: 1px solid var(--border-strong);
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.96), rgba(8, 17, 32, 0.98));
+      box-shadow: 0 30px 100px rgba(2, 8, 23, 0.64);
+      transform: translateX(calc(100% + 32px));
+      transition: transform 0.24s ease;
+    }
+
+    .drawer.open .drawer-panel {
+      transform: translateX(0);
+    }
+
+    .activity-popover {
+      position: fixed;
+      top: 94px;
+      right: 120px;
+      width: min(380px, calc(100vw - 32px));
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.96);
+      box-shadow: 0 24px 80px rgba(2, 8, 23, 0.54);
+      backdrop-filter: var(--glass);
+      z-index: 70;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mini-tile {
+      padding: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.11);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.5);
+    }
+
+    .mini-tile strong {
+      display: block;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .mini-tile span {
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    @media (max-width: 1440px) {
+      .metrics-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
       }
 
-      const docs = await res.json();
-      renderDocuments(docs);
+      .dashboard-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
 
-    } catch (err) {
-      console.error("Search/filter error", err);
+      .span-8,
+      .span-7,
+      .span-6,
+      .span-5,
+      .span-4 {
+        grid-column: span 6;
+      }
+
+      .chart-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .heatmap {
+        grid-template-columns: repeat(14, 1fr);
+      }
     }
-  }, 300);
-}
 
-// 🔄 Events
-searchInput.addEventListener("input", triggerSearch);
-statusFilter.addEventListener("change", triggerSearch);
-typeFilter.addEventListener("change", triggerSearch);
-dateFilter.addEventListener("change", triggerSearch);
+    @media (max-width: 980px) {
+      .app-shell,
+      .app-shell.sidebar-collapsed {
+        grid-template-columns: 1fr;
+        padding: 12px;
+      }
 
+      .sidebar {
+        position: fixed;
+        left: 12px;
+        top: 12px;
+        bottom: 12px;
+        width: min(312px, calc(100vw - 24px));
+        height: auto;
+        transform: translateX(calc(-100% - 24px));
+        transition: transform 0.25s ease;
+      }
 
+      .sidebar.open {
+        transform: translateX(0);
+      }
 
-/* ================= WORKFLOW KANBAN BOARD ================= */
+      .mobile-menu {
+        display: inline-grid;
+      }
 
-// Mock Data for Visual Simulation (Replace with API fetch in production)
-let workflowItems = [
-    { id: 'doc-1', title: 'Q3_Financial_Report.pdf', type: 'PDF', status: 'pending', priority: 'High', aiConfidence: 98, assignee: 'AS' },
-    { id: 'doc-2', title: 'Metro_Safety_Audit_v2.docx', type: 'DOCX', status: 'processing', priority: 'Medium', aiConfidence: 45, assignee: 'JD' },
-    { id: 'doc-3', title: 'Vendor_Contract_778.pdf', type: 'PDF', status: 'review', priority: 'High', aiConfidence: 89, assignee: 'AS' },
-    { id: 'doc-4', title: 'HR_Policy_Update.pdf', type: 'PDF', status: 'approved', priority: 'Low', aiConfidence: 99, assignee: 'System' },
-    { id: 'doc-5', title: 'Invoice_#9901.png', type: 'IMG', status: 'pending', priority: 'Medium', aiConfidence: 0, assignee: 'Unassigned' }
-];
+      .topbar {
+        top: 12px;
+        border-radius: 20px;
+      }
 
-// Initialize Board
-function initWorkflowBoard() {
-    renderKanbanColumns();
-    updateWorkflowCounts();
-}
+      .top-actions .button span {
+        display: none;
+      }
+    }
 
-function renderKanbanColumns() {
-    // Clear all columns
-    document.querySelectorAll('.kanban-dropzone').forEach(el => el.innerHTML = '');
+    @media (max-width: 760px) {
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
 
-    workflowItems.forEach(item => {
-        const cardHTML = createKanbanCard(item);
-        const column = document.querySelector(`.kanban-dropzone[data-status="${item.status}"]`);
-        if (column) {
-            column.insertAdjacentHTML('beforeend', cardHTML);
-        }
-    });
-    
-    // Re-initialize icons for newly added elements
-    feather.replace();
-}
+      .topbar {
+        flex-wrap: wrap;
+      }
 
-function createKanbanCard(item) {
-    // Style determination based on priority and AI score
-    const priorityColor = item.priority === 'High' ? 'text-red-400 bg-red-400/10' : 
-                          item.priority === 'Medium' ? 'text-yellow-400 bg-yellow-400/10' : 'text-blue-400 bg-blue-400/10';
-    
-    const aiBadge = item.aiConfidence > 0 
-        ? `<div class="flex items-center gap-1 text-xs font-medium ${item.aiConfidence > 80 ? 'text-green-400' : 'text-yellow-400'}">
-             <i data-feather="cpu" class="w-3 h-3"></i> ${item.aiConfidence}% AI Match
-           </div>` 
-        : '';
+      .ai-search {
+        flex-basis: 100%;
+        order: 3;
+      }
 
-    return `
-    <div id="${item.id}" draggable="true" ondragstart="drag(event)" class="kanban-card group bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 hover:shadow-lg transition-all cursor-move select-none relative">
-        <div class="flex justify-between items-start mb-2">
-            <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${priorityColor}">
-                ${item.priority}
-            </span>
-            <button class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"><i data-feather="more-horizontal" class="w-4 h-4"></i></button>
+      .hero-title {
+        font-size: 2.25rem;
+      }
+
+      .summary-panel {
+        padding: 12px;
+      }
+
+      .page-heading {
+        flex-direction: column;
+      }
+
+      .mini-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="appShell" class="app-shell">
+    <aside id="sidebar" class="sidebar">
+      <div class="brand">
+        <div class="brand-lockup">
+          <div class="ai-logo" aria-hidden="true"><i data-feather="cpu"></i></div>
+          <div class="brand-copy">
+            <p class="brand-title">AIDMS</p>
+            <p class="brand-subtitle">Intelligent Document OS</p>
+          </div>
         </div>
-        
-        <h4 class="text-gray-200 font-medium text-sm mb-1 truncate" title="${item.title}">${item.title}</h4>
-        
-        <div class="flex items-center justify-between mt-3">
-            ${aiBadge}
-            <div class="h-6 w-6 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-bold text-white border-2 border-gray-800" title="Assigned to ${item.assignee}">
-                ${item.assignee}
+        <button id="sidebar-toggle" class="icon-button" type="button" aria-label="Collapse sidebar">
+          <i data-feather="chevrons-left"></i>
+        </button>
+      </div>
+
+      <nav id="sidebar-nav" class="nav" aria-label="Main navigation">
+        <a href="#dashboard" class="nav-link active" data-target="dashboard" data-tooltip="Dashboard" title="Dashboard">
+          <i data-feather="grid"></i><span class="nav-label">Dashboard</span>
+        </a>
+        <a href="#documents" class="nav-link" data-target="documents" data-tooltip="Documents" title="Documents">
+          <i data-feather="file-text"></i><span class="nav-label">Documents</span>
+        </a>
+        <a href="#workflows" class="nav-link" data-target="workflows" data-tooltip="Workflows" title="Workflows">
+          <i data-feather="git-branch"></i><span class="nav-label">Workflows</span>
+        </a>
+        <a href="#ai-insights" class="nav-link" data-target="ai-insights" data-tooltip="AI Insights" title="AI Insights">
+          <i data-feather="cpu"></i><span class="nav-label">AI Insights</span>
+        </a>
+        <a href="#smart-search" class="nav-link" data-target="smart-search" data-tooltip="Smart Search" title="Smart Search">
+          <i data-feather="search"></i><span class="nav-label">Smart Search</span>
+        </a>
+        <a href="#approvals" class="nav-link" data-target="approvals" data-tooltip="Approvals" title="Approvals">
+          <i data-feather="check-circle"></i><span class="nav-label">Approvals</span>
+        </a>
+        <a href="#analytics" class="nav-link" data-target="analytics" data-tooltip="Analytics" title="Analytics">
+          <i data-feather="bar-chart-2"></i><span class="nav-label">Analytics</span>
+        </a>
+        <a href="#team" class="nav-link" data-target="team" data-tooltip="Team" title="Team">
+          <i data-feather="users"></i><span class="nav-label">Team</span>
+        </a>
+        <a href="#settings" class="nav-link" data-target="settings" data-tooltip="Settings" title="Settings">
+          <i data-feather="settings"></i><span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="profile-card">
+          <div class="avatar online">U</div>
+          <div class="user-meta">
+            <p class="user-name">Standard User</p>
+            <p class="user-role">Document Contributor</p>
+          </div>
+          <span class="role-badge">Online</span>
+        </div>
+        <button id="assistantQuickAction" class="assistant-action" type="button">
+          <i data-feather="zap"></i><span class="assist-label">Ask document AI</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="topbar">
+        <button id="mobileMenu" class="icon-button mobile-menu" type="button" aria-label="Open menu">
+          <i data-feather="menu"></i>
+        </button>
+
+        <div class="ai-search">
+          <i data-feather="search"></i>
+          <input id="searchInput" type="text" autocomplete="off" placeholder="Ask AI to find documents, workflows, approvals...">
+          <span class="shortcut">Ctrl K</span>
+        </div>
+
+        <div class="top-actions">
+          <button id="quickUploadBtn" class="button primary" type="button">
+            <i data-feather="upload-cloud"></i><span>Upload</span>
+          </button>
+          <button id="activityFeedBtn" class="icon-button" type="button" aria-label="Activity feed">
+            <i data-feather="activity"></i>
+          </button>
+          <button id="notificationBtn" class="icon-button" type="button" aria-label="Notifications">
+            <i data-feather="bell"></i><span class="notification-dot"></span>
+          </button>
+          <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle theme">
+            <i data-feather="moon"></i>
+          </button>
+          <button id="avatarBtn" class="avatar" type="button" aria-label="User profile">U</button>
+        </div>
+      </header>
+
+      <div id="activityPopover" class="activity-popover hidden">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">Activity Feed</h3>
+            <p class="panel-subtitle">Live workflow events</p>
+          </div>
+          <span class="panel-pill"><span class="pulse-dot"></span> Live</span>
+        </div>
+        <div id="activityPopoverList" class="timeline"></div>
+      </div>
+
+      <main class="content">
+        <section id="dashboard" class="page-content">
+          <div class="hero-grid">
+            <article class="hero-panel">
+              <div class="eyebrow"><span class="pulse-dot"></span><span id="aiStatus">AI routing engine online</span></div>
+              <h1 class="hero-title"><span id="greeting">Good Evening, User</span><br><span class="gradient-text">Your documents are moving intelligently.</span></h1>
+              <p class="hero-copy">Your AI assistant processed <strong id="heroProcessed">0</strong> documents today, detected workflow priority, and surfaced the next approval actions across the workspace.</p>
+              <div class="hero-actions">
+                <button id="heroUploadBtn" class="button primary" type="button"><i data-feather="upload-cloud"></i>Quick upload</button>
+                <button id="heroSearchBtn" class="button" type="button"><i data-feather="command"></i>Open AI command</button>
+                <button class="button" type="button" data-nav-target="workflows"><i data-feather="git-branch"></i>Review workflow</button>
+              </div>
+            </article>
+
+            <aside class="panel summary-panel">
+              <div class="summary-chip">
+                <div>
+                  <span>Workflow Summary</span>
+                  <strong id="heroQueue">0 approvals queued</strong>
+                </div>
+                <div class="chip-icon"><i data-feather="check-circle"></i></div>
+              </div>
+              <div class="summary-chip">
+                <div>
+                  <span>AI Confidence</span>
+                  <strong id="heroConfidence">96.8%</strong>
+                </div>
+                <div class="chip-icon"><i data-feather="target"></i></div>
+              </div>
+              <div class="summary-chip">
+                <div>
+                  <span>Automation Health</span>
+                  <strong>Optimal</strong>
+                </div>
+                <div class="chip-icon"><i data-feather="shield"></i></div>
+              </div>
+            </aside>
+          </div>
+
+          <div class="metrics-grid">
+            <article class="glass-card metric-card">
+              <div class="metric-top">
+                <div class="metric-icon"><i data-feather="file-text"></i></div>
+                <span class="trend"><i data-feather="trending-up"></i>12%</span>
+              </div>
+              <p class="metric-label">Total Documents</p>
+              <p class="metric-value" id="totalDocs">0</p>
+              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#38bdf8" d="M2 30 C18 18, 26 22, 40 14 S70 12, 82 20 S102 26, 118 8"></path></svg>
+            </article>
+
+            <article class="glass-card metric-card">
+              <div class="metric-top">
+                <div class="metric-icon violet"><i data-feather="cpu"></i></div>
+                <span class="trend"><i data-feather="zap"></i>Live</span>
+              </div>
+              <p class="metric-label">AI Processed</p>
+              <p class="metric-value" id="aiProcessed">0</p>
+              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#8b5cf6" d="M2 28 C18 30, 24 12, 40 18 S62 34, 76 16 S96 4, 118 12"></path></svg>
+            </article>
+
+            <article class="glass-card metric-card">
+              <div class="metric-top">
+                <div class="metric-icon orange"><i data-feather="clock"></i></div>
+                <span class="trend warn"><i data-feather="alert-triangle"></i>Queue</span>
+              </div>
+              <p class="metric-label">Pending Approvals</p>
+              <p class="metric-value" id="pendingApproval">0</p>
+              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#fb923c" d="M2 26 C14 14, 28 18, 40 24 S60 32, 72 20 S94 14, 118 18"></path></svg>
+            </article>
+
+            <article class="glass-card metric-card">
+              <div class="metric-top">
+                <div class="metric-icon emerald"><i data-feather="git-branch"></i></div>
+                <span class="trend"><i data-feather="activity"></i>4 lanes</span>
+              </div>
+              <p class="metric-label">Active Workflows</p>
+              <p class="metric-value" id="activeWorkflows">0</p>
+              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#34d399" d="M2 31 C20 28, 28 8, 44 10 S70 32, 88 17 S104 20, 118 7"></path></svg>
+            </article>
+
+            <article class="glass-card metric-card">
+              <div class="metric-top">
+                <div class="metric-icon"><i data-feather="archive"></i></div>
+                <span class="trend"><i data-feather="database"></i>Safe</span>
+              </div>
+              <p class="metric-label">Archived Files</p>
+              <p class="metric-value" id="archivedDocs">0</p>
+              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#22d3ee" d="M2 24 C20 24, 25 28, 38 20 S62 18, 76 14 S96 18, 118 10"></path></svg>
+            </article>
+
+            <article class="glass-card metric-card">
+              <div class="metric-top">
+                <div class="metric-icon violet"><i data-feather="target"></i></div>
+                <span class="trend"><i data-feather="check"></i>High</span>
+              </div>
+              <p class="metric-label">AI Accuracy Rate</p>
+              <p class="metric-value"><span id="accuracyRate">0</span>%</p>
+              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#ec4899" d="M2 31 C18 27, 29 24, 42 17 S70 14, 82 10 S102 8, 118 5"></path></svg>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel span-8">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Document Intelligence Analytics</h2>
+                  <p class="panel-subtitle">Monthly ingestion, AI routing, and approval motion in one view.</p>
+                </div>
+                <span class="panel-pill"><i data-feather="bar-chart-2"></i> Predictive</span>
+              </div>
+              <div class="chart-layout">
+                <div class="chart-wrap"><canvas id="activityChart"></canvas></div>
+                <div>
+                  <div class="panel-header" style="margin-bottom: 10px;">
+                    <div>
+                      <h3 class="panel-title" style="font-size: 0.9rem;">Activity Heatmap</h3>
+                      <p class="panel-subtitle">Last 5 weeks</p>
+                    </div>
+                  </div>
+                  <div id="heatmapGrid" class="heatmap"></div>
+                </div>
+              </div>
+            </article>
+
+            <aside class="panel span-4">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Recent Activity</h2>
+                  <p class="panel-subtitle">Uploads, approvals, AI actions, and transitions.</p>
+                </div>
+                <span class="panel-pill"><span class="pulse-dot"></span> Now</span>
+              </div>
+              <div id="activityList" class="timeline">
+                <div class="skeleton-state"><span class="skeleton-line"></span></div>
+              </div>
+            </aside>
+
+            <article class="panel span-4">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">AI Insights</h2>
+                  <p class="panel-subtitle">Recommendations generated from document flow.</p>
+                </div>
+                <span class="panel-pill"><i data-feather="cpu"></i> AI</span>
+              </div>
+              <div id="insightsList" class="insights-list"></div>
+            </article>
+
+            <article class="panel span-4">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Workflow Graph</h2>
+                  <p class="panel-subtitle">AI routing paths and approval chain.</p>
+                </div>
+                <span class="panel-pill"><i data-feather="git-branch"></i> Node view</span>
+              </div>
+              <div class="workflow-map">
+                <svg class="workflow-lines" viewBox="0 0 640 320" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M92 88 C190 70 210 44 296 54"></path>
+                  <path d="M370 88 C450 100 492 122 548 142"></path>
+                  <path d="M306 106 C250 160 244 230 306 244"></path>
+                  <path d="M386 242 C450 226 500 206 548 174"></path>
+                </svg>
+                <div class="node input"><span class="node-dot"></span><small>Intake</small><strong>Smart upload</strong></div>
+                <div class="node ai"><span class="node-dot"></span><small>AI</small><strong>Classify and extract</strong></div>
+                <div class="node review"><span class="node-dot"></span><small>Review</small><strong>Human validation</strong></div>
+                <div class="node approval"><span class="node-dot"></span><small>Approval</small><strong>Route and archive</strong></div>
+              </div>
+            </article>
+
+            <article class="panel span-4">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Workflow Performance</h2>
+                  <p class="panel-subtitle">SLA health, bottlenecks, and automation speed.</p>
+                </div>
+              </div>
+              <div class="mini-grid">
+                <div class="mini-tile"><strong id="slaTile">98%</strong><span>SLA met</span></div>
+                <div class="mini-tile"><strong id="cycleTile">2.4h</strong><span>Avg cycle</span></div>
+                <div class="mini-tile"><strong id="autoTile">74%</strong><span>Auto routed</span></div>
+              </div>
+              <div style="margin-top: 16px;" class="progress-track"><span style="width: 74%;"></span></div>
+              <p class="panel-subtitle" style="margin-top: 12px;">AI routing is handling most low-risk documents before reviewer handoff.</p>
+            </article>
+
+            <article class="panel span-8">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Recently Updated Documents</h2>
+                  <p class="panel-subtitle">Enterprise table with AI category, status, confidence, and quick preview.</p>
+                </div>
+                <button class="button" type="button" data-nav-target="documents"><i data-feather="file-text"></i>Open documents</button>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Document Name</th>
+                      <th>AI Category</th>
+                      <th>Owner</th>
+                      <th>Workflow</th>
+                      <th>Approval</th>
+                      <th>Modified</th>
+                      <th>Confidence</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboard-documents-body">
+                    <tr><td colspan="8" class="skeleton-state"><span class="skeleton-line"></span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="documents" class="page-content hidden">
+          <div class="page-heading">
+            <div>
+              <h1>Documents</h1>
+              <p>AI-tagged document operations with filtering, sorting, preview drawer, and upload flow.</p>
             </div>
-        </div>
-        
-        <div class="mt-3 w-full bg-gray-700 h-1 rounded-full overflow-hidden">
-             <div class="bg-blue-500 h-full" style="width: ${getProgressBarWidth(item.status)}%"></div>
-        </div>
+            <button id="upload-btn" class="button primary" type="button"><i data-feather="upload-cloud"></i>Upload document</button>
+          </div>
+
+          <article class="panel">
+            <div class="table-tools">
+              <div class="filter-grid">
+                <input id="docSearchInput" class="input" type="search" placeholder="Search document name or tag">
+                <select id="statusFilter" class="select">
+                  <option value="all">All statuses</option>
+                  <option value="approved">Approved</option>
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="review">In review</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="archived">Archived</option>
+                </select>
+                <select id="typeFilter" class="select">
+                  <option value="all">All types</option>
+                  <option value="PDF">PDF</option>
+                  <option value="DOCX">DOCX</option>
+                  <option value="XLSX">XLSX</option>
+                  <option value="PNG">PNG</option>
+                  <option value="JPG">JPG</option>
+                </select>
+                <input id="dateFilter" class="select" type="date">
+              </div>
+              <button id="resetFiltersBtn" class="button" type="button"><i data-feather="refresh-cw"></i>Reset</button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th><button class="sort-button" type="button" data-sort="fileName">Document Name <i data-feather="chevron-down"></i></button></th>
+                    <th>AI Category</th>
+                    <th>Owner</th>
+                    <th><button class="sort-button" type="button" data-sort="status">Workflow <i data-feather="chevron-down"></i></button></th>
+                    <th>Approval</th>
+                    <th><button class="sort-button" type="button" data-sort="createdAt">Last Modified <i data-feather="chevron-down"></i></button></th>
+                    <th><button class="sort-button" type="button" data-sort="confidence">Confidence <i data-feather="chevron-down"></i></button></th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="documents-table-body">
+                  <tr><td colspan="8" class="skeleton-state"><span class="skeleton-line"></span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="documentsPagination" class="pagination"></div>
+          </article>
+        </section>
+
+        <section id="workflows" class="page-content hidden">
+          <div class="page-heading">
+            <div>
+              <h1>Workflows</h1>
+              <p>Move documents across the approval lifecycle with AI confidence, priority, and routing status visible in every card.</p>
+            </div>
+            <button class="button primary" type="button"><i data-feather="plus"></i>New workflow</button>
+          </div>
+
+          <article class="panel">
+            <div id="kanbanBoard" class="kanban"></div>
+          </article>
+        </section>
+
+        <section id="ai-insights" class="page-content hidden">
+          <div class="page-heading">
+            <div>
+              <h1>AI Insights</h1>
+              <p>Smart alerts, anomalies, bottlenecks, and automation opportunities for the document workspace.</p>
+            </div>
+            <button class="button" type="button" id="refreshInsightsBtn"><i data-feather="refresh-cw"></i>Refresh</button>
+          </div>
+          <article class="panel">
+            <div id="insightsPageList" class="insights-list"></div>
+          </article>
+        </section>
+
+        <section id="smart-search" class="page-content hidden">
+          <div class="page-heading">
+            <div>
+              <h1>Smart Search</h1>
+              <p>Natural language retrieval for pending approvals, finance files, contracts, and OCR text.</p>
+            </div>
+            <button id="smartSearchOpenBtn" class="button primary" type="button"><i data-feather="command"></i>Open command</button>
+          </div>
+          <article class="panel">
+            <div class="mini-grid">
+              <button class="suggestion-button smart-prompt" type="button" data-query="Find all pending finance invoices from March.">
+                <span class="file-glyph"><i data-feather="search"></i></span>
+                <span><strong class="doc-title">Pending finance invoices</strong><span class="doc-sub">Find all pending finance invoices from March.</span></span>
+                <i data-feather="arrow-up-right"></i>
+              </button>
+              <button class="suggestion-button smart-prompt" type="button" data-query="Show contracts with low AI confidence.">
+                <span class="file-glyph"><i data-feather="target"></i></span>
+                <span><strong class="doc-title">Low confidence contracts</strong><span class="doc-sub">Show contracts with low AI confidence.</span></span>
+                <i data-feather="arrow-up-right"></i>
+              </button>
+              <button class="suggestion-button smart-prompt" type="button" data-query="List approval delays older than two days.">
+                <span class="file-glyph"><i data-feather="clock"></i></span>
+                <span><strong class="doc-title">Approval delays</strong><span class="doc-sub">List approval delays older than two days.</span></span>
+                <i data-feather="arrow-up-right"></i>
+              </button>
+            </div>
+          </article>
+        </section>
+
+        <section id="approvals" class="page-content hidden">
+          <div class="page-heading">
+            <div>
+              <h1>Approvals</h1>
+              <p>Priority queue for reviewer handoffs, AI checks, and policy-controlled approvals.</p>
+            </div>
+            <a class="button primary" href="/admin/pending-docs"><i data-feather="shield"></i>Admin queue</a>
+          </div>
+          <article class="panel">
+            <div id="approvalQueue" class="timeline"></div>
+          </article>
+        </section>
+
+        <section id="analytics" class="page-content hidden">
+          <div class="page-heading">
+            <div>
+              <h1>Analytics</h1>
+              <p>Operational visibility for document volume, review speed, SLA health, and AI automation lift.</p>
+            </div>
+          </div>
+          <div class="dashboard-grid">
+            <article class="panel span-8">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Document Trends</h2>
+                  <p class="panel-subtitle">Same live activity data in expanded analytics mode.</p>
+                </div>
+              </div>
+              <div class="chart-wrap"><canvas id="analyticsChart"></canvas></div>
+            </article>
+            <article class="panel span-4">
+              <div class="mini-grid">
+                <div class="mini-tile"><strong id="analyticsDocs">0</strong><span>Total docs</span></div>
+                <div class="mini-tile"><strong id="analyticsPending">0</strong><span>Pending</span></div>
+                <div class="mini-tile"><strong id="analyticsArchived">0</strong><span>Archived</span></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="team" class="page-content hidden">
+          <div class="page-heading">
+            <div>
+              <h1>Team</h1>
+              <p>Reviewer workload, ownership, and collaboration signals for document operations.</p>
+            </div>
+            <button class="button" type="button"><i data-feather="users"></i>Invite member</button>
+          </div>
+          <article class="panel">
+            <div class="mini-grid">
+              <div class="mini-tile"><strong>8</strong><span>Reviewers</span></div>
+              <div class="mini-tile"><strong>3</strong><span>Active admins</span></div>
+              <div class="mini-tile"><strong>92%</strong><span>Load balance</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section id="settings" class="page-content hidden">
+          <div class="page-heading">
+            <div>
+              <h1>Settings</h1>
+              <p>Workspace intelligence, security, notification, and integration controls.</p>
+            </div>
+          </div>
+          <article class="panel">
+            <div class="insights-list">
+              <div class="insight-item">
+                <div class="insight-icon"><i data-feather="lock"></i></div>
+                <div><p class="insight-title">Policy guardrails</p><p class="insight-copy">Approval routing is aligned with document category and user role.</p></div>
+              </div>
+              <div class="insight-item">
+                <div class="insight-icon"><i data-feather="sliders"></i></div>
+                <div><p class="insight-title">AI confidence threshold</p><p class="insight-copy">Documents below 86% confidence are routed to manual review.</p></div>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
     </div>
-    `;
-}
+  </div>
 
-function getProgressBarWidth(status) {
-    switch(status) {
-        case 'pending': return 10;
-        case 'processing': return 40;
-        case 'review': return 75;
-        case 'approved': return 100;
-        default: return 0;
+  <div id="upload-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="uploadTitle">
+    <div class="modal-content">
+      <div class="modal-head">
+        <div>
+          <h2 id="uploadTitle" class="modal-title">Upload New Document</h2>
+          <p class="panel-subtitle">AI classification starts as soon as the file lands.</p>
+        </div>
+        <button id="close-upload-modal-btn" class="icon-button" type="button" aria-label="Close upload">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="dropzone" class="dropzone">
+          <div>
+            <i data-feather="upload-cloud" style="width: 48px; height: 48px; margin: 0 auto 14px; color: var(--cyan);"></i>
+            <p style="margin: 0; color: white; font-weight: 800;">Drop documents here</p>
+            <p class="panel-subtitle" style="margin-top: 8px;">PDF, DOCX, XLSX, and scanned images up to 10MB.</p>
+          </div>
+          <input id="file-input" class="hidden" type="file" multiple>
+        </div>
+        <div id="upload-progress-container" style="margin-top: 14px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ai-search-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="aiSearchTitle">
+    <div class="modal-content">
+      <div class="modal-head">
+        <div>
+          <h2 id="aiSearchTitle" class="modal-title">AI Command Search</h2>
+          <p class="panel-subtitle">Try: "Find all pending finance invoices from March."</p>
+        </div>
+        <button id="closeSearchModal" class="icon-button" type="button" aria-label="Close AI search">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input id="aiSearchInput" class="search-modal-input" type="text" autocomplete="off" placeholder="Ask a natural language document question">
+        <div id="aiSuggestions" class="suggestions"></div>
+      </div>
+    </div>
+  </div>
+
+  <aside id="previewDrawer" class="drawer" aria-hidden="true">
+    <div class="drawer-panel">
+      <div class="panel-header">
+        <div>
+          <h2 id="previewTitle" class="panel-title">Document Preview</h2>
+          <p id="previewMeta" class="panel-subtitle"></p>
+        </div>
+        <button id="closePreviewDrawer" class="icon-button" type="button" aria-label="Close preview">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <div id="previewContent" class="insights-list"></div>
+    </div>
+  </aside>
+
+  <script>
+    feather.replace();
+
+    const appShell = document.getElementById("appShell");
+    const sidebar = document.getElementById("sidebar");
+    const sidebarToggle = document.getElementById("sidebar-toggle");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const sidebarNav = document.getElementById("sidebar-nav");
+    const pageContents = document.querySelectorAll(".page-content");
+    const searchInput = document.getElementById("searchInput");
+    const themeToggle = document.getElementById("theme-toggle");
+    const uploadModal = document.getElementById("upload-modal");
+    const uploadButtons = [
+      document.getElementById("quickUploadBtn"),
+      document.getElementById("heroUploadBtn"),
+      document.getElementById("upload-btn")
+    ].filter(Boolean);
+    const closeUploadModalBtn = document.getElementById("close-upload-modal-btn");
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("file-input");
+    const uploadProgressContainer = document.getElementById("upload-progress-container");
+    const aiSearchModal = document.getElementById("ai-search-modal");
+    const aiSearchInput = document.getElementById("aiSearchInput");
+    const aiSuggestions = document.getElementById("aiSuggestions");
+    const closeSearchModal = document.getElementById("closeSearchModal");
+    const documentsTableBody = document.getElementById("documents-table-body");
+    const dashboardDocumentsBody = document.getElementById("dashboard-documents-body");
+    const documentsPagination = document.getElementById("documentsPagination");
+    const previewDrawer = document.getElementById("previewDrawer");
+    const closePreviewDrawer = document.getElementById("closePreviewDrawer");
+    const activityPopover = document.getElementById("activityPopover");
+    const activityFeedBtn = document.getElementById("activityFeedBtn");
+    const notificationBtn = document.getElementById("notificationBtn");
+
+    const state = {
+      documents: [],
+      visibleDocuments: [],
+      stats: { total: 0, today: 0, pending: 0, archived: 0, monthly: Array(12).fill(0) },
+      activities: [],
+      page: 1,
+      pageSize: 7,
+      sortKey: "createdAt",
+      sortDirection: "desc",
+      searchResults: []
+    };
+
+    const workflowItems = [
+      { id: "doc-1", title: "Q3_Financial_Report.pdf", type: "PDF", status: "pending", priority: "High", aiConfidence: 98, assignee: "AS" },
+      { id: "doc-2", title: "Metro_Safety_Audit_v2.docx", type: "DOCX", status: "processing", priority: "Medium", aiConfidence: 87, assignee: "JD" },
+      { id: "doc-3", title: "Vendor_Contract_778.pdf", type: "PDF", status: "review", priority: "High", aiConfidence: 91, assignee: "AS" },
+      { id: "doc-4", title: "HR_Policy_Update.pdf", type: "PDF", status: "approved", priority: "Low", aiConfidence: 99, assignee: "AI" },
+      { id: "doc-5", title: "Invoice_9901.png", type: "IMG", status: "pending", priority: "Medium", aiConfidence: 76, assignee: "OP" }
+    ];
+
+    let activityChart;
+    let analyticsChart;
+    let debounceTimer;
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
-}
 
-function updateWorkflowCounts() {
-    const statuses = ['pending', 'processing', 'review', 'approved'];
-    statuses.forEach(status => {
-        const count = workflowItems.filter(i => i.status === status).length;
-        const el = document.getElementById(`count-${status}`);
-        if(el) el.innerText = count;
+    function formatStatus(status) {
+      return String(status || "pending").replace(/_/g, " ");
+    }
+
+    function getDocumentId(doc) {
+      return doc._id || doc.id || doc.fileName;
+    }
+
+    function hashString(value) {
+      return String(value || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    }
+
+    function getConfidence(doc) {
+      if (typeof doc.confidence === "number") return doc.confidence;
+      const base = 82 + (hashString(doc.fileName) % 17);
+      return Math.min(99, base);
+    }
+
+    function getCategory(doc) {
+      const keywords = Array.isArray(doc.keywords) ? doc.keywords.filter(Boolean) : [];
+      if (keywords.length) return keywords[0];
+      const type = String(doc.fileType || "").toLowerCase();
+      const name = String(doc.fileName || "").toLowerCase();
+      if (name.includes("invoice") || name.includes("finance")) return "Finance";
+      if (name.includes("contract") || name.includes("vendor")) return "Contracts";
+      if (name.includes("audit") || name.includes("safety")) return "Compliance";
+      if (name.includes("hr") || name.includes("policy")) return "Policy";
+      if (type === "pdf") return "Knowledge";
+      if (type === "xlsx") return "Spreadsheet";
+      if (type === "docx") return "Document";
+      return "General";
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+      return new Date(value).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    }
+
+    function relativeTime(value) {
+      if (!value) return "Just now";
+      const diff = Date.now() - new Date(value).getTime();
+      const minutes = Math.max(1, Math.round(diff / 60000));
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.round(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      return `${Math.round(hours / 24)}d ago`;
+    }
+
+    function setGreeting() {
+      const hour = new Date().getHours();
+      const label = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+      document.getElementById("greeting").textContent = `${label}, User`;
+    }
+
+    function toggleModal(modal, show) {
+      modal.classList.toggle("hidden", !show);
+      if (show) feather.replace();
+    }
+
+    function navigate(targetId) {
+      document.querySelectorAll(".nav-link").forEach(link => {
+        link.classList.toggle("active", link.dataset.target === targetId);
+      });
+      pageContents.forEach(page => page.classList.add("hidden"));
+      const target = document.getElementById(targetId);
+      if (target) target.classList.remove("hidden");
+      if (window.innerWidth < 981) sidebar.classList.remove("open");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      requestAnimationFrame(() => {
+        if (activityChart) activityChart.resize();
+        if (analyticsChart) analyticsChart.resize();
+      });
+      feather.replace();
+    }
+
+    sidebarToggle.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      appShell.classList.toggle("sidebar-collapsed");
     });
-}
 
-/* ================= DRAG AND DROP LOGIC ================= */
-function allowDrop(ev) {
-    ev.preventDefault();
-    ev.currentTarget.classList.add('bg-gray-800/50'); // Highlight drop zone
-}
+    mobileMenu.addEventListener("click", () => sidebar.classList.add("open"));
 
-function drag(ev) {
-    ev.dataTransfer.setData("text", ev.target.id);
-    ev.target.classList.add('opacity-50'); // Visual feedback while dragging
-}
+    document.addEventListener("click", event => {
+      if (window.innerWidth < 981 && sidebar.classList.contains("open")) {
+        const clickedInsideSidebar = sidebar.contains(event.target);
+        const clickedMenu = mobileMenu.contains(event.target);
+        if (!clickedInsideSidebar && !clickedMenu) sidebar.classList.remove("open");
+      }
+    });
 
-function drop(ev) {
-    ev.preventDefault();
-    const data = ev.dataTransfer.getData("text");
-    const card = document.getElementById(data);
-    
-    // Find drop target (handle dropping inside a card vs on the column)
-    let dropZone = ev.target.closest('.kanban-dropzone');
-    
-    if (dropZone && card) {
-        // Remove highlight from all zones
-        document.querySelectorAll('.kanban-dropzone').forEach(el => el.classList.remove('bg-gray-800/50'));
-        card.classList.remove('opacity-50');
-        
-        dropZone.appendChild(card);
-        
-        // Update Data Model
-        const newStatus = dropZone.getAttribute('data-status');
-        const itemIndex = workflowItems.findIndex(i => i.id === data);
-        if(itemIndex > -1) {
-            workflowItems[itemIndex].status = newStatus;
-            
-            // Re-render card to update progress bar and styles
-            card.outerHTML = createKanbanCard(workflowItems[itemIndex]);
-            feather.replace(); // Refresh icons
-            updateWorkflowCounts();
-            
-            // Optional: Trigger API call to save new status here
-            // saveStatusChange(workflowItems[itemIndex].id, newStatus);
+    sidebarNav.addEventListener("click", event => {
+      const link = event.target.closest(".nav-link");
+      if (!link) return;
+      event.preventDefault();
+      navigate(link.dataset.target);
+    });
+
+    document.addEventListener("click", event => {
+      const navButton = event.target.closest("[data-nav-target]");
+      if (navButton) navigate(navButton.dataset.navTarget);
+    });
+
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("focus-theme");
+      themeToggle.innerHTML = document.body.classList.contains("focus-theme")
+        ? '<i data-feather="sun"></i>'
+        : '<i data-feather="moon"></i>';
+      feather.replace();
+    });
+
+    uploadButtons.forEach(button => {
+      button.addEventListener("click", () => toggleModal(uploadModal, true));
+    });
+
+    closeUploadModalBtn.addEventListener("click", () => toggleModal(uploadModal, false));
+    uploadModal.addEventListener("click", event => {
+      if (event.target === uploadModal) toggleModal(uploadModal, false);
+    });
+
+    dropzone.addEventListener("click", () => fileInput.click());
+    dropzone.addEventListener("dragover", event => {
+      event.preventDefault();
+      dropzone.classList.add("dropzone-active");
+    });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dropzone-active"));
+    dropzone.addEventListener("drop", event => {
+      event.preventDefault();
+      dropzone.classList.remove("dropzone-active");
+      uploadFiles(event.dataTransfer.files);
+    });
+    fileInput.addEventListener("change", () => uploadFiles(fileInput.files));
+
+    async function uploadFiles(files) {
+      if (!files || !files.length) return;
+
+      const formData = new FormData();
+      Array.from(files).forEach(file => formData.append("documents", file));
+      uploadProgressContainer.innerHTML = '<div class="insight-item"><div class="insight-icon"><i data-feather="upload-cloud"></i></div><div><p class="insight-title">Uploading documents</p><p class="insight-copy">AI intake will refresh automatically after upload.</p></div></div>';
+      feather.replace();
+
+      try {
+        const res = await fetch("/documents/upload", {
+          method: "POST",
+          body: formData,
+          credentials: "include"
+        });
+
+        if (!res.ok) {
+          uploadProgressContainer.innerHTML = `<p class="panel-subtitle">Upload failed: ${escapeHtml(await res.text())}</p>`;
+          return;
         }
-    }
-}
 
-// Hook into existing event listeners
-document.addEventListener("DOMContentLoaded", () => {
-    // ... existing init code ...
-    initWorkflowBoard();
-});
-async function loadRecentActivity() {
-  try {
-    const res = await fetch("/activities/recent", {
-      credentials: "include"
-    });
-
-    if (!res.ok) return;
-
-    const activities = await res.json();
-
-    const list = document.getElementById("activityList");
-    if (!list) return;
-
-    list.innerHTML = "";
-
-    if (activities.length === 0) {
-      list.innerHTML = "<li>No recent activity</li>";
-      return;
+        uploadProgressContainer.innerHTML = '<div class="insight-item"><div class="insight-icon"><i data-feather="check-circle"></i></div><div><p class="insight-title">Upload complete</p><p class="insight-copy">Dashboard intelligence has been refreshed.</p></div></div>';
+        feather.replace();
+        setTimeout(() => toggleModal(uploadModal, false), 650);
+        fileInput.value = "";
+        await Promise.all([loadDocuments(), loadDashboardStats(), loadRecentActivity()]);
+      } catch (err) {
+        console.error(err);
+        uploadProgressContainer.innerHTML = '<p class="panel-subtitle">Upload failed. Please try again.</p>';
+      }
     }
 
-    activities.forEach(act => {
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <strong>${act.user?.username || "User"}</strong>
-        ${act.action}
-        <span>${act.entityName || ""}</span>
-        <small>${new Date(act.createdAt).toLocaleString()}</small>
+    function animateNumber(id, target, options = {}) {
+      const element = document.getElementById(id);
+      if (!element) return;
+      const duration = options.duration || 850;
+      const decimals = options.decimals || 0;
+      const start = Number(element.textContent) || 0;
+      const startTime = performance.now();
+
+      function tick(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const value = start + (target - start) * eased;
+        element.textContent = decimals ? value.toFixed(decimals) : Math.round(value);
+        if (progress < 1) requestAnimationFrame(tick);
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    async function loadDashboardStats() {
+      try {
+        const res = await fetch("/documents/stats", { credentials: "include" });
+        if (res.ok) {
+          state.stats = await res.json();
+        }
+      } catch (err) {
+        console.error("Stats error", err);
+      }
+
+      updateMetrics();
+      renderCharts(state.stats.monthly || Array(12).fill(0));
+      renderHeatmap();
+      renderInsights();
+    }
+
+    function updateMetrics() {
+      const total = Number(state.stats.total || state.documents.length || 0);
+      const pending = Number(state.stats.pending || state.documents.filter(doc => doc.status === "pending").length || 0);
+      const archived = Number(state.stats.archived || state.documents.filter(doc => doc.status === "archived").length || 0);
+      const today = Number(state.stats.today || 0);
+      const processed = Math.max(total - pending, today);
+      const activeWorkflows = workflowItems.filter(item => item.status !== "approved").length;
+      const accuracy = total ? Math.min(99.3, 94.8 + Math.min(total, 12) * 0.18) : 96.8;
+
+      animateNumber("totalDocs", total);
+      animateNumber("aiProcessed", processed);
+      animateNumber("pendingApproval", pending);
+      animateNumber("activeWorkflows", activeWorkflows);
+      animateNumber("archivedDocs", archived);
+      animateNumber("accuracyRate", accuracy, { decimals: 1 });
+
+      document.getElementById("heroProcessed").textContent = processed;
+      document.getElementById("heroQueue").textContent = `${pending} approvals queued`;
+      document.getElementById("heroConfidence").textContent = `${accuracy.toFixed(1)}%`;
+      document.getElementById("analyticsDocs").textContent = total;
+      document.getElementById("analyticsPending").textContent = pending;
+      document.getElementById("analyticsArchived").textContent = archived;
+    }
+
+    function renderCharts(monthly) {
+      const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const routed = monthly.map((value, index) => Math.max(0, Math.round(value * 0.72 + (index % 3))));
+
+      renderLineChart("activityChart", monthly, routed, chart => activityChart = chart, activityChart);
+      renderLineChart("analyticsChart", monthly, routed, chart => analyticsChart = chart, analyticsChart);
+
+      function renderLineChart(canvasId, primary, secondary, setter, existing) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        if (existing) existing.destroy();
+        const ctx = canvas.getContext("2d");
+        const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+        gradient.addColorStop(0, "rgba(56, 189, 248, 0.28)");
+        gradient.addColorStop(1, "rgba(56, 189, 248, 0)");
+        const violetGradient = ctx.createLinearGradient(0, 0, 0, 320);
+        violetGradient.addColorStop(0, "rgba(139, 92, 246, 0.22)");
+        violetGradient.addColorStop(1, "rgba(139, 92, 246, 0)");
+
+        const chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Documents",
+                data: primary,
+                borderColor: "#38bdf8",
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.42,
+                pointRadius: 4,
+                pointHoverRadius: 7,
+                pointBackgroundColor: "#081120",
+                pointBorderColor: "#22d3ee",
+                pointBorderWidth: 2
+              },
+              {
+                label: "AI routed",
+                data: secondary,
+                borderColor: "#8b5cf6",
+                backgroundColor: violetGradient,
+                fill: true,
+                tension: 0.42,
+                pointRadius: 3,
+                pointHoverRadius: 6,
+                pointBackgroundColor: "#081120",
+                pointBorderColor: "#c4b5fd",
+                pointBorderWidth: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 900, easing: "easeOutQuart" },
+            interaction: { intersect: false, mode: "index" },
+            plugins: {
+              legend: {
+                labels: { color: "#cbd5e1", boxWidth: 10, usePointStyle: true }
+              },
+              tooltip: {
+                backgroundColor: "rgba(15, 23, 42, 0.94)",
+                borderColor: "rgba(148, 163, 184, 0.18)",
+                borderWidth: 1,
+                padding: 12,
+                titleColor: "#f8fafc",
+                bodyColor: "#cbd5e1"
+              }
+            },
+            scales: {
+              x: {
+                grid: { color: "rgba(148, 163, 184, 0.06)" },
+                ticks: { color: "#94a3b8" }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: "rgba(148, 163, 184, 0.08)" },
+                ticks: { color: "#94a3b8", precision: 0 }
+              }
+            }
+          }
+        });
+        setter(chart);
+      }
+    }
+
+    function renderHeatmap() {
+      const grid = document.getElementById("heatmapGrid");
+      if (!grid) return;
+      const seed = state.documents.length + (state.stats.pending || 0);
+      grid.innerHTML = Array.from({ length: 35 }, (_, index) => {
+        const intensity = 0.11 + (((index * 13 + seed * 7) % 70) / 100);
+        return `<span class="heat-cell" style="--heat: ${intensity.toFixed(2)}" title="${Math.round(intensity * 100)} activity score"></span>`;
+      }).join("");
+    }
+
+    async function loadDocuments() {
+      try {
+        const res = await fetch("/documents/my", { credentials: "include" });
+        if (!res.ok) return;
+        state.documents = await res.json();
+      } catch (err) {
+        console.error("Documents error", err);
+      }
+      state.visibleDocuments = [...state.documents];
+      state.page = 1;
+      sortVisibleDocuments();
+      renderDocuments();
+      renderDashboardDocuments();
+      renderApprovalQueue();
+      updateMetrics();
+      renderInsights();
+      renderHeatmap();
+      if (!state.activities.length) renderRecentActivity();
+      renderAISuggestions(aiSearchInput.value);
+    }
+
+    function sortVisibleDocuments() {
+      const direction = state.sortDirection === "asc" ? 1 : -1;
+      state.visibleDocuments.sort((a, b) => {
+        const key = state.sortKey;
+        const aValue = key === "confidence" ? getConfidence(a) : (a[key] || "");
+        const bValue = key === "confidence" ? getConfidence(b) : (b[key] || "");
+        if (key === "createdAt") return (new Date(aValue).getTime() - new Date(bValue).getTime()) * direction;
+        return String(aValue).localeCompare(String(bValue)) * direction;
+      });
+    }
+
+    function renderDocuments() {
+      const start = (state.page - 1) * state.pageSize;
+      const docs = state.visibleDocuments.slice(start, start + state.pageSize);
+      documentsTableBody.innerHTML = renderDocumentRows(docs, true);
+      renderPagination();
+      feather.replace();
+    }
+
+    function renderDashboardDocuments() {
+      dashboardDocumentsBody.innerHTML = renderDocumentRows(state.documents.slice(0, 5), false);
+      feather.replace();
+    }
+
+    function renderDocumentRows(docs, includeEmpty) {
+      if (!docs.length) {
+        return `<tr><td colspan="8" class="empty-state">${includeEmpty ? "No documents match this view." : "Upload documents to activate the intelligence layer."}</td></tr>`;
+      }
+
+      return docs.map(doc => {
+        const id = escapeHtml(getDocumentId(doc));
+        const confidence = getConfidence(doc);
+        const status = formatStatus(doc.status);
+        const statusClass = escapeHtml(doc.status || "pending");
+        const type = escapeHtml(String(doc.fileType || "FILE").toUpperCase());
+        const category = escapeHtml(getCategory(doc));
+        const fileName = escapeHtml(doc.fileName);
+        const path = escapeHtml(doc.filePath || "");
+
+        return `
+          <tr>
+            <td>
+              <div class="doc-name">
+                <span class="file-glyph"><i data-feather="file-text"></i></span>
+                <span>
+                  <button class="doc-title" type="button" data-preview="${id}">${fileName}</button>
+                  <span class="doc-sub">${type} &middot; AI tagged</span>
+                </span>
+              </div>
+            </td>
+            <td><span class="badge"><i data-feather="tag"></i>${category}</span></td>
+            <td> You </td>
+            <td><span class="badge ${statusClass}">${status}</span></td>
+            <td><span class="badge ${statusClass}">${status === "approved" ? "Approved" : status === "rejected" ? "Rejected" : "Needs review"}</span></td>
+            <td>${formatDate(doc.updatedAt || doc.createdAt)}</td>
+            <td>
+              <div class="confidence">
+                <span>${confidence}%</span>
+                <span class="confidence-bar"><span style="width: ${confidence}%;"></span></span>
+              </div>
+            </td>
+            <td>
+              <div class="row-actions">
+                <button class="icon-button" type="button" data-preview="${id}" title="Preview"><i data-feather="eye"></i></button>
+                <a class="icon-button" href="/${path}" target="_blank" rel="noreferrer" title="Open"><i data-feather="external-link"></i></a>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderPagination() {
+      const totalPages = Math.max(1, Math.ceil(state.visibleDocuments.length / state.pageSize));
+      documentsPagination.innerHTML = `
+        <button class="button" type="button" data-page="prev" ${state.page === 1 ? "disabled" : ""}><i data-feather="chevron-left"></i>Prev</button>
+        <span class="panel-subtitle">Page ${state.page} of ${totalPages}</span>
+        <button class="button" type="button" data-page="next" ${state.page === totalPages ? "disabled" : ""}>Next<i data-feather="chevron-right"></i></button>
       `;
-      list.appendChild(li);
+    }
+
+    documentsPagination.addEventListener("click", event => {
+      const button = event.target.closest("[data-page]");
+      if (!button) return;
+      const totalPages = Math.max(1, Math.ceil(state.visibleDocuments.length / state.pageSize));
+      if (button.dataset.page === "prev") state.page = Math.max(1, state.page - 1);
+      if (button.dataset.page === "next") state.page = Math.min(totalPages, state.page + 1);
+      renderDocuments();
     });
-  } catch (err) {
-    console.error("Recent activity error", err);
-  }
-}
 
+    document.addEventListener("click", event => {
+      const previewButton = event.target.closest("[data-preview]");
+      if (previewButton) {
+        const doc = state.documents.find(item => String(getDocumentId(item)) === String(previewButton.dataset.preview));
+        if (doc) openPreview(doc);
+      }
 
-</script>
+      const sortButton = event.target.closest("[data-sort]");
+      if (sortButton) {
+        const key = sortButton.dataset.sort;
+        if (state.sortKey === key) {
+          state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
+        } else {
+          state.sortKey = key;
+          state.sortDirection = key === "fileName" ? "asc" : "desc";
+        }
+        sortVisibleDocuments();
+        renderDocuments();
+      }
+    });
+
+    closePreviewDrawer.addEventListener("click", closePreview);
+    previewDrawer.addEventListener("click", event => {
+      if (event.target === previewDrawer) closePreview();
+    });
+
+    function openPreview(doc) {
+      const confidence = getConfidence(doc);
+      document.getElementById("previewTitle").textContent = doc.fileName || "Document";
+      document.getElementById("previewMeta").textContent = `${String(doc.fileType || "file").toUpperCase()} - ${formatDate(doc.createdAt)} - ${confidence}% AI confidence`;
+      document.getElementById("previewContent").innerHTML = `
+        <div class="insight-item">
+          <div class="insight-icon"><i data-feather="tag"></i></div>
+          <div><p class="insight-title">AI Category</p><p class="insight-copy">${escapeHtml(getCategory(doc))}</p></div>
+        </div>
+        <div class="insight-item">
+          <div class="insight-icon"><i data-feather="activity"></i></div>
+          <div><p class="insight-title">Workflow Status</p><p class="insight-copy">${escapeHtml(formatStatus(doc.status))}</p></div>
+        </div>
+        <div class="insight-item">
+          <div class="insight-icon"><i data-feather="message-square"></i></div>
+          <div><p class="insight-title">AI Summary</p><p class="insight-copy">${escapeHtml(doc.summary || "No summary available yet. OCR and AI enrichment can populate this area after processing.")}</p></div>
+        </div>
+        <div class="insight-item">
+          <div class="insight-icon"><i data-feather="download"></i></div>
+          <div><p class="insight-title">Document Link</p><p class="insight-copy"><a href="/${escapeHtml(doc.filePath || "")}" target="_blank" rel="noreferrer" style="color: var(--cyan);">Open original file</a></p></div>
+        </div>
+      `;
+      previewDrawer.classList.add("open");
+      previewDrawer.setAttribute("aria-hidden", "false");
+      feather.replace();
+    }
+
+    function closePreview() {
+      previewDrawer.classList.remove("open");
+      previewDrawer.setAttribute("aria-hidden", "true");
+    }
+
+    const docSearchInput = document.getElementById("docSearchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const typeFilter = document.getElementById("typeFilter");
+    const dateFilter = document.getElementById("dateFilter");
+    const resetFiltersBtn = document.getElementById("resetFiltersBtn");
+
+    [docSearchInput, statusFilter, typeFilter, dateFilter].forEach(input => {
+      input.addEventListener(input.tagName === "SELECT" ? "change" : "input", triggerSearch);
+    });
+
+    resetFiltersBtn.addEventListener("click", () => {
+      docSearchInput.value = "";
+      statusFilter.value = "all";
+      typeFilter.value = "all";
+      dateFilter.value = "";
+      state.visibleDocuments = [...state.documents];
+      state.page = 1;
+      sortVisibleDocuments();
+      renderDocuments();
+    });
+
+    function triggerSearch() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async () => {
+        const q = docSearchInput.value.trim();
+        const status = statusFilter.value;
+        const type = typeFilter.value;
+        const date = dateFilter.value;
+
+        if (!q && status === "all" && type === "all" && !date) {
+          state.visibleDocuments = [...state.documents];
+          state.page = 1;
+          sortVisibleDocuments();
+          renderDocuments();
+          return;
+        }
+
+        const params = new URLSearchParams();
+        if (q) params.append("q", q);
+        if (status && status !== "all") params.append("status", status);
+        if (type && type !== "all") params.append("type", type);
+        if (date) params.append("date", date);
+
+        try {
+          const res = await fetch(`/documents/search?${params.toString()}`, { credentials: "include" });
+          state.visibleDocuments = res.ok ? await res.json() : [];
+          state.page = 1;
+          sortVisibleDocuments();
+          renderDocuments();
+        } catch (err) {
+          console.error("Search/filter error", err);
+        }
+      }, 260);
+    }
+
+    function renderInsights() {
+      const pending = state.stats.pending || state.documents.filter(doc => doc.status === "pending").length;
+      const lowConfidence = state.documents.filter(doc => getConfidence(doc) < 88).length;
+      const insights = [
+        {
+          icon: "zap",
+          title: "Automation suggestion",
+          copy: pending > 0 ? `${pending} pending documents can be grouped into a priority review sprint.` : "Approval queue is clear. Keep auto-routing active for new uploads."
+        },
+        {
+          icon: "alert-triangle",
+          title: "Document anomaly",
+          copy: lowConfidence ? `${lowConfidence} documents have confidence below 88% and should be checked manually.` : "No low-confidence anomalies detected in the current workspace."
+        },
+        {
+          icon: "git-branch",
+          title: "Workflow bottleneck",
+          copy: "Review lane has the highest handoff time. AI suggests routing finance files directly to approvers."
+        },
+        {
+          icon: "clock",
+          title: "Approval delay",
+          copy: "Escalate files that remain pending for more than 48 hours to maintain SLA health."
+        }
+      ];
+
+      const markup = insights.map(item => `
+        <div class="insight-item">
+          <div class="insight-icon"><i data-feather="${item.icon}"></i></div>
+          <div><p class="insight-title">${escapeHtml(item.title)}</p><p class="insight-copy">${escapeHtml(item.copy)}</p></div>
+        </div>
+      `).join("");
+
+      document.getElementById("insightsList").innerHTML = markup;
+      document.getElementById("insightsPageList").innerHTML = markup;
+      feather.replace();
+    }
+
+    document.getElementById("refreshInsightsBtn").addEventListener("click", renderInsights);
+
+    async function loadRecentActivity() {
+      try {
+        const res = await fetch("/activities/recent", { credentials: "include" });
+        state.activities = res.ok ? await res.json() : [];
+      } catch (err) {
+        console.error("Recent activity error", err);
+      }
+      renderRecentActivity();
+    }
+
+    function renderRecentActivity() {
+      const fallback = state.documents.slice(0, 5).map(doc => ({
+        user: { username: "AI Intake" },
+        action: "uploaded and queued",
+        entityName: doc.fileName,
+        entityType: "document",
+        createdAt: doc.createdAt
+      }));
+      const activities = state.activities.length ? state.activities : fallback;
+      const markup = activities.length ? activities.map(activity => {
+        const actor = activity.user?.username || "User";
+        const initials = actor.split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase() || "AI";
+        return `
+          <div class="timeline-item">
+            <div class="timeline-avatar">${escapeHtml(initials)}</div>
+            <div>
+              <p class="timeline-title"><strong>${escapeHtml(actor)}</strong> ${escapeHtml(activity.action || "updated")} <span style="color: var(--cyan);">${escapeHtml(activity.entityName || "")}</span></p>
+              <div class="timeline-meta">
+                <span class="badge">${escapeHtml(activity.entityType || "workflow")}</span>
+                <span>${relativeTime(activity.createdAt)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("") : '<div class="empty-state">No recent activity yet.</div>';
+
+      document.getElementById("activityList").innerHTML = markup;
+      document.getElementById("activityPopoverList").innerHTML = markup;
+      feather.replace();
+    }
+
+    activityFeedBtn.addEventListener("click", () => activityPopover.classList.toggle("hidden"));
+    notificationBtn.addEventListener("click", () => activityPopover.classList.toggle("hidden"));
+
+    document.addEventListener("click", event => {
+      const clickedActivity = activityPopover.contains(event.target) || activityFeedBtn.contains(event.target) || notificationBtn.contains(event.target);
+      if (!clickedActivity) activityPopover.classList.add("hidden");
+    });
+
+    function renderApprovalQueue() {
+      const approvals = state.documents.filter(doc => ["pending", "processing", "review", "changes_requested"].includes(doc.status));
+      document.getElementById("approvalQueue").innerHTML = approvals.length ? approvals.map(doc => `
+        <div class="timeline-item">
+          <div class="timeline-avatar">${String(getCategory(doc)).slice(0, 2).toUpperCase()}</div>
+          <div>
+            <p class="timeline-title">${escapeHtml(doc.fileName)}</p>
+            <div class="timeline-meta">
+              <span class="badge ${escapeHtml(doc.status)}">${escapeHtml(formatStatus(doc.status))}</span>
+              <span>${getConfidence(doc)}% AI confidence</span>
+              <button class="button" type="button" data-preview="${escapeHtml(getDocumentId(doc))}"><i data-feather="eye"></i>Preview</button>
+            </div>
+          </div>
+        </div>
+      `).join("") : '<div class="empty-state">No approval items are waiting right now.</div>';
+      feather.replace();
+    }
+
+    function renderKanban() {
+      const columns = [
+        { key: "pending", title: "Pending", color: "var(--orange)" },
+        { key: "processing", title: "AI Processing", color: "var(--cyan)" },
+        { key: "review", title: "In Review", color: "var(--violet)" },
+        { key: "approved", title: "Approved", color: "var(--emerald)" }
+      ];
+
+      document.getElementById("kanbanBoard").innerHTML = columns.map(column => {
+        const items = workflowItems.filter(item => item.status === column.key);
+        return `
+          <section class="kanban-column">
+            <div class="kanban-head">
+              <div class="kanban-title"><span class="status-dot" style="background: ${column.color};"></span>${column.title}</div>
+              <span class="badge">${items.length}</span>
+            </div>
+            <div class="kanban-dropzone" data-status="${column.key}">
+              ${items.map(createKanbanCard).join("")}
+            </div>
+          </section>
+        `;
+      }).join("");
+      feather.replace();
+    }
+
+    function createKanbanCard(item) {
+      const progress = item.status === "pending" ? 16 : item.status === "processing" ? 46 : item.status === "review" ? 74 : 100;
+      return `
+        <article class="kanban-card" draggable="true" data-workflow-id="${item.id}">
+          <div class="metric-top">
+            <span class="badge ${item.priority === "High" ? "rejected" : item.priority === "Medium" ? "pending" : "approved"}">${item.priority}</span>
+            <button class="icon-button" type="button" title="More"><i data-feather="more-horizontal"></i></button>
+          </div>
+          <p class="timeline-title" style="margin-top: 12px;">${escapeHtml(item.title)}</p>
+          <div class="timeline-meta">
+            <span class="badge"><i data-feather="file-text"></i>${escapeHtml(item.type)}</span>
+            <span>${item.aiConfidence}% AI match</span>
+          </div>
+          <div class="metric-top" style="margin-top: 13px;">
+            <span class="panel-subtitle">Assigned to ${escapeHtml(item.assignee)}</span>
+            <span class="avatar" style="width: 28px; height: 28px; border-radius: 10px; font-size: 0.7rem;">${escapeHtml(item.assignee.slice(0, 2))}</span>
+          </div>
+          <div class="progress-track" style="margin-top: 12px;"><span style="width: ${progress}%;"></span></div>
+        </article>
+      `;
+    }
+
+    document.getElementById("kanbanBoard").addEventListener("dragstart", event => {
+      const card = event.target.closest(".kanban-card");
+      if (!card) return;
+      card.classList.add("dragging");
+      event.dataTransfer.setData("text/plain", card.dataset.workflowId);
+    });
+
+    document.getElementById("kanbanBoard").addEventListener("dragend", event => {
+      const card = event.target.closest(".kanban-card");
+      if (card) card.classList.remove("dragging");
+      document.querySelectorAll(".kanban-dropzone").forEach(zone => zone.classList.remove("is-over"));
+    });
+
+    document.getElementById("kanbanBoard").addEventListener("dragover", event => {
+      const zone = event.target.closest(".kanban-dropzone");
+      if (!zone) return;
+      event.preventDefault();
+      zone.classList.add("is-over");
+    });
+
+    document.getElementById("kanbanBoard").addEventListener("dragleave", event => {
+      const zone = event.target.closest(".kanban-dropzone");
+      if (zone) zone.classList.remove("is-over");
+    });
+
+    document.getElementById("kanbanBoard").addEventListener("drop", event => {
+      const zone = event.target.closest(".kanban-dropzone");
+      if (!zone) return;
+      event.preventDefault();
+      const id = event.dataTransfer.getData("text/plain");
+      const item = workflowItems.find(entry => entry.id === id);
+      if (item) {
+        item.status = zone.dataset.status;
+        renderKanban();
+        updateMetrics();
+      }
+    });
+
+    function openSearchModal(query = "") {
+      toggleModal(aiSearchModal, true);
+      aiSearchInput.value = query;
+      renderAISuggestions(query);
+      setTimeout(() => aiSearchInput.focus(), 40);
+    }
+
+    function closeAISearch() {
+      toggleModal(aiSearchModal, false);
+      searchInput.value = "";
+    }
+
+    searchInput.addEventListener("focus", () => openSearchModal(searchInput.value));
+    searchInput.addEventListener("click", () => openSearchModal(searchInput.value));
+    document.getElementById("heroSearchBtn").addEventListener("click", () => openSearchModal());
+    document.getElementById("assistantQuickAction").addEventListener("click", () => openSearchModal());
+    document.getElementById("smartSearchOpenBtn").addEventListener("click", () => openSearchModal());
+    closeSearchModal.addEventListener("click", closeAISearch);
+    aiSearchModal.addEventListener("click", event => {
+      if (event.target === aiSearchModal) closeAISearch();
+    });
+
+    document.addEventListener("keydown", event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        openSearchModal();
+      }
+      if (event.key === "Escape") {
+        closeAISearch();
+        closePreview();
+        toggleModal(uploadModal, false);
+      }
+    });
+
+    aiSearchInput.addEventListener("input", () => renderAISuggestions(aiSearchInput.value));
+    aiSearchInput.addEventListener("keydown", event => {
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        const first = aiSuggestions.querySelector("button");
+        if (first) first.focus();
+      }
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const first = aiSuggestions.querySelector("button");
+        if (first) first.click();
+      }
+    });
+
+    document.querySelectorAll(".smart-prompt").forEach(button => {
+      button.addEventListener("click", () => openSearchModal(button.dataset.query));
+    });
+
+    function renderAISuggestions(query = "") {
+      const normalized = query.trim().toLowerCase();
+      let matches = state.documents.filter(doc => {
+        const keywords = Array.isArray(doc.keywords) ? doc.keywords : [];
+        const haystack = [doc.fileName, doc.fileType, doc.status, getCategory(doc), ...keywords].join(" ").toLowerCase();
+        return !normalized || haystack.includes(normalized) || normalized.split(/\s+/).some(token => haystack.includes(token));
+      }).slice(0, 5);
+
+      if (!matches.length && state.documents.length) matches = state.documents.slice(0, 3);
+
+      const promptSuggestions = [
+        "Find all pending finance invoices from March.",
+        "Show documents with low AI confidence.",
+        "Which approvals are delayed today?"
+      ];
+
+      const docsMarkup = matches.map(doc => `
+        <button class="suggestion-button" type="button" data-preview="${escapeHtml(getDocumentId(doc))}">
+          <span class="file-glyph"><i data-feather="file-text"></i></span>
+          <span>
+            <strong class="doc-title">${escapeHtml(doc.fileName)}</strong>
+            <span class="doc-sub">${escapeHtml(getCategory(doc))} - ${escapeHtml(formatStatus(doc.status))} - ${getConfidence(doc)}% confidence</span>
+          </span>
+          <i data-feather="arrow-up-right"></i>
+        </button>
+      `).join("");
+
+      const promptsMarkup = promptSuggestions.map(prompt => `
+        <button class="suggestion-button" type="button" data-search-prompt="${escapeHtml(prompt)}">
+          <span class="file-glyph"><i data-feather="command"></i></span>
+          <span>
+            <strong class="doc-title">${escapeHtml(prompt)}</strong>
+            <span class="doc-sub">Semantic query suggestion</span>
+          </span>
+          <i data-feather="send"></i>
+        </button>
+      `).join("");
+
+      aiSuggestions.innerHTML = docsMarkup + promptsMarkup;
+      feather.replace();
+    }
+
+    aiSuggestions.addEventListener("click", event => {
+      const promptButton = event.target.closest("[data-search-prompt]");
+      if (promptButton) {
+        aiSearchInput.value = promptButton.dataset.searchPrompt;
+        renderAISuggestions(aiSearchInput.value);
+        return;
+      }
+      const previewButton = event.target.closest("[data-preview]");
+      if (previewButton) {
+        const doc = state.documents.find(item => String(getDocumentId(item)) === String(previewButton.dataset.preview));
+        if (doc) {
+          closeAISearch();
+          openPreview(doc);
+        }
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      setGreeting();
+      renderKanban();
+      renderHeatmap();
+      renderInsights();
+      await Promise.all([loadDocuments(), loadDashboardStats(), loadRecentActivity()]);
+    });
+  </script>
+</body>
 
 </html>
