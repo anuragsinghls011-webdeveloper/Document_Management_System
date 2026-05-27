@@ -1,0 +1,215 @@
+/#include <stdio.h>
+
+int main() {
+   int arr[50],i,max,min,size;
+   printf("enter the size of array:");
+   scanf("%d",&size);
+   
+   printf("enter the elements in array:");
+   for(i=0;i<size;i++){
+       scanf("%d",&arr[i]);
+   }
+   max=arr[0];
+   min=arr[0];
+   for(i=1;i<size;i++){
+       if(arr[i]>max){
+           max=arr[i];
+           
+       }
+       if(arr[i]<min){
+           min=arr[i];
+           
+       }
+   }
+   printf("Maximum element is=%d\n",max);
+   printf("Minimum element is =%d\n",min);
+
+    return 0;
+}
+
+
+
+
+#include <stdio.h>
+
+int main() {
+   int arr[50];
+   int size,evenc=0,oddc=0;
+   printf("enter the size of array :");
+   scanf("%d",&size);
+   printf("enter the elements in array:");
+   for(int i=0;i<size;i++){
+       scanf("%d",&arr[i]);
+   }
+   for(int i=0;i<size;i++){
+       if(arr[i]%2==0){
+           evenc++;
+       }
+       else{
+           oddc++;
+       }
+   }
+   printf("odd element count=%d\n",oddc);
+   printf("even element count=%d\n",evenc);
+   return 0;
+}
+
+
+
+
+#include <stdio.h>
+
+int main() {
+
+   int size;
+   printf("enter the size of array :");
+   scanf("%d",&size);
+   int arr1[size],arr2[size];
+   printf("enter the elements in array:");
+   for(int i=0;i<size;i++){
+       scanf("%d",&arr1[i]);
+   }
+   for(int i=0;i<size;i++){
+       arr2[i]=arr1[size-i-1];
+   }
+   printf("element of second array (reversed):\n");
+   for(int i=0;i<size;i++){
+       printf("arr2[%d]=%d\n",arr2[i]);
+   }
+   
+   return 0;
+}
+ 
+
+
+
+#include <stdio.h>
+
+int main() {
+
+   int size,sum=0;
+   printf("enter the size of array :");
+   scanf("%d",&size);
+   int arr[size];
+   printf("enter the elements in array:");
+   for(int i=0;i<size;i++){
+       scanf("%d",&arr[i]);
+   }
+   for(int i=0;i<size;i++){
+       if(arr[i]<0){
+           sum+=arr[i];
+       }
+   }
+   printf("Sum=%d",sum);
+   
+   return 0;
+}
+ 
+
+
+
+
+#include <stdio.h>
+
+int binarysearch(int arr[],int st,int end,int targ){
+    while(st<=end){
+       int mid=st+(end-st)/2;
+        if(targ>arr[mid]){
+            int elementfound=1;
+           return binarysearch(arr,targ,mid+1,end);
+          
+        }
+        else if (targ<arr[mid]){
+           int elementfound=1;
+          return  binarysearch(arr,targ,st,mid-1);
+        }
+        else{
+            return mid;
+        }
+    }
+    return -1;
+}
+
+int main() {
+    // Write C code here
+   int st=0,end,size,i,j,targ,mid;
+   printf("enter the size of array");
+   scanf("%d",&size);
+   int arr[size];
+   printf("enter the element in array:");
+   for(i=0;i<size;i++){
+       scanf("%d",&arr[i]);fA2Q3W
+   }
+   printf("enter the target element:");
+   scanf("%d",&targ);
+   end=size-1;
+   int elementfound= 1;
+   if(elementfound==1){
+       printf("Element found at index %d\n", mid);
+    } 
+    else {
+        printf("Element not found\n");
+    }
+   
+   
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+#include <stdio.h>
+int printarray(int arr[],int n){
+    for(int i=0;i<n;i++){
+        printf("%d\t",arr[i]);
+    }
+     printf("\n");
+}
+int selectionsort(int arr[],int n){
+    int temp,flag,smallest_element,j;
+    for(int i=0;i<n-1;i++){
+        smallest_element=i;
+        for(int j=i+1;j<n;j++){
+            if(arr[j]<arr[smallest_element]){
+                smallest_element=j;
+                
+            }
+               
+                
+            }
+            if(smallest_element!=i){
+                temp=arr[i];
+                arr[i]=arr[smallest_element];
+                arr[smallest_element]=temp;
+                
+            }
+           
+        }
+        
+        
+        
+    
+}
+
+int main() {
+    int n;
+    printf("enter the size of array :");
+    scanf("%d",&n);
+    int arr[n];
+    printf("enter the elment of the array :");
+    for(int i=0;i<n;i++){
+        scanf("%d",&arr[i]);
+    }
+    printarray(arr,n);
+    selectionsort(arr,n);
+    printarray(arr,n);
+    
+    return 0;
+}
+
+ 

@@ -1,0 +1,86 @@
+                          C PROGRAMMING
+
+
+P-1: WAP IN C TO PRINT THE SUM OF TWO NUMBERS.
+
+
+#include <stdio.h>
+
+int main() {
+    int num1, num2, sum;
+
+    // Input two numbers
+    printf("Enter first number: ");
+    scanf("%d", &num1);
+
+    printf("Enter second number: ");
+    scanf("%d", &num2);
+
+    // Calculate sum
+    sum = num1 + num2;
+
+    // Output the result
+    printf("Sum of %d and %d is: %d\n", num1, num2, sum);
+
+    return 0;
+}
+
+
+P-2:WAP IN C TO CALCULATE AREA AND PERIMETER OF SQUAR.
+
+
+#include <stdio.h>
+
+int main() {
+    float side, area, perimeter;
+
+    // Ask the user to input the side length of the square
+    printf("Enter the side length of the square: ");
+    scanf("%f", &side);
+
+    // Calculate area and perimeter
+    area = side * side;
+    perimeter = 4 * side;
+
+    // Display the results
+    printf("Area of the square: %.2f\n", area);
+    printf("Perimeter of the square: %.2f\n", perimeter);
+
+    return 0;
+}
+
+
+P-3:WAP IN C TO CALCULATECAREA AND PERIMETER OF CIRCLE
+
+
+#include <stdio.h>
+#include <math.h>  // For the constant M_PI (Pi)
+
+int main() {
+    float radius, area, perimeter;
+
+    // Ask the user to input the radius of the circle
+    printf("Enter the radius of the circle: ");
+    scanf("%f", &radius);
+
+    // Calculate area and perimeter (circumference)
+area = M_PI * radius * radius;  // Area = π * r²
+    perimeter = 2 * M_PI * radius;  // Circumference = 2 * π * r
+
+    // Display the results
+    printf("Area of the circle: %.2f\n", area);
+    printf("Perimeter (Circumference) of the circle: %.2f\n", perimeter);
+
+    return 0;
+}
+
+
+P-4:WAP IN C TO FIND THE TOTAL MARKS AVERAGE AND PERCENTAGE OF MARKS OBTAINED BY A STUDNET.
+anurag sing is very good coder .anushka agrawal is very very good coder
+
+
+
+
+
+
+

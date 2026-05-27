@@ -1,0 +1,630 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { 
+  Github, 
+  Linkedin, 
+  Twitter, 
+  Mail, 
+  ExternalLink, 
+  Code2, 
+  Terminal, 
+  Cpu, 
+  Globe, 
+  Database, 
+  Moon, 
+  Sun, 
+  Menu, 
+  X, 
+  MapPin, 
+  Download,
+  ChevronRight,
+  Send
+} from 'lucide-react';
+
+// --- Data & Assets ---
+
+const PROFILE = {
+  name: "Alex Dev",
+  role: "Full Stack Engineer",
+  bio: "I craft robust, scalable digital products with a focus on performance and user experience. Passionate about bridging the gap between engineering and design.",
+  location: "San Francisco, CA",
+  email: "hello@alexdev.com",
+  social: {
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    twitter: "https://twitter.com"
+  }
+};
+
+const SKILLS = [
+  {
+    category: "Frontend",
+    icon: <Globe className="w-6 h-6" />,
+    items: ["React", "TypeScript", "Next.js", "Tailwind CSS", "Framer Motion", "Redux"]
+  },
+  {
+    category: "Backend",
+    icon: <Terminal className="w-6 h-6" />,
+    items: ["Node.js", "Python", "PostgreSQL", "GraphQL", "Redis", "Docker"]
+  },
+  {
+    category: "Tools & Cloud",
+    icon: <Cpu className="w-6 h-6" />,
+    items: ["AWS", "Git", "CI/CD", "Jest", "Figma", "Vercel"]
+  },
+  {
+    category: "AI & Data",
+    icon: <Database className="w-6 h-6" />,
+    items: ["LangChain", "OpenAI API", "Pandas", "Vector DBs", "Scikit-learn"]
+  }
+];
+
+const EXPERIENCE = [
+  {
+    id: 1,
+    role: "Senior Frontend Engineer",
+    company: "TechFlow Solutions",
+    period: "2022 - Present",
+    description: "Leading a team of 5 developers building a high-frequency trading dashboard. Improved render performance by 40% using React concurrency features."
+  },
+  {
+    id: 2,
+    role: "Full Stack Developer",
+    company: "Creative Pulse Agency",
+    period: "2020 - 2022",
+    description: "Developed 15+ custom web applications for clients in Fintech and Healthcare. Managed end-to-end deployment pipelines on AWS."
+  },
+  {
+    id: 3,
+    role: "Junior Developer",
+    company: "StartUp Inc.",
+    period: "2018 - 2020",
+    description: "Collaborated on the core SaaS product using Vue.js and Django. Implemented the initial payment gateway integration."
+  }
+];
+
+const PROJECTS = [
+  {
+    id: 1,
+    title: "E-Commerce Dashboard",
+    category: "Full Stack",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop",
+    description: "A comprehensive analytics dashboard for online retailers featuring real-time sales tracking and inventory management.",
+    tech: ["React", "Node.js", "Chart.js", "MongoDB"],
+    links: { demo: "#", code: "#" }
+  },
+  {
+    id: 2,
+    title: "AI Content Generator",
+    category: "AI / ML",
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2532&auto=format&fit=crop",
+    description: "SaaS platform helping marketers generate blog posts using GPT-4. Includes tone adjustment and SEO optimization tools.",
+    tech: ["Next.js", "OpenAI API", "Stripe", "Tailwind"],
+    links: { demo: "#", code: "#" }
+  },
+  {
+    id: 3,
+    title: "TaskMaster Pro",
+    category: "Productivity",
+    image: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?q=80&w=2372&auto=format&fit=crop",
+    description: "Collaborative project management tool with Kanban boards, real-time chat, and file sharing capabilities.",
+    tech: ["Vue.js", "Firebase", "Pinia", "Sass"],
+    links: { demo: "#", code: "#" }
+  },
+  {
+    id: 4,
+    title: "Crypto Portfolio",
+    category: "Fintech",
+    image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?q=80&w=2448&auto=format&fit=crop",
+    description: "Real-time cryptocurrency tracker with price alerts, portfolio rebalancing suggestions, and historical data visualization.",
+    tech: ["React Native", "Redux", "CoinGecko API"],
+    links: { demo: "#", code: "#" }
+  },
+  {
+    id: 5,
+    title: "HealthBeat",
+    category: "Healthcare",
+    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=2370&auto=format&fit=crop",
+    description: "Telemedicine app allowing patients to book appointments, video chat with doctors, and view medical records securey.",
+    tech: ["Flutter", "Dart", "WebRTC", "Node.js"],
+    links: { demo: "#", code: "#" }
+  },
+  {
+    id: 6,
+    title: "Urban Explorer",
+    category: "Mobile",
+    image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2321&auto=format&fit=crop",
+    description: "Social travel app for sharing hidden gems and custom itineraries in major cities worldwide.",
+    tech: ["React", "Mapbox GL", "GraphQL", "AWS Amplify"],
+    links: { demo: "#", code: "#" }
+  }
+];
+
+// --- Reusable Components ---
+
+const Section = ({ children, id, className = "" }) => {
+  return (
+    <motion.section
+      id={id}
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+      className={`py-20 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto ${className}`}
+    >
+      {children}
+    </motion.section>
+  );
+};
+
+const Button = ({ children, variant = "primary", className = "", ...props }) => {
+  const baseStyle = "px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2";
+  const variants = {
+    primary: "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30",
+    secondary: "bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400",
+    outline: "border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+  };
+
+  return (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className={`${baseStyle} ${variants[variant]} ${className}`}
+      {...props}
+    >
+      {children}
+    </motion.button>
+  );
+};
+
+// --- Main Application Component ---
+
+export default function PortfolioApp() {
+  const [darkMode, setDarkMode] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [activeSection, setActiveSection] = useState('home');
+  
+  // Scroll Progress Bar
+  const { scrollYProgress } = useScroll();
+  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
+  // Toggle Dark Mode
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  // Close mobile menu on resize
+  useEffect(() => {
+    const handleResize = () => setIsMenuOpen(false);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const navLinks = [
+    { name: "About", href: "#about" },
+    { name: "Skills", href: "#skills" },
+    { name: "Projects", href: "#projects" },
+    { name: "Experience", href: "#experience" },
+    { name: "Contact", href: "#contact" },
+  ];
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
+
+  const handleNavClick = (href) => {
+    closeMenu();
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+      
+      {/* Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-indigo-500 origin-left z-50"
+        style={{ scaleX }}
+      />
+
+      {/* Navigation */}
+      <nav className={`fixed top-0 w-full z-40 transition-all duration-300 backdrop-blur-md border-b ${darkMode ? 'bg-slate-950/80 border-slate-800' : 'bg-white/80 border-slate-200'}`}>
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent cursor-pointer"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            {PROFILE.name}<span className="text-indigo-500">.</span>
+          </motion.div>
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map((link, index) => (
+              <a 
+                key={link.name}
+                href={link.href}
+                onClick={(e) => { e.preventDefault(); handleNavClick(link.href); }}
+                className="text-sm font-medium hover:text-indigo-500 transition-colors relative group"
+              >
+                {link.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-500 transition-all duration-300 group-hover:w-full"></span>
+              </a>
+            ))}
+            
+            <button 
+              onClick={() => setDarkMode(!darkMode)}
+              className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-slate-200 hover:bg-slate-300'}`}
+              aria-label="Toggle Theme"
+            >
+              {darkMode ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-indigo-600" />}
+            </button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-4">
+             <button 
+              onClick={() => setDarkMode(!darkMode)}
+              className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-slate-200 hover:bg-slate-300'}`}
+            >
+              {darkMode ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-indigo-600" />}
+            </button>
+            <button onClick={toggleMenu} className="p-2">
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Nav Dropdown */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className={`md:hidden overflow-hidden border-b ${darkMode ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'}`}
+            >
+              <div className="flex flex-col px-6 py-4 gap-4">
+                {navLinks.map((link) => (
+                  <a 
+                    key={link.name}
+                    href={link.href}
+                    onClick={(e) => { e.preventDefault(); handleNavClick(link.href); }}
+                    className="text-lg font-medium py-2 border-b border-slate-100 dark:border-slate-800"
+                  >
+                    {link.name}
+                  </a>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+        {/* Background Decoration */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-500/20 dark:bg-indigo-500/10 blur-[100px] rounded-full -z-10 pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center gap-12">
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="flex-1 text-center md:text-left"
+          >
+            <div className="inline-block px-3 py-1 mb-4 text-xs font-medium tracking-wider text-indigo-500 uppercase bg-indigo-500/10 rounded-full">
+              Available for hire
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              Hi, I'm {PROFILE.name}.<br />
+              <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                {PROFILE.role}
+              </span>
+            </h1>
+            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-8 max-w-lg mx-auto md:mx-0">
+              {PROFILE.bio}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+              <Button onClick={() => handleNavClick('#projects')}>
+                View My Work <ChevronRight size={18} />
+              </Button>
+              <Button variant="secondary" onClick={() => handleNavClick('#contact')}>
+                Contact Me
+              </Button>
+            </div>
+            
+            <div className="mt-12 flex items-center justify-center md:justify-start gap-6 text-slate-500 dark:text-slate-400">
+              <a href={PROFILE.social.github} target="_blank" rel="noreferrer" className="hover:text-indigo-500 transition-colors"><Github size={24} /></a>
+              <a href={PROFILE.social.linkedin} target="_blank" rel="noreferrer" className="hover:text-indigo-500 transition-colors"><Linkedin size={24} /></a>
+              <a href={PROFILE.social.twitter} target="_blank" rel="noreferrer" className="hover:text-indigo-500 transition-colors"><Twitter size={24} /></a>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="flex-1 relative"
+          >
+            <div className="relative w-72 h-72 md:w-96 md:h-96 mx-auto">
+              <div className="absolute inset-0 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl rotate-6 opacity-50 blur-lg animate-pulse"></div>
+              <img 
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2487&auto=format&fit=crop" 
+                alt="Profile" 
+                className="relative w-full h-full object-cover rounded-2xl shadow-2xl border-4 border-white dark:border-slate-800 rotate-3 hover:rotate-0 transition-transform duration-500"
+              />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <Section id="about" className="bg-white/50 dark:bg-slate-900/50">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="relative">
+             <div className="absolute -top-4 -left-4 w-24 h-24 bg-indigo-500/20 rounded-full blur-xl"></div>
+             <img 
+               src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2372&auto=format&fit=crop" 
+               alt="Workspace"
+               className="rounded-xl shadow-lg relative z-10 grayscale hover:grayscale-0 transition-all duration-500"
+             />
+          </div>
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">About Me</h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+              I'm a passionate developer with a deep interest in building scalable web applications. 
+              My journey began 5 years ago when I built my first website for a local non-profit. 
+              Since then, I've worked with startups and enterprise clients to deliver robust digital solutions.
+            </p>
+            <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+              When I'm not coding, you can find me hiking, playing chess, or experimenting with new IoT projects.
+            </p>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                <h3 className="text-3xl font-bold text-indigo-500 mb-1">5+</h3>
+                <p className="text-sm text-slate-500">Years Experience</p>
+              </div>
+              <div className="p-4 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                <h3 className="text-3xl font-bold text-purple-500 mb-1">50+</h3>
+                <p className="text-sm text-slate-500">Projects Completed</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* Skills Section */}
+      <Section id="skills">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Technical Skills</h2>
+          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            My tech stack allows me to build high-performance, scalable, and responsive applications.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {SKILLS.map((skillGroup, idx) => (
+            <motion.div
+              key={idx}
+              whileHover={{ y: -5 }}
+              className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700"
+            >
+              <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center mb-4">
+                {skillGroup.icon}
+              </div>
+              <h3 className="text-xl font-semibold mb-4">{skillGroup.category}</h3>
+              <ul className="space-y-2">
+                {skillGroup.items.map((item, i) => (
+                  <li key={i} className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
+        </div>
+      </Section>
+
+      {/* Projects Section */}
+      <Section id="projects" className="bg-slate-50 dark:bg-slate-900/30">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Projects</h2>
+          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            A selection of my recent work. Click on a card to view more details.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {PROJECTS.map((project) => (
+            <motion.div
+              layoutId={`project-${project.id}`}
+              key={project.id}
+              onClick={() => setSelectedProject(project)}
+              whileHover={{ y: -10 }}
+              className="group bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-700 cursor-pointer"
+            >
+              <div className="relative h-48 overflow-hidden">
+                <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/0 transition-all z-10" />
+                <img 
+                  src={project.image} 
+                  alt={project.title} 
+                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                />
+              </div>
+              <div className="p-6">
+                <span className="text-xs font-bold text-indigo-500 uppercase tracking-wider mb-2 block">
+                  {project.category}
+                </span>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-indigo-500 transition-colors">
+                  {project.title}
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2">
+                  {project.description}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {project.tech.slice(0, 3).map((t, i) => (
+                    <span key={i} className="px-2 py-1 bg-slate-100 dark:bg-slate-700 text-xs rounded text-slate-600 dark:text-slate-300">
+                      {t}
+                    </span>
+                  ))}
+                  {project.tech.length > 3 && (
+                    <span className="px-2 py-1 bg-slate-100 dark:bg-slate-700 text-xs rounded text-slate-600 dark:text-slate-300">
+                      +{project.tech.length - 3}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </Section>
+
+      {/* Experience Section */}
+      <Section id="experience">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Experience & Education</h2>
+          <p className="text-slate-600 dark:text-slate-400">My professional journey.</p>
+        </div>
+
+        <div className="max-w-3xl mx-auto relative">
+          {/* Vertical Line */}
+          <div className="absolute left-[20px] md:left-1/2 top-0 bottom-0 w-0.5 bg-indigo-200 dark:bg-indigo-900"></div>
+
+          <div className="space-y-12">
+            {EXPERIENCE.map((exp, idx) => (
+              <motion.div 
+                key={exp.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className={`relative flex flex-col md:flex-row gap-8 ${idx % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
+              >
+                {/* Dot */}
+                <div className="absolute left-[20px] md:left-1/2 -translate-x-1/2 w-4 h-4 bg-indigo-500 rounded-full border-4 border-white dark:border-slate-950 z-10"></div>
+
+                <div className="ml-12 md:ml-0 md:w-1/2">
+                   <div className={`bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 ${idx % 2 === 0 ? 'md:text-left' : 'md:text-right'}`}>
+                     <span className="text-indigo-500 font-bold text-sm">{exp.period}</span>
+                     <h3 className="text-xl font-bold mt-1">{exp.role}</h3>
+                     <h4 className="text-slate-500 font-medium mb-4">{exp.company}</h4>
+                     <p className="text-slate-600 dark:text-slate-400 text-sm">
+                       {exp.description}
+                     </p>
+                   </div>
+                </div>
+                <div className="hidden md:block md:w-1/2"></div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* Contact Section */}
+      <Section id="contact" className="bg-slate-50 dark:bg-slate-900/30">
+        <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+          <div className="p-8 md:p-12 md:w-1/2 bg-indigo-600 text-white flex flex-col justify-between">
+            <div>
+              <h2 className="text-3xl font-bold mb-6">Let's Chat</h2>
+              <p className="text-indigo-100 mb-12">
+                I'm currently open to new opportunities. Whether you have a question or just want to say hi, I'll try my best to get back to you!
+              </p>
+              
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-indigo-500/50 rounded-full flex items-center justify-center">
+                    <Mail size={20} />
+                  </div>
+                  <span>{PROFILE.email}</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-indigo-500/50 rounded-full flex items-center justify-center">
+                    <MapPin size={20} />
+                  </div>
+                  <span>{PROFILE.location}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-12 flex gap-4">
+              <a href={PROFILE.social.github} className="w-10 h-10 bg-indigo-500/50 hover:bg-indigo-500 rounded-full flex items-center justify-center transition-colors">
+                <Github size={20} />
+              </a>
+              <a href={PROFILE.social.linkedin} className="w-10 h-10 bg-indigo-500/50 hover:bg-indigo-500 rounded-full flex items-center justify-center transition-colors">
+                <Linkedin size={20} />
+              </a>
+              <a href={PROFILE.social.twitter} className="w-10 h-10 bg-indigo-500/50 hover:bg-indigo-500 rounded-full flex items-center justify-center transition-colors">
+                <Twitter size={20} />
+              </a>
+            </div>
+          </div>
+
+          <div className="p-8 md:p-12 md:w-1/2">
+            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Name</label>
+                <input 
+                  type="text" 
+                  className="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  placeholder="John Doe"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
+                <input 
+                  type="email" 
+                  className="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  placeholder="john@example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Message</label>
+                <textarea 
+                  rows="4"
+                  className="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none"
+                  placeholder="Tell me about your project..."
+                ></textarea>
+              </div>
+              <Button className="w-full justify-center">
+                Send Message <Send size={18} />
+              </Button>
+            </form>
+          </div>
+        </div>
+      </Section>
+
+      {/* Footer */}
+      <footer className="bg-white dark:bg-slate-950 py-8 border-t border-slate-100 dark:border-slate-800 text-center">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
+          © {new Date().getFullYear()} {PROFILE.name}. All rights reserved.
+        </p>
+      </footer>
+
+      {/* Project Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedProject(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            
+            <motion.div
+              layoutId={`project-${selectedProject.id}`}
+              className="relative bg-white dark:bg-slate-900 w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+            >
+              <button 
+                onClick={(

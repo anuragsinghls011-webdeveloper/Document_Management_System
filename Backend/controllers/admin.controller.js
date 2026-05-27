@@ -1,6 +1,10 @@
 const Document = require("../models/document.model");
 const Activity = require("../models/activity.model");
 
+<<<<<<< HEAD
+=======
+//  Fetch pending documents
+>>>>>>> d01f47e50e3f8e6132207dc22b657c309df604b9
 exports.pendingDocs = async (req, res) => {
   try {
     const pendingDocs = await Document.find({ status: "pending" })
@@ -14,6 +18,10 @@ exports.pendingDocs = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+//  Fetch single document
+>>>>>>> d01f47e50e3f8e6132207dc22b657c309df604b9
 exports.getDocument = async (req, res) => {
   try {
     const doc = await Document.findById(req.params.id).populate("userId", "username email");
@@ -29,6 +37,10 @@ exports.getDocument = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+//  Approve
+>>>>>>> d01f47e50e3f8e6132207dc22b657c309df604b9
 exports.approveDoc = async (req, res) => {
   try {
     const doc = await Document.findById(req.params.id);
@@ -56,6 +68,10 @@ exports.approveDoc = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+//  Reject
+>>>>>>> d01f47e50e3f8e6132207dc22b657c309df604b9
 exports.rejectDoc = async (req, res) => {
   try {
     const { reason, comment } = req.body;
@@ -85,10 +101,37 @@ exports.rejectDoc = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+//  Request changes
+exports.requestChanges = async (req, res) => {
+  const { comment } = req.body;
+
+  const doc = await Document.findByIdAndUpdate(
+    req.params.id,
+    { status: "Changes Requested" },
+    { new: true }
+  );
+
+  await Activity.create({
+    user: req.userId,
+    action: "Requested changes",
+    entityType: "Document",
+    entityName: doc.title,
+    comment
+  });
+
+  res.json({ success: true, status: "Changes Requested" });
+};
+>>>>>>> d01f47e50e3f8e6132207dc22b657c309df604b9
 exports.requestChanges = async (req, res) => {
   try {
     const { comment } = req.body;
 
+<<<<<<< HEAD
+=======
+    //  Comment mandatory
+>>>>>>> d01f47e50e3f8e6132207dc22b657c309df604b9
     if (!comment || comment.trim() === "") {
       return res.status(400).json({
         success: false,
@@ -96,7 +139,12 @@ exports.requestChanges = async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
     const doc = await Document.findById(req.params.id);
+=======
+    //  Find document
+    const doc = await Document.findById(id);
+>>>>>>> d01f47e50e3f8e6132207dc22b657c309df604b9
 
     if (!doc) {
       return res.status(404).json({
@@ -105,10 +153,19 @@ exports.requestChanges = async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
     doc.status = "changes_requested";
     doc.reviewComment = comment.trim();
     await doc.save();
 
+=======
+    //  Update status
+    doc.status = "Changes Requested";
+    doc.reviewComment = comment; // optional field
+    await doc.save();
+
+    
+>>>>>>> d01f47e50e3f8e6132207dc22b657c309df604b9
     await Activity.create({
       user: req.user.id,
       action: "Requested changes",
