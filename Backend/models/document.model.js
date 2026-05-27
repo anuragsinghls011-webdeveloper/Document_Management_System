@@ -22,7 +22,6 @@ const documentSchema = new mongoose.Schema(
       required: true
     },
 
-    // AI extracted data
     extractedText: {
       type: String,
       default: ""
@@ -38,10 +37,9 @@ const documentSchema = new mongoose.Schema(
       default: []
     },
 
-    // Approval workflow
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected"],
+      enum: ["pending", "processing", "review", "approved", "rejected", "changes_requested", "archived"],
       default: "pending"
     },
 
@@ -56,14 +54,17 @@ const documentSchema = new mongoose.Schema(
 
     rejectionReason: {
       type: String
+    },
+
+    reviewComment: {
+      type: String
     }
   },
   {
-    timestamps: true // createdAt & updatedAt automatically
+    timestamps: true
   }
 );
 
-// Full text search
 documentSchema.index({
   fileName: "text",
   extractedText: "text",

@@ -373,7 +373,7 @@
                 <a class="sidebar-link" data-target="documents"><i data-feather="file-text"></i><span class="sidebar-text">Documents</span></a>
 
                 <a class="sidebar-link" data-target="workflows"><i data-feather="git-merge"></i><span class="sidebar-text">Workflows</span></a>
-                <a href="/admin/pending" class="menu-item">
+                <a href="/admin/pending-docs" class="menu-item">
   <span class="icon">📄</span>
   <span>Documents Approval</span>
 </a>
@@ -451,7 +451,7 @@
 
                         <div class="chart-card chart-card-large fade-in-up" style="animation-delay: 0.5s;"><h3 class="chart-title">Monthly Document Activity</h3><div class="chart-container"><canvas id="activityChart"></canvas></div></div>
 
-                        <div class="chart-card fade-in-up"   class="recent-activity"    style="animation-delay: 0.6s;"><h3 class="chart-title">Recent Activity</h3><ul id="activityList"></ul></div>
+                        <div class="chart-card fade-in-up recent-activity" style="animation-delay: 0.6s;"><h3 class="chart-title">Recent Activity</h3><ul id="activityList"></ul></div>
 
                     </div>
 
@@ -472,10 +472,10 @@
                     <div class="filters">
   <select id="statusFilter" class="filter-select">
     <option value="all">All Statuses</option>
-    <option value="Approved">Approved</option>
-    <option value="Pending">Pending</option>
-    <option value="In Review">In Review</option>
-    <option value="Rejected">Rejected</option>
+    <option value="approved">Approved</option>
+    <option value="pending">Pending</option>
+    <option value="review">In Review</option>
+    <option value="rejected">Rejected</option>
   </select>
 
   <select id="typeFilter" class="filter-select">
@@ -820,31 +820,6 @@ function renderChart(monthly) {
   });
 }
 
-/* ================= RECENT ACTIVITY ================= */
-async function loadRecentActivity() {
-  try {
-    const res = await fetch("/documents/recent", {
-      credentials: "include"
-    });
-    if (!res.ok) return;
-
-    const data = await res.json();
-    const container = document.getElementById("recent-activity-feed");
-
-    container.innerHTML = data.map(item => `
-      <p>
-        <span class="font-semibold text-white">You</span> uploaded
-        <span class="text-blue-400">${item.document}</span>
-        <span class="text-gray-500 float-right">
-          ${new Date(item.time).toLocaleDateString()}
-        </span>
-      </p>
-    `).join("");
-  } catch (err) {
-    console.error(err);
-  }
-}
-
 /* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", () => {
   loadDocuments();
@@ -1045,10 +1020,18 @@ document.addEventListener("DOMContentLoaded", () => {
     initWorkflowBoard();
 });
 async function loadRecentActivity() {
-    const res = await fetch("/activities/recent");
+  try {
+    const res = await fetch("/activities/recent", {
+      credentials: "include"
+    });
+
+    if (!res.ok) return;
+
     const activities = await res.json();
 
     const list = document.getElementById("activityList");
+    if (!list) return;
+
     list.innerHTML = "";
 
     if (activities.length === 0) {
@@ -1059,16 +1042,17 @@ async function loadRecentActivity() {
     activities.forEach(act => {
       const li = document.createElement("li");
       li.innerHTML = `
-        <strong>${act.user.username}</strong>
+        <strong>${act.user?.username || "User"}</strong>
         ${act.action}
         <span>${act.entityName || ""}</span>
         <small>${new Date(act.createdAt).toLocaleString()}</small>
       `;
       list.appendChild(li);
     });
+  } catch (err) {
+    console.error("Recent activity error", err);
   }
-
-  loadRecentActivity();
+}
 
 
 </script>

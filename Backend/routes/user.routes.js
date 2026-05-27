@@ -1,7 +1,7 @@
 const express = require('express');
 const router = (express.Router());
 const { body, validationResult } = require('express-validator');
-const { user: userModel } = require('../models/user.model');
+const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt=require("jsonwebtoken");
 
@@ -50,19 +50,25 @@ router.post(
         });
       }
 
-      console.log("Register attempt for email:", email, "password:", password);
+      const existingUser = await User.findOne({
+        $or: [{ email: email.toLowerCase() }, { username }]
+      });
+
+      if (existingUser) {
+        return res.status(400).json({
+          message: "User already exists",
+        });
+      }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      console.log("Hashed password:", hashedPassword);
 
-      const newUser = new userModel({
+      const newUser = new User({
         username,
         email: email.toLowerCase(),
         password: hashedPassword,
       });
 
       await newUser.save(); 
-      console.log("USER SAVED:", newUser);
 
       return res.render("login");
     } catch (err) {
@@ -77,41 +83,42 @@ router.get('/login',(req,res)=>{
     res.render('login');
 })
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  console.log("Login attempt for email:", email);
-  console.log("Password provided:", password);
+    if (!email || !password) {
+      return res.status(400).send("Email and password required");
+    }
 
-  const user = await userModel.findOne({ email: email.toLowerCase() });
-  if (!user) {
-    console.log("User not found for email:", email);
-    return res.status(401).send("Invalid credentials");
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.status(401).send("Invalid credentials");
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).send("Invalid credentials");
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user._id.toString(),
+        role: user.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "lax"
+    });
+
+    res.redirect("/dashboard");
+  } catch (err) {
+    console.log("LOGIN ERROR:", err);
+    return res.status(500).send("Login failed");
   }
-
-  console.log("User found:", user.email, "Hashed password:", user.password);
-
-  const match = await bcrypt.compare(password, user.password);
-  console.log("Password match result:", match);
-  if (!match) {
-    console.log("Password does not match");
-    return res.status(401).send("Invalid credentials");
-  }
-
-  const token = jwt.sign(
-  {
-    userId: user._id.toString()   
-  },
-  process.env.JWT_SECRET,
-  { expiresIn: "1d" }
-);
-
-res.cookie("token", token, {
-  httpOnly: true
-});
-
-
-  
-  res.redirect("/dashboard");
 });
 
 

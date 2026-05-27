@@ -1,11 +1,10 @@
 const Document = require("../models/document.model");
 const Activity = require("../models/activity.model");
 
-// 🔹 Fetch pending documents
 exports.pendingDocs = async (req, res) => {
   try {
-    const pendingDocs = await Document.find({ status: "Pending" })
-      .populate("uploadedBy", "username email")
+    const pendingDocs = await Document.find({ status: "pending" })
+      .populate("userId", "username email")
       .sort({ createdAt: -1 });
 
     res.json({ success: true, documents: pendingDocs });
@@ -15,79 +14,81 @@ exports.pendingDocs = async (req, res) => {
   }
 };
 
-// 🔹 Fetch single document
 exports.getDocument = async (req, res) => {
-  const doc = await Document.findById(req.params.id)
-    .populate("uploadedBy", "username email");
+  try {
+    const doc = await Document.findById(req.params.id).populate("userId", "username email");
 
-  res.json(doc);
+    if (!doc) {
+      return res.status(404).json({ success: false, message: "Document not found" });
+    }
+
+    res.json({ success: true, document: doc });
+  } catch (error) {
+    console.error("GET DOCUMENT ERROR:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };
 
-// 🔹 Approve
 exports.approveDoc = async (req, res) => {
-  const doc = await Document.findByIdAndUpdate(
-    req.params.id,
-    { status: "Approved" },
-    { new: true }
-  );
+  try {
+    const doc = await Document.findById(req.params.id);
 
-  await Activity.create({
-    user: req.userId,
-    action: "Approved document",
-    entityType: "Document",
-    entityName: doc.title
-  });
+    if (!doc) {
+      return res.status(404).json({ success: false, message: "Document not found" });
+    }
 
-  res.json({ success: true, status: "Approved" });
+    doc.status = "approved";
+    doc.approvedBy = req.user.id;
+    doc.approvedAt = new Date();
+    await doc.save();
+
+    await Activity.create({
+      user: req.user.id,
+      action: "Approved document",
+      entityType: "Document",
+      entityName: doc.fileName
+    });
+
+    res.json({ success: true, status: doc.status });
+  } catch (error) {
+    console.error("APPROVE DOC ERROR:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };
 
-// 🔹 Reject
 exports.rejectDoc = async (req, res) => {
-  const { comment } = req.body;
+  try {
+    const { reason, comment } = req.body;
+    const rejectionReason = reason || comment || "";
+    const doc = await Document.findById(req.params.id);
 
-  const doc = await Document.findByIdAndUpdate(
-    req.params.id,
-    { status: "Rejected" },
-    { new: true }
-  );
+    if (!doc) {
+      return res.status(404).json({ success: false, message: "Document not found" });
+    }
 
-  await Activity.create({
-    user: req.userId,
-    action: "Rejected document",
-    entityType: "Document",
-    entityName: doc.title,
-    comment
-  });
+    doc.status = "rejected";
+    doc.rejectionReason = rejectionReason;
+    await doc.save();
 
-  res.json({ success: true, status: "Rejected" });
+    await Activity.create({
+      user: req.user.id,
+      action: "Rejected document",
+      entityType: "Document",
+      entityName: doc.fileName,
+      comment: rejectionReason
+    });
+
+    res.json({ success: true, status: doc.status });
+  } catch (error) {
+    console.error("REJECT DOC ERROR:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };
 
-// 🔹 Request changes
-exports.requestChanges = async (req, res) => {
-  const { comment } = req.body;
-
-  const doc = await Document.findByIdAndUpdate(
-    req.params.id,
-    { status: "Changes Requested" },
-    { new: true }
-  );
-
-  await Activity.create({
-    user: req.userId,
-    action: "Requested changes",
-    entityType: "Document",
-    entityName: doc.title,
-    comment
-  });
-
-  res.json({ success: true, status: "Changes Requested" });
-};
 exports.requestChanges = async (req, res) => {
   try {
     const { comment } = req.body;
-    const { id } = req.params;
 
-    // ❌ Comment mandatory
     if (!comment || comment.trim() === "") {
       return res.status(400).json({
         success: false,
@@ -95,8 +96,7 @@ exports.requestChanges = async (req, res) => {
       });
     }
 
-    // 🔍 Find document
-    const doc = await Document.findById(id);
+    const doc = await Document.findById(req.params.id);
 
     if (!doc) {
       return res.status(404).json({
@@ -105,26 +105,23 @@ exports.requestChanges = async (req, res) => {
       });
     }
 
-    // 📝 Update status
-    doc.status = "Changes Requested";
-    doc.reviewComment = comment; // optional field
+    doc.status = "changes_requested";
+    doc.reviewComment = comment.trim();
     await doc.save();
 
-    // 📜 Activity log
     await Activity.create({
-      user: req.userId,
+      user: req.user.id,
       action: "Requested changes",
       entityType: "Document",
-      entityName: doc.title,
-      comment: comment
+      entityName: doc.fileName,
+      comment: comment.trim()
     });
 
     return res.json({
       success: true,
-      status: "Changes Requested",
+      status: doc.status,
       message: "Changes requested successfully"
     });
-
   } catch (error) {
     console.error("REQUEST CHANGES ERROR:", error);
     return res.status(500).json({

@@ -1,25 +1,37 @@
 const mongoose = require("mongoose");
 const Document = require("../models/document.model");
-const extractText = require("../services/ocr.service");
-const { extractKeywords, generateSummary } = require("../services/ai.service");
 
+const STATUS_ALIASES = {
+  pending: "pending",
+  processing: "processing",
+  review: "review",
+  "in review": "review",
+  approved: "approved",
+  rejected: "rejected",
+  "changes requested": "changes_requested",
+  changes_requested: "changes_requested",
+  archived: "archived"
+};
 
+function normalizeStatus(status) {
+  return STATUS_ALIASES[String(status || "").trim().toLowerCase()];
+}
 
 
 exports.upload = async (req, res) => {
   try {
-    console.log("REQ.USER ", req.user);
-
     if (!req.files || req.files.length === 0) {
       return res.status(400).send("No files");
     }
 
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+
     for (const file of req.files) {
       const doc = await Document.create({
-        userId: new mongoose.Types.ObjectId(req.user.id),   
+        userId,
         fileName: file.originalname,
         fileType: file.originalname.split(".").pop(),
-        filePath: file.path,
+        filePath: `uploads/${file.filename}`,
         status: "pending"
       });
 
@@ -37,8 +49,8 @@ exports.upload = async (req, res) => {
 
 exports.myDocuments = async (req, res) => {
   try {
-    const docs = await Document.find({ userId: new mongoose.Types.ObjectId(req.user.id) })
-      .sort({ createdAt: -1 });
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const docs = await Document.find({ userId }).sort({ createdAt: -1 });
 
     res.json(docs);
   } catch (err) {
@@ -48,26 +60,6 @@ exports.myDocuments = async (req, res) => {
 };
 
 
-exports.stats = async (req, res) => {
-  try {
-    const docs = await Document.find({ userId: req.user.id });
-
-    const monthly = Array(12).fill(0);
-
-    docs.forEach(doc => {
-      const month = new Date(doc.createdAt).getMonth();
-      monthly[month]++;
-    });
-
-    res.json({
-      total: docs.length,
-      monthly
-    });
-  } catch (err) {
-    console.error("STATS ERROR ", err);
-    res.status(500).send("Failed to load stats");
-  }
-};
 exports.stats = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user.id);
@@ -91,7 +83,6 @@ exports.stats = async (req, res) => {
       status: "archived"
     });
 
-    
     const monthly = Array(12).fill(0);
     const docs = await Document.find({ userId });
 
@@ -127,13 +118,14 @@ exports.search = async (req, res) => {
     }
 
     
-    if (status && status !== "all") {
-      query.status = { $regex: new RegExp(`^${status}$`, 'i') };
+    const normalizedStatus = normalizeStatus(status);
+    if (normalizedStatus) {
+      query.status = normalizedStatus;
     }
 
     
     if (type && type !== "all") {
-      query.fileType = { $regex: new RegExp(`^${type}$`, 'i') };
+      query.fileType = { $regex: new RegExp(`^${type}$`, "i") };
     }
 
     
@@ -144,8 +136,6 @@ exports.search = async (req, res) => {
 
       query.createdAt = { $gte: start, $lte: end };
     }
-
-    console.log("SEARCH QUERY ", query);
 
     const docs = await Document.find(query).sort({ createdAt: -1 });
 
@@ -159,7 +149,8 @@ exports.search = async (req, res) => {
 
 exports.recent = async (req, res) => {
   try {
-    const docs = await Document.find({})
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const docs = await Document.find({ userId })
       .sort({ createdAt: -1 })
       .limit(5);
 

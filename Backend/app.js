@@ -7,9 +7,11 @@ const path = require("path");
 
 const userRouter = require("./routes/user.routes");
 const adminRoutes = require("./routes/admin.routes");
-
-
-connectDB();
+const dashboardRoutes = require("./routes/dashboard.routes");
+const documentRoutes = require("./routes/document.routes");
+const activityRoutes = require("./routes/activity.routes");
+const auth = require("./middlewares/auth.middleware");
+const adminOnly = require("./middlewares/admin.middleware");
 
 const app = express();
 
@@ -22,37 +24,24 @@ app.use(cookieParser());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-
 app.use("/", userRouter);
-app.get("/dashboard", require("./middlewares/auth.middleware"), (req, res) => res.render("dashboard"));
-app.use("/dashboard", require("./routes/dashboard.routes"));
-app.use("/documents", require("./routes/document.routes"));
-
-const activityRoutes = require("./routes/activity.routes");
-
+app.get("/dashboard", auth, (req, res) => res.render("dashboard"));
+app.get("/admin/pending-docs", auth, adminOnly, (req, res) => res.render("admin.dashboard"));
+app.use("/dashboard", dashboardRoutes);
+app.use("/documents", documentRoutes);
 app.use("/", activityRoutes);
 app.use("/admin", adminRoutes);
-
-
 
 app.get('/', (req, res) => {
   res.render('home');
 });
-app.get('/register', (req, res) => {
-  res.render('register');
-})
-app.get('/login', (req, res) => {
-  res.render('login');
-})
-app.get('/dashboard', (req, res) => {
-  res.render('dashboard');
-});
-app.get('/admin/pending-docs',(req,res) =>{
-  res.render('admin/pending-docs');
-
-});
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (require.main === module) {
+  connectDB();
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

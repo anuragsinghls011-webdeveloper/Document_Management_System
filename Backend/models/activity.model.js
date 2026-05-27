@@ -19,6 +19,9 @@ const activitySchema = new mongoose.Schema(
     entityName: {
       type: String
       
+    },
+    comment: {
+      type: String
     }
   },
   { timestamps: true }
