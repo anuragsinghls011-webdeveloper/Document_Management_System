@@ -15,5 +15,14 @@ router.get("/activities/recent", auth, async (req, res) => {
     res.status(500).json({ message: "Failed to load activity" });
   }
 });
-
+router.post("/activities", auth, async (req, res) => {
+  try {
+    const { type, details } = req.body;
+    const activity = new Activity({ type, details, user: req.user.id });
+    await activity.save();
+    res.status(201).json(activity);
+  } catch (err) {
+    res.status(400).json({ message: "Failed to create activity" });
+  }
+});
 module.exports = router;
