@@ -70,9 +70,15 @@ router.post(
 
       await newUser.save(); 
 
-      return res.render("login");
+      if (req.headers['accept']?.includes('application/json')) {
+        return res.json({ success: true, redirect: "/login" });
+      }
+      return res.redirect("/login");
     } catch (err) {
       console.log("SAVE ERROR:", err);
+      if (req.headers['accept']?.includes('application/json')) {
+        return res.status(500).json({ message: "Database error occurred" });
+      }
       return res.status(500).send("Database error");
     }
   }
@@ -87,16 +93,25 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
+      if (req.headers['accept']?.includes('application/json')) {
+        return res.status(400).json({ message: "Email and password required" });
+      }
       return res.status(400).send("Email and password required");
     }
 
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
+      if (req.headers['accept']?.includes('application/json')) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
       return res.status(401).send("Invalid credentials");
     }
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
+      if (req.headers['accept']?.includes('application/json')) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
       return res.status(401).send("Invalid credentials");
     }
 
@@ -114,9 +129,15 @@ router.post('/login', async (req, res) => {
       sameSite: "lax"
     });
 
+    if (req.headers['accept']?.includes('application/json')) {
+      return res.json({ success: true, redirect: "/dashboard" });
+    }
     res.redirect("/dashboard");
   } catch (err) {
     console.log("LOGIN ERROR:", err);
+    if (req.headers['accept']?.includes('application/json')) {
+      return res.status(500).json({ message: "Login failed" });
+    }
     return res.status(500).send("Login failed");
   }
 });

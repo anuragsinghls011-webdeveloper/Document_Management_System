@@ -4,54 +4,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-Powered Intelligent Document Management</title>
+    <meta name="description" content="Transform your document workflows with AI-powered intelligent management. Automated data extraction, smart routing, and bank-grade security.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0A102A;
+            margin: 0;
+            overflow-x: hidden;
         }
+
+        /* Page load animation */
+        body { opacity: 0; animation: pageIn 0.7s ease forwards; }
+        @keyframes pageIn {
+            to { opacity: 1; }
+        }
+
         .main-container {
             background-image: radial-gradient(circle at 50% 30%, rgba(19, 36, 122, 0.5) 0%, #0A102A 40%);
             overflow: hidden;
         }
+
         .glow-effect {
             filter: drop-shadow(0 0 15px rgba(77, 135, 255, 0.6));
         }
+
         .text-glow {
             text-shadow: 0 0 10px rgba(77, 135, 255, 0.5);
         }
+
         .card-bg {
             background-color: rgba(10, 25, 80, 0.3);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(56, 95, 226, 0.4);
+            transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease, border-color 0.4s ease;
         }
+
+        .card-bg:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 24px 60px rgba(59, 130, 246, 0.2);
+            border-color: rgba(56, 189, 248, 0.5);
+        }
+
         .nav-link {
-            transition: color 0.3s ease, text-shadow 0.3s ease;
+            transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.2s ease;
+            position: relative;
         }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
         .nav-link:hover {
             color: #ffffff;
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+            transform: translateY(-1px);
         }
+
         .login-btn {
-             transition: all 0.3s ease;
+             transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
         }
+
         .login-btn:hover {
             background-color: #3B82F6;
             color: #ffffff;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
-        }
-        .cta-btn {
-            transition: all 0.3s ease;
-        }
-        .cta-btn:hover {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
             transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
         }
-        /* Background particles simulation */
+
+        .cta-btn {
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .cta-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+        }
+
+        /* Background particles */
         .particle {
             position: absolute;
             background-color: rgba(77, 135, 255, 0.5);
@@ -59,13 +124,15 @@
             animation: float 20s infinite ease-in-out;
             opacity: 0;
         }
+
         @keyframes float {
-            0% { transform: translateY(0); opacity: 0; }
+            0% { transform: translateY(0) scale(1); opacity: 0; }
             25% { opacity: 0.7; }
-            50% { transform: translateY(-100px); opacity: 0.3; }
+            50% { transform: translateY(-100px) scale(1.2); opacity: 0.3; }
             75% { opacity: 0.7; }
-            100% { transform: translateY(0); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 0; }
         }
+
         /* Animated Gradient Text */
         .animated-gradient-text {
             background-image: linear-gradient(90deg, #818cf8, #3b82f6, #67e8f9, #3b82f6, #818cf8);
@@ -80,9 +147,159 @@
             0% { background-position: 200% center; }
             100% { background-position: 0% center; }
         }
+
+        /* Scroll-triggered entrance animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.15s; }
+        .reveal-delay-2 { transition-delay: 0.3s; }
+        .reveal-delay-3 { transition-delay: 0.45s; }
+
+        /* Mobile hamburger menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 60;
+            background: none;
+            border: none;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        .mobile-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 16, 42, 0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            z-index: 50;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .mobile-overlay.open {
+            transform: translateX(0);
+        }
+
+        .mobile-overlay a {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .mobile-overlay a:hover {
+            color: #38bdf8;
+            transform: scale(1.05);
+        }
+
+        /* Section styling */
+        .section-glass {
+            background: rgba(10, 25, 80, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(56, 95, 226, 0.25);
+            border-radius: 24px;
+        }
+
+        .section-title-gradient {
+            background: linear-gradient(90deg, #f8fafc, #a5f3fc 50%, #c4b5fd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Feature icons */
+        .feature-icon-ring {
+            position: relative;
+        }
+
+        .feature-icon-ring::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 14px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card-bg:hover .feature-icon-ring::after {
+            opacity: 1;
+        }
+
+        /* Footer */
+        footer a {
+            transition: color 0.3s ease, transform 0.2s ease;
+            display: inline-block;
+        }
+        footer a:hover {
+            color: #38bdf8;
+            transform: translateY(-1px);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0A102A; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(56, 189, 248, 0.4), rgba(129, 140, 248, 0.4));
+            border-radius: 999px;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .desktop-nav { display: none !important; }
+            .desktop-auth { display: none !important; }
+        }
     </style>
 </head>
 <body class="text-gray-300">
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileOverlay" class="mobile-overlay">
+        <a href="#about" onclick="closeMobileMenu()">ABOUT</a>
+        <a href="/dashboard" onclick="closeMobileMenu()">DASHBOARD</a>
+        <a href="#contact" onclick="closeMobileMenu()">CONTACT US</a>
+        <div class="flex flex-col gap-4 mt-4">
+            <a href="/register" class="login-btn border border-blue-400/50 rounded-lg px-8 py-3 text-blue-200 font-semibold text-center">Register</a>
+            <a href="/login" class="login-btn border border-blue-400/50 rounded-lg px-8 py-3 text-blue-200 font-semibold text-center">Login</a>
+        </div>
+    </div>
 
     <div class="relative min-h-screen w-full main-container">
         <!-- Background decorative elements -->
@@ -92,13 +309,18 @@
             <div class="particle" style="width: 1px; height: 1px; top: 70%; left: 50%; animation-delay: -8s;"></div>
             <div class="particle" style="width: 2px; height: 2px; top: 80%; left: 20%; animation-delay: -12s;"></div>
             <div class="particle" style="width: 3px; height: 3px; top: 50%; left: 95%; animation-delay: -15s;"></div>
+            <div class="particle" style="width: 2px; height: 2px; top: 35%; left: 40%; animation-delay: -3s;"></div>
+            <div class="particle" style="width: 1px; height: 1px; top: 60%; left: 70%; animation-delay: -10s;"></div>
+            <div class="particle" style="width: 3px; height: 3px; top: 15%; left: 55%; animation-delay: -7s;"></div>
+            <div class="particle" style="width: 2px; height: 2px; top: 90%; left: 85%; animation-delay: -18s;"></div>
+            <div class="particle" style="width: 1px; height: 1px; top: 45%; left: 10%; animation-delay: -14s;"></div>
         </div>
 
         <!-- Header -->
-        <header class="absolute top-0 left-0 right-0 z-20">
-            <nav class="container mx-auto px-6 py-6 flex justify-between items-center">
+        <header class="fixed top-0 left-0 right-0 z-40" style="background: rgba(10,16,42,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(56,95,226,0.15);">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
                 <!-- Logo -->
-                <div class="flex items-center space-x-2 border-2 border-gray-500 rounded-md p-2">
+                <a href="/" class="flex items-center space-x-2 border-2 border-gray-500/50 rounded-md p-2 hover:border-blue-400/60 transition-colors duration-300">
                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-white">
                         <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M2 7L12 12L22 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -106,28 +328,36 @@
                         <path d="M17 4.5L7 9.5" stroke="currentColor" stroke-width="1.5"/>
                     </svg>
                     <span class="text-white font-bold text-sm">KMRL</span>
-                </div>
+                </a>
 
-                <!-- Navigation Links -->
-                <div class="hidden md:flex space-x-10 text-gray-400 font-medium text-sm font-weight=600">
+                <!-- Navigation Links (Desktop) -->
+                <div class="desktop-nav hidden md:flex space-x-10 text-gray-400 font-semibold text-sm">
                     <a href="#about" class="nav-link">ABOUT</a>
                     <a href="/dashboard" class="nav-link">DASHBOARD</a>
                     <a href="#contact" class="nav-link">CONTACT US</a>
                 </div>
 
-                <!-- Login Button -->
-                 <a href="/register" class="login-btn border border-gray-500 rounded-md px-6 py-2 text-gray-300 font-semibold margin-left-4">
-                    Register
-                </a>
-                <a href="/login" class="login-btn border border-gray-500 rounded-md px-6 py-2 text-gray-300 font-semibold text-sm">
-                    LOGIN
-                </a>
-                
+                <!-- Auth Buttons (Desktop) -->
+                <div class="desktop-auth hidden md:flex items-center gap-3">
+                    <a href="/register" class="login-btn border border-gray-500/60 rounded-md px-6 py-2 text-gray-300 font-semibold text-sm">
+                        Register
+                    </a>
+                    <a href="/login" class="login-btn border border-gray-500/60 rounded-md px-6 py-2 text-gray-300 font-semibold text-sm">
+                        LOGIN
+                    </a>
+                </div>
+
+                <!-- Hamburger (Mobile) -->
+                <button id="hamburgerBtn" class="hamburger" aria-label="Open menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </nav>
         </header>
 
-        <!-- Main Content -->
-        <main class="relative z-10 flex flex-col items-center justify-center min-h-screen pt-24 pb-12 px-4">
+        <!-- Hero Section -->
+        <main class="relative z-10 flex flex-col items-center justify-center min-h-screen pt-28 pb-12 px-4">
             
             <!-- Digital Brain Graphic -->
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[120%] md:-translate-y-[110%] w-64 h-64 md:w-96 md:h-96 glow-effect z-0">
@@ -146,9 +376,7 @@
                         </filter>
                     </defs>
                     <g filter="url(#glow)" fill="url(#brainGradient)">
-                        <!-- Simplified brain-like shape -->
                         <path d="M100 20 C40 20, 20 60, 20 100 C20 150, 60 180, 100 180 C140 180, 180 150, 180 100 C180 60, 160 20, 100 20 Z" fill-opacity="0.1"/>
-                        <!-- Lines suggesting brain folds -->
                         <path d="M100,22 C110,40 125,50 140,55 C150,80 145,110 130,130 C110,150 80,155 60,140 C40,120 45,80 65,60 C80,45 90,30 100,22 Z" stroke="rgba(191, 219, 254, 0.7)" stroke-width="1" fill="none"/>
                         <path d="M100,100 C80,90 70,75 65,60" stroke="rgba(191, 219, 254, 0.7)" stroke-width="1" fill="none"/>
                         <path d="M100,100 C120,110 130,125 135,140" stroke="rgba(191, 219, 254, 0.7)" stroke-width="1" fill="none"/>
@@ -171,8 +399,7 @@
                 </svg>
             </div>
 
-
-            <div class="text-center max-w-4xl mx-auto z-10">
+            <div class="text-center max-w-4xl mx-auto z-10 reveal">
                 <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight text-glow animated-gradient-text">
                     AI-POWERED INTELLIGENT DOCUMENT MANAGEMENT
                 </h1>
@@ -183,9 +410,9 @@
 
             <div class="mt-12 w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-center z-10 px-4">
                 <!-- Left Card -->
-                <div class="card-bg rounded-2xl p-6 md:p-8 space-y-8 h-full">
+                <div class="card-bg rounded-2xl p-6 md:p-8 space-y-8 h-full reveal reveal-delay-1">
                     <div class="flex items-center space-x-4">
-                        <div class="bg-blue-900/50 p-3 rounded-lg border border-blue-600/50">
+                        <div class="feature-icon-ring bg-blue-900/50 p-3 rounded-lg border border-blue-600/50">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -193,7 +420,7 @@
                         <span class="font-semibold text-white">AUTOMATED DATA EXTRACTION</span>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <div class="bg-blue-900/50 p-3 rounded-lg border border-blue-600/50">
+                        <div class="feature-icon-ring bg-blue-900/50 p-3 rounded-lg border border-blue-600/50">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -202,7 +429,7 @@
                         <span class="font-semibold text-white">SMART WORKFLOW AUTOMATION</span>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <div class="bg-blue-900/50 p-3 rounded-lg border border-blue-600/50">
+                        <div class="feature-icon-ring bg-blue-900/50 p-3 rounded-lg border border-blue-600/50">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                             </svg>
@@ -212,24 +439,182 @@
                 </div>
 
                 <!-- Center Button -->
-                <div class="text-center">
-                    <a href="/register" name="" id="anurag" class="cta-btn bg-blue-600 text-white font-bold py-4 px-10 rounded-lg text-lg shadow-2xl shadow-blue-500/50">
+                <div class="text-center reveal reveal-delay-2">
+                    <a href="/register" id="ctaButton" class="cta-btn inline-block bg-blue-600 text-white font-bold py-4 px-10 rounded-lg text-lg shadow-2xl shadow-blue-500/50">
                         START FREE TRIAL
                     </a>
                 </div>
 
                 <!-- Right Card -->
-                <div class="card-bg rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center space-y-4 h-full">
+                <div class="card-bg rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center space-y-4 h-full reveal reveal-delay-3">
                     <div class="glow-effect">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                         </svg>
                     </div>
                     <span class="font-semibold text-white text-lg">BANK-GRADE SECURITY</span>
+                    <p class="text-blue-200/70 text-sm">Enterprise encryption, role-based access, and audit compliance built in.</p>
                 </div>
             </div>
         </main>
     </div>
+
+    <!-- About Section -->
+    <section id="about" class="relative py-24 px-4" style="background: linear-gradient(180deg, #0A102A 0%, #0d1535 100%);">
+        <div class="absolute inset-0 z-0 opacity-30">
+            <div class="particle" style="width: 2px; height: 2px; top: 20%; left: 30%; animation-delay: -4s;"></div>
+            <div class="particle" style="width: 3px; height: 3px; top: 60%; left: 70%; animation-delay: -9s;"></div>
+        </div>
+        <div class="container mx-auto max-w-6xl relative z-10">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-5xl font-black section-title-gradient mb-4">Why Choose KMRL DMS?</h2>
+                <p class="text-blue-200/70 max-w-2xl mx-auto text-lg">Built for modern enterprises that demand intelligent automation, real-time insights, and bulletproof security.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="section-glass p-8 text-center reveal reveal-delay-1">
+                    <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500/30 to-cyan-500/20 flex items-center justify-center border border-blue-500/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-white font-bold text-xl mb-3">AI-First Processing</h3>
+                    <p class="text-blue-200/60 text-sm leading-relaxed">OCR text extraction, auto-categorization, and intelligent routing powered by cutting-edge AI models.</p>
+                </div>
+
+                <div class="section-glass p-8 text-center reveal reveal-delay-2">
+                    <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-violet-500/30 to-pink-500/20 flex items-center justify-center border border-violet-500/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-violet-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </div>
+                    <h3 class="text-white font-bold text-xl mb-3">Workflow Automation</h3>
+                    <p class="text-blue-200/60 text-sm leading-relaxed">Visual workflow builder with approval chains, SLA tracking, and automatic escalation triggers.</p>
+                </div>
+
+                <div class="section-glass p-8 text-center reveal reveal-delay-3">
+                    <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-emerald-500/30 to-teal-500/20 flex items-center justify-center border border-emerald-500/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-white font-bold text-xl mb-3">Real-Time Analytics</h3>
+                    <p class="text-blue-200/60 text-sm leading-relaxed">Live dashboards tracking document flow, approval bottlenecks, and team performance metrics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="relative py-24 px-4" style="background: linear-gradient(180deg, #0d1535 0%, #0A102A 100%);">
+        <div class="container mx-auto max-w-3xl relative z-10">
+            <div class="text-center mb-12 reveal">
+                <h2 class="text-3xl md:text-5xl font-black section-title-gradient mb-4">Get In Touch</h2>
+                <p class="text-blue-200/70 text-lg">Have questions? Reach out and our team will get back to you within 24 hours.</p>
+            </div>
+
+            <div class="section-glass p-8 md:p-12 reveal reveal-delay-1">
+                <form class="space-y-6" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Message Sent!'; setTimeout(() => this.querySelector('button').textContent='Send Message', 2000);">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-blue-200/80 mb-2">Name</label>
+                            <input type="text" placeholder="Your name" class="w-full bg-white/5 border border-blue-500/20 rounded-lg py-3 px-4 text-white placeholder-blue-200/30 focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 focus:outline-none transition duration-300">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-blue-200/80 mb-2">Email</label>
+                            <input type="email" placeholder="your@email.com" class="w-full bg-white/5 border border-blue-500/20 rounded-lg py-3 px-4 text-white placeholder-blue-200/30 focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 focus:outline-none transition duration-300">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-blue-200/80 mb-2">Message</label>
+                        <textarea rows="4" placeholder="Tell us about your needs..." class="w-full bg-white/5 border border-blue-500/20 rounded-lg py-3 px-4 text-white placeholder-blue-200/30 focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 focus:outline-none transition duration-300 resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="cta-btn w-full bg-blue-600 text-white font-bold py-4 rounded-lg text-lg shadow-2xl shadow-blue-500/30 hover:shadow-blue-500/50">
+                        Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-blue-900/30" style="background: #080e22;">
+        <div class="container mx-auto max-w-6xl">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+                <div class="md:col-span-2">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-blue-400">
+                            <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 7L12 12L22 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 22V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="text-white font-bold">KMRL Document Intelligence</span>
+                    </div>
+                    <p class="text-blue-200/50 text-sm leading-relaxed max-w-sm">AI-powered intelligent document management system designed for modern enterprises demanding speed, accuracy, and compliance.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4 text-sm">PLATFORM</h4>
+                    <div class="flex flex-col gap-3">
+                        <a href="/dashboard" class="text-blue-200/50 text-sm">Dashboard</a>
+                        <a href="#about" class="text-blue-200/50 text-sm">Features</a>
+                        <a href="/register" class="text-blue-200/50 text-sm">Get Started</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4 text-sm">SUPPORT</h4>
+                    <div class="flex flex-col gap-3">
+                        <a href="#contact" class="text-blue-200/50 text-sm">Contact Us</a>
+                        <a href="#" class="text-blue-200/50 text-sm">Documentation</a>
+                        <a href="#" class="text-blue-200/50 text-sm">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-blue-900/20 pt-8 text-center">
+                <p class="text-blue-200/30 text-sm">&copy; 2026 KMRL Document Intelligence System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu
+        const hamburger = document.getElementById('hamburgerBtn');
+        const overlay = document.getElementById('mobileOverlay');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            overlay.classList.toggle('open');
+            document.body.style.overflow = overlay.classList.contains('open') ? 'hidden' : '';
+        });
+
+        function closeMobileMenu() {
+            hamburger.classList.remove('active');
+            overlay.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // Scroll-triggered reveal
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Header shrink on scroll
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 60) {
+                header.style.padding = '0';
+                header.style.borderBottomColor = 'rgba(56,95,226,0.3)';
+            } else {
+                header.style.padding = '';
+                header.style.borderBottomColor = 'rgba(56,95,226,0.15)';
+            }
+        }, { passive: true });
+    </script>
 
 </body>
 </html>

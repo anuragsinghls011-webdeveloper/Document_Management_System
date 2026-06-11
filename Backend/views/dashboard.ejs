@@ -546,6 +546,14 @@
       animation: reveal 0.46s ease both;
     }
 
+    .page-content.page-entering {
+      animation: reveal 0.4s cubic-bezier(0.4,0,0.2,1) both;
+    }
+
+    .page-content.page-exiting {
+      animation: revealOut 0.2s ease both;
+    }
+
     @keyframes reveal {
       from {
         opacity: 0;
@@ -555,6 +563,91 @@
         opacity: 1;
         transform: translateY(0);
       }
+    }
+
+    @keyframes revealOut {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+    }
+
+    /* Scroll to top button */
+    .scroll-top-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(12px);
+      color: var(--cyan);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      z-index: 50;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      pointer-events: none;
+    }
+
+    .scroll-top-btn.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .scroll-top-btn:hover {
+      box-shadow: 0 12px 30px rgba(34, 211, 238, 0.18);
+      transform: translateY(-3px);
+    }
+
+    /* Logout button */
+    .logout-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 42px;
+      border: 1px solid rgba(251, 113, 133, 0.22);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(251, 113, 133, 0.1), rgba(239, 68, 68, 0.08));
+      color: #fda4af;
+      font-size: 0.83rem;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .logout-action:hover {
+      transform: translateY(-2px);
+      border-color: rgba(251, 113, 133, 0.44);
+      background: linear-gradient(135deg, rgba(251, 113, 133, 0.18), rgba(239, 68, 68, 0.15));
+      box-shadow: 0 18px 42px rgba(239, 68, 68, 0.12);
+    }
+
+    /* Mobile sidebar backdrop */
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 8, 23, 0);
+      backdrop-filter: blur(0px);
+      z-index: 29;
+      pointer-events: none;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease;
+    }
+
+    .sidebar-backdrop.active {
+      background: rgba(2, 8, 23, 0.5);
+      backdrop-filter: blur(8px);
+      pointer-events: auto;
     }
 
     .hero-grid {
@@ -1765,6 +1858,14 @@
 </head>
 
 <body>
+  <!-- Mobile sidebar backdrop -->
+  <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+  <!-- Scroll to top -->
+  <button id="scrollTopBtn" class="scroll-top-btn" type="button" aria-label="Scroll to top">
+    <i data-feather="chevron-up"></i>
+  </button>
+
   <div id="appShell" class="app-shell">
     <aside id="sidebar" class="sidebar">
       <div class="brand">
@@ -1822,6 +1923,9 @@
         <button id="assistantQuickAction" class="assistant-action" type="button">
           <i data-feather="zap"></i><span class="assist-label">Ask document AI</span>
         </button>
+        <a href="/" id="logoutBtn" class="logout-action" onclick="document.cookie='token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'; return true;">
+          <i data-feather="log-out"></i><span class="assist-label">Log out</span>
+        </a>
       </div>
     </aside>
 
@@ -2464,16 +2568,36 @@
       document.querySelectorAll(".nav-link").forEach(link => {
         link.classList.toggle("active", link.dataset.target === targetId);
       });
-      pageContents.forEach(page => page.classList.add("hidden"));
+
+      // Smooth cross-fade transition
+      const currentPage = document.querySelector(".page-content:not(.hidden)");
       const target = document.getElementById(targetId);
-      if (target) target.classList.remove("hidden");
-      if (window.innerWidth < 981) sidebar.classList.remove("open");
+
+      if (currentPage && currentPage !== target) {
+        currentPage.classList.add("page-exiting");
+        setTimeout(() => {
+          pageContents.forEach(page => { page.classList.add("hidden"); page.classList.remove("page-exiting", "page-entering"); });
+          if (target) {
+            target.classList.remove("hidden");
+            target.classList.add("page-entering");
+          }
+          requestAnimationFrame(() => {
+            if (activityChart) activityChart.resize();
+            if (analyticsChart) analyticsChart.resize();
+          });
+          feather.replace();
+        }, 200);
+      } else {
+        pageContents.forEach(page => page.classList.add("hidden"));
+        if (target) { target.classList.remove("hidden"); target.classList.add("page-entering"); }
+        feather.replace();
+      }
+
+      if (window.innerWidth < 981) {
+        sidebar.classList.remove("open");
+        document.getElementById("sidebarBackdrop").classList.remove("active");
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
-      requestAnimationFrame(() => {
-        if (activityChart) activityChart.resize();
-        if (analyticsChart) analyticsChart.resize();
-      });
-      feather.replace();
     }
 
     sidebarToggle.addEventListener("click", () => {
@@ -2481,14 +2605,35 @@
       appShell.classList.toggle("sidebar-collapsed");
     });
 
-    mobileMenu.addEventListener("click", () => sidebar.classList.add("open"));
+    mobileMenu.addEventListener("click", () => {
+      sidebar.classList.add("open");
+      document.getElementById("sidebarBackdrop").classList.add("active");
+    });
+
+    document.getElementById("sidebarBackdrop").addEventListener("click", () => {
+      sidebar.classList.remove("open");
+      document.getElementById("sidebarBackdrop").classList.remove("active");
+    });
 
     document.addEventListener("click", event => {
       if (window.innerWidth < 981 && sidebar.classList.contains("open")) {
         const clickedInsideSidebar = sidebar.contains(event.target);
         const clickedMenu = mobileMenu.contains(event.target);
-        if (!clickedInsideSidebar && !clickedMenu) sidebar.classList.remove("open");
+        if (!clickedInsideSidebar && !clickedMenu) {
+          sidebar.classList.remove("open");
+          document.getElementById("sidebarBackdrop").classList.remove("active");
+        }
       }
+    });
+
+    // Scroll to top button
+    const scrollTopBtn = document.getElementById("scrollTopBtn");
+    window.addEventListener("scroll", () => {
+      scrollTopBtn.classList.toggle("visible", window.scrollY > 400);
+    }, { passive: true });
+
+    scrollTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
     sidebarNav.addEventListener("click", event => {

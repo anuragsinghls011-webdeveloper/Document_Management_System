@@ -3,22 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Login Page</title>
+    <title>Login — KMRL Document Intelligence</title>
+    <meta name="description" content="Sign in to your KMRL AI-powered Document Management System account.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; }
+
         body {
             font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: #081120;
+            opacity: 0;
+            animation: pageIn 0.6s ease 0.1s forwards;
         }
 
+        @keyframes pageIn { to { opacity: 1; } }
+
         .background-animation {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             overflow: hidden;
-            z-index: -1;
+            z-index: 0;
         }
 
         .background-animation span {
@@ -28,161 +35,392 @@
             backface-visibility: hidden;
             position: absolute;
             animation: move linear infinite;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(56, 189, 248, 0.07);
         }
 
-        .background-animation span:nth-child(0) {
-            color: #84a98c;
-            top: 68%;
-            left: 77%;
-            animation-duration: 35s;
-            animation-delay: -2s;
-            transform-origin: -15vw -1vh;
-            box-shadow: -40vmin 0 5.1119958913vmin currentColor;
-        }
         .background-animation span:nth-child(1) {
-            color: #cad2c5;
-            top: 81%;
-            left: 88%;
-            animation-duration: 25s;
-            animation-delay: -11s;
-            transform-origin: -11vw 24vh;
-            box-shadow: 40vmin 0 5.897391942vmin currentColor;
+            color: #38bdf8;
+            top: 68%; left: 77%;
+            animation-duration: 35s; animation-delay: -2s;
+            transform-origin: -15vw -1vh;
+            box-shadow: -40vmin 0 5vmin currentColor;
         }
         .background-animation span:nth-child(2) {
-            color: #84a98c;
-            top: 52%;
-            left: 77%;
-            animation-duration: 47s;
-            animation-delay: -18s;
-            transform-origin: 11vw 12vh;
-            box-shadow: -40vmin 0 5.4801331189vmin currentColor;
+            color: #818cf8;
+            top: 81%; left: 88%;
+            animation-duration: 25s; animation-delay: -11s;
+            transform-origin: -11vw 24vh;
+            box-shadow: 40vmin 0 5.9vmin currentColor;
         }
         .background-animation span:nth-child(3) {
-            color: #84a98c;
-            top: 51%;
-            left: 21%;
-            animation-duration: 24s;
-            animation-delay: -32s;
-            transform-origin: -16vw -1vh;
-            box-shadow: 40vmin 0 5.467475137vmin currentColor;
+            color: #22d3ee;
+            top: 52%; left: 77%;
+            animation-duration: 47s; animation-delay: -18s;
+            transform-origin: 11vw 12vh;
+            box-shadow: -40vmin 0 5.5vmin currentColor;
         }
         .background-animation span:nth-child(4) {
-            color: #52796f;
-            top: 38%;
-            left: 81%;
-            animation-duration: 42s;
-            animation-delay: -25s;
-            transform-origin: -15vw 12vh;
-            box-shadow: 40vmin 0 5.867916964vmin currentColor;
+            color: #8b5cf6;
+            top: 51%; left: 21%;
+            animation-duration: 24s; animation-delay: -32s;
+            transform-origin: -16vw -1vh;
+            box-shadow: 40vmin 0 5.5vmin currentColor;
         }
         .background-animation span:nth-child(5) {
-            color: #cad2c5;
-            top: 54%;
-            left: 95%;
-            animation-duration: 26s;
-            animation-delay: -21s;
-            transform-origin: -11vw 19vh;
-            box-shadow: -40vmin 0 5.4419953256vmin currentColor;
+            color: #2563eb;
+            top: 38%; left: 81%;
+            animation-duration: 42s; animation-delay: -25s;
+            transform-origin: -15vw 12vh;
+            box-shadow: 40vmin 0 5.9vmin currentColor;
         }
         .background-animation span:nth-child(6) {
-            color: #52796f;
-            top: 73%;
-            left: 7%;
-            animation-duration: 47s;
-            animation-delay: -26s;
+            color: #38bdf8;
+            top: 54%; left: 95%;
+            animation-duration: 26s; animation-delay: -21s;
+            transform-origin: -11vw 19vh;
+            box-shadow: -40vmin 0 5.4vmin currentColor;
+        }
+        .background-animation span:nth-child(7) {
+            color: #818cf8;
+            top: 73%; left: 7%;
+            animation-duration: 47s; animation-delay: -26s;
             transform-origin: -17vw -11vh;
-            box-shadow: -40vmin 0 5.1762283944vmin currentColor;
+            box-shadow: -40vmin 0 5.2vmin currentColor;
         }
 
         @keyframes move {
-            100% {
-                transform: translate3d(0, 0, 1px) rotate(360deg);
-            }
+            100% { transform: translate3d(0, 0, 1px) rotate(360deg); }
         }
+
+        /* Form card */
+        .form-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            animation: cardIn 0.7s cubic-bezier(0.4,0,0.2,1) 0.2s both;
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Input styling */
+        .input-field {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: #f8fafc;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            outline: none;
+        }
+
+        .input-field::placeholder { color: rgba(148, 163, 184, 0.4); }
+
+        .input-field:focus {
+            border-color: rgba(56, 189, 248, 0.55);
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.08), 0 0 20px rgba(37, 99, 235, 0.15);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .input-field.error {
+            border-color: rgba(251, 113, 133, 0.6);
+            box-shadow: 0 0 0 4px rgba(251, 113, 133, 0.08);
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
+        .error-msg {
+            color: #fb7185;
+            font-size: 0.76rem;
+            margin-top: 6px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #2563eb, #38bdf8);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .submit-btn:hover::before { transform: translateX(100%); }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 40px rgba(37, 99, 235, 0.35);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn .spinner {
+            display: none;
+            width: 20px; height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin: 0 auto;
+        }
+
+        .submit-btn.loading .btn-text { display: none; }
+        .submit-btn.loading .spinner { display: block; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Social buttons */
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            border-color: rgba(56, 189, 248, 0.35);
+            background: rgba(30, 41, 59, 0.7);
+            box-shadow: 0 12px 28px rgba(8, 145, 178, 0.12);
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(148, 163, 184, 0.7);
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #38bdf8;
+            transform: translateX(-3px);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #081120; }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 999px; }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body class="text-white">
     <div class="background-animation">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
     </div>
 
-    <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="min-h-screen flex flex-col items-center justify-center p-4 relative z-10">
+        <!-- Back to Home -->
+        <a href="/" class="back-link mb-6" style="animation: cardIn 0.5s ease 0.1s both;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back to Home
+        </a>
+
         <div class="w-full max-w-md">
-            <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-white/20">
+            <div class="form-card rounded-2xl shadow-2xl p-8 space-y-6">
+                <!-- Logo -->
                 <div class="text-center">
-                    <h1 class="text-3xl font-bold tracking-tight">Welcome Back</h1>
-                    <p class="text-gray-300 mt-2">Sign in to continue your journey.</p>
+                    <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-white">
+                            <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 7L12 12L22 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 22V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold tracking-tight">Welcome Back</h1>
+                    <p class="text-slate-400 mt-2 text-sm">Sign in to your document workspace.</p>
                 </div>
 
-                <!-- Flash Messages -->
-                
-
-                <form class="space-y-6" action="/login" method="POST">
+                <form id="loginForm" class="space-y-5" action="/login" method="POST" novalidate>
+                    <div id="globalError" class="hidden bg-rose-500/15 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-sm text-center"></div>
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-300">Email Address</label>
-                        <div class="mt-1">
-                            <input id="email" name="email" type="email" autocomplete="email" required
-                                class="w-full bg-white/10 border border-white/20 rounded-lg py-3 px-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-300">
-                        </div>
+                        <label for="email" class="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
+                        <input id="email" name="email" type="email" autocomplete="email" required
+                            class="input-field" placeholder="you@company.com">
+                        <p id="emailError" class="error-msg">Please enter a valid email address.</p>
                     </div>
 
                     <div>
-                        <div class="flex items-center justify-between">
-                            <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
-                            <a href="#" class="text-sm text-green-400 hover:text-green-300 transition duration-300">Forgot password?</a>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="password" class="block text-sm font-medium text-slate-300">Password</label>
+                            <a href="#" class="text-sm text-blue-400 hover:text-cyan-300 transition duration-300">Forgot password?</a>
                         </div>
-                        <div class="mt-1">
-                            <input id="password" name="password" type="password" autocomplete="current-password" required
-                                class="w-full bg-white/10 border border-white/20 rounded-lg py-3 px-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-300">
-                        </div>
+                        <input id="password" name="password" type="password" autocomplete="current-password" required
+                            class="input-field" placeholder="••••••••">
+                        <p id="passwordError" class="error-msg">Password is required.</p>
                     </div>
 
-                    <div>
-                        <button type="submit"
-                          class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transform hover:scale-105 transition duration-300">
-                            Sign In
-                        </button>
-                    </div>
+                    <button type="submit" id="submitBtn" class="submit-btn">
+                        <span class="btn-text">Sign In</span>
+                        <div class="spinner"></div>
+                    </button>
                 </form>
 
-                <div class="flex items-center justify-center space-x-2">
-                    <span class="h-px w-16 bg-gray-500"></span>
-                    <span class="text-gray-400 font-normal">or continue with</span>
-                    <span class="h-px w-16 bg-gray-500"></span>
+                <div class="flex items-center justify-center space-x-3">
+                    <span class="h-px flex-1 bg-slate-700/50"></span>
+                    <span class="text-slate-500 font-normal text-sm">or continue with</span>
+                    <span class="h-px flex-1 bg-slate-700/50"></span>
                 </div>
 
                 <div class="flex justify-center space-x-4">
-                    <button class="flex items-center justify-center w-12 h-12 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition duration-300 transform hover:scale-110">
-                        <svg class="w-6 h-6" viewBox="0 0 48 48">
+                    <button class="social-btn" aria-label="Sign in with Google">
+                        <svg class="w-5 h-5" viewBox="0 0 48 48">
                             <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C42.021,35.596,44,30.138,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
                         </svg>
                     </button>
-                    <button class="flex items-center justify-center w-12 h-12 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition duration-300 transform hover:scale-110">
-                        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <button class="social-btn" aria-label="Sign in with GitHub">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                             <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.378.203 2.398.1 2.65.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
                         </svg>
                     </button>
-                     <button class="flex items-center justify-center w-12 h-12 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition duration-300 transform hover:scale-110">
-                        <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                    <button class="social-btn" aria-label="Sign in with Facebook">
+                        <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
                         </svg>
                     </button>
                 </div>
                 
-                <p class="text-center text-gray-400 text-sm">
+                <p class="text-center text-slate-400 text-sm">
                     Don't have an account? 
-                    <a href="/register" class="font-medium text-green-400 hover:text-green-300 transition duration-300">Sign up</a>
+                    <a href="/register" class="font-medium text-blue-400 hover:text-cyan-300 transition duration-300">Sign up</a>
                 </p>
             </div>
         </div>
     </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const submitBtn = document.getElementById('submitBtn');
+        const globalError = document.getElementById('globalError');
+
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function showError(input, errorEl) {
+            input.classList.add('error');
+            errorEl.style.display = 'block';
+            setTimeout(() => input.classList.remove('error'), 500);
+        }
+
+        function clearError(input, errorEl) {
+            input.classList.remove('error');
+            errorEl.style.display = 'none';
+        }
+
+        emailInput.addEventListener('input', () => {
+            clearError(emailInput, document.getElementById('emailError'));
+            globalError.classList.add('hidden');
+        });
+        passwordInput.addEventListener('input', () => {
+            clearError(passwordInput, document.getElementById('passwordError'));
+            globalError.classList.add('hidden');
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            let valid = true;
+
+            if (!validateEmail(emailInput.value.trim())) {
+                showError(emailInput, document.getElementById('emailError'));
+                valid = false;
+            }
+
+            if (!passwordInput.value.trim()) {
+                showError(passwordInput, document.getElementById('passwordError'));
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            globalError.classList.add('hidden');
+
+            const formData = new URLSearchParams(new FormData(form));
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json'
+                },
+                body: formData.toString()
+            })
+            .then(async response => {
+                const isJson = response.headers.get('content-type')?.includes('application/json');
+                const data = isJson ? await response.json() : null;
+
+                if (!response.ok) {
+                    throw new Error(data?.message || 'Invalid email or password.');
+                }
+
+                if (data && data.redirect) {
+                    window.location.href = data.redirect;
+                } else {
+                    window.location.href = '/dashboard';
+                }
+            })
+            .catch(error => {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+                globalError.textContent = error.message;
+                globalError.classList.remove('hidden');
+                
+                // Shake globalError
+                globalError.style.animation = 'none';
+                globalError.offsetHeight; // trigger reflow
+                globalError.style.animation = 'shake 0.4s ease';
+            });
+        });
+    </script>
 </body>
-<script></script>
 </html>

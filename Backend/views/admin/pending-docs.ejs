@@ -3,29 +3,757 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Approval System</title>
-    <link rel="stylesheet" href="approval-styles.css">
+    <title>Document Approval — KMRL DMS</title>
+    <meta name="description" content="Review and approve documents with AI-generated summaries and approval workflow.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(1100px 620px at 10% -10%, rgba(56, 189, 248, 0.1), transparent 62%),
+                radial-gradient(1000px 640px at 88% 8%, rgba(139, 92, 246, 0.08), transparent 64%),
+                linear-gradient(135deg, #081120, #0B1220 48%, #111827);
+            color: #f8fafc;
+            overflow-x: hidden;
+            opacity: 0;
+            animation: pageIn 0.6s ease 0.1s forwards;
+        }
+
+        @keyframes pageIn { to { opacity: 1; } }
+
+        body::before {
+            content: "";
+            position: fixed; inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(148,163,184,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148,163,184,0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 78%);
+            z-index: -1;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.9); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(56,189,248,0.4), rgba(139,92,246,0.4)); border-radius: 999px; }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 22px;
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 20px;
+            background: rgba(8, 17, 32, 0.7);
+            backdrop-filter: blur(18px);
+            margin-bottom: 20px;
+            animation: slideDown 0.5s ease 0.15s both;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-content {
+            display: flex; align-items: center; gap: 14px; flex: 1;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-size: 1.4rem;
+            font-weight: 850;
+        }
+
+        .header-actions {
+            display: flex; gap: 8px;
+        }
+
+        .btn-icon {
+            display: grid;
+            width: 40px; height: 40px;
+            place-items: center;
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.5);
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            border-color: rgba(56,189,248,0.35);
+            color: #fff;
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        /* Document Card */
+        .document-card {
+            padding: 20px;
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 20px;
+            background: linear-gradient(145deg, rgba(30,41,59,0.7), rgba(8,17,32,0.6));
+            backdrop-filter: blur(18px);
+            margin-bottom: 20px;
+            animation: slideUp 0.6s ease 0.2s both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .document-header {
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        }
+
+        .document-icon {
+            width: 54px; height: 54px;
+            display: grid; place-items: center;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(56,189,248,0.18), rgba(139,92,246,0.14));
+            color: #22d3ee;
+            flex-shrink: 0;
+        }
+
+        .document-info { flex: 1; min-width: 0; }
+
+        .document-title {
+            font-size: 1.1rem; font-weight: 800;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .document-meta {
+            display: flex; flex-wrap: wrap; gap: 14px;
+            margin-top: 6px;
+        }
+
+        .meta-item {
+            display: inline-flex; align-items: center; gap: 5px;
+            color: #94a3b8; font-size: 0.78rem;
+        }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px;
+            border: 1px solid rgba(251,146,60,0.22);
+            border-radius: 999px;
+            background: rgba(251,146,60,0.1);
+            color: #fdba74;
+            font-size: 0.76rem; font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #fb923c;
+            box-shadow: 0 0 8px rgba(251,146,60,0.6);
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+            animation: slideUp 0.6s ease 0.35s both;
+        }
+
+        @media (max-width: 900px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .document-header { flex-direction: column; align-items: flex-start; }
+        }
+
+        /* Section */
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+        }
+
+        .section-title-wrapper {
+            display: flex; flex-direction: column; gap: 6px;
+        }
+
+        .ai-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px;
+            border: 1px solid rgba(34,211,238,0.2);
+            border-radius: 999px;
+            background: rgba(8, 47, 73, 0.22);
+            color: #a5f3fc;
+            font-size: 0.7rem; font-weight: 800;
+            width: fit-content;
+        }
+
+        .section-title {
+            font-size: 1rem; font-weight: 800; color: #f8fafc;
+        }
+
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px;
+            border: 1px solid rgba(148,163,184,0.14);
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            color: #cbd5e1;
+            font-size: 0.82rem; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            border-color: rgba(56,189,248,0.3);
+            color: #fff;
+        }
+
+        /* Feature cards */
+        .ai-summary-section, .approval-section {
+            display: flex; flex-direction: column; gap: 16px;
+        }
+
+        .feature-card {
+            padding: 18px;
+            border: 1px solid rgba(148,163,184,0.1);
+            border-radius: 20px;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+        }
+
+        .feature-header {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 14px; color: #e2e8f0;
+        }
+
+        .feature-title {
+            font-size: 0.92rem; font-weight: 750;
+        }
+
+        /* Summary content */
+        .summary-content {
+            padding: 18px;
+            border: 1px solid rgba(148,163,184,0.1);
+            border-radius: 20px;
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        .summary-paragraph {
+            color: #cbd5e1; font-size: 0.88rem; line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .key-points { margin-bottom: 18px; }
+
+        .key-points-title, .entities-title, .sentiment-title {
+            font-size: 0.82rem; font-weight: 800; color: #e2e8f0;
+            margin-bottom: 10px;
+        }
+
+        .key-points-list {
+            list-style: none; padding: 0;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .key-points-list li {
+            position: relative;
+            padding-left: 18px;
+            color: #94a3b8;
+            font-size: 0.84rem; line-height: 1.5;
+        }
+
+        .key-points-list li::before {
+            content: '';
+            position: absolute; left: 0; top: 8px;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #22d3ee;
+            box-shadow: 0 0 8px rgba(34,211,238,0.5);
+        }
+
+        .entity-tags {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .entity-tag {
+            padding: 5px 10px;
+            border: 1px solid rgba(56,189,248,0.18);
+            border-radius: 999px;
+            background: rgba(56,189,248,0.08);
+            color: #a5f3fc;
+            font-size: 0.72rem; font-weight: 700;
+        }
+
+        /* Sentiment bar */
+        .sentiment-bar {
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(148,163,184,0.12);
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .sentiment-fill {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #34d399, #22d3ee);
+            transition: width 1s ease;
+        }
+
+        .sentiment-label {
+            color: #94a3b8; font-size: 0.76rem;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            width: 32px; height: 32px;
+            border: 3px solid rgba(56,189,248,0.2);
+            border-top-color: #22d3ee;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .summary-loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
+        /* Preview */
+        .preview-container { text-align: center; }
+
+        .preview-placeholder {
+            padding: 32px;
+            border: 1px dashed rgba(148,163,184,0.15);
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.3);
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .preview-placeholder p {
+            margin-top: 8px; font-size: 0.82rem;
+        }
+
+        .btn-link {
+            background: none; border: none;
+            color: #38bdf8; font-size: 0.86rem; font-weight: 700;
+            cursor: pointer; text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .btn-link:hover { color: #22d3ee; }
+
+        /* Version list */
+        .version-list {
+            display: flex; flex-direction: column; gap: 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .version-list::before {
+            content: '';
+            position: absolute; left: 8px; top: 8px; bottom: 8px;
+            width: 2px;
+            background: rgba(148,163,184,0.12);
+        }
+
+        .version-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 0;
+            position: relative;
+        }
+
+        .version-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #475569;
+            border: 2px solid rgba(15,23,42,0.9);
+            position: absolute; left: -16px;
+            z-index: 1;
+        }
+
+        .version-item.active .version-dot {
+            background: #22d3ee;
+            box-shadow: 0 0 10px rgba(34,211,238,0.6);
+        }
+
+        .version-info {
+            display: flex; flex-direction: column;
+        }
+
+        .version-number {
+            font-size: 0.84rem; font-weight: 700; color: #e2e8f0;
+        }
+
+        .version-date {
+            font-size: 0.72rem; color: #64748b;
+        }
+
+        /* Comments */
+        .comments-container {
+            display: flex; flex-direction: column; gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .comment-item {
+            display: flex; gap: 10px;
+        }
+
+        .comment-avatar {
+            width: 36px; height: 36px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(139,92,246,0.8), rgba(34,211,238,0.6));
+            color: #fff;
+            display: grid; place-items: center;
+            font-size: 0.72rem; font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .comment-content { flex: 1; min-width: 0; }
+
+        .comment-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .comment-author {
+            font-size: 0.82rem; font-weight: 750; color: #e2e8f0;
+        }
+
+        .comment-time {
+            font-size: 0.7rem; color: #64748b;
+        }
+
+        .comment-text {
+            font-size: 0.82rem; color: #94a3b8; line-height: 1.5;
+        }
+
+        .comment-input-wrapper {
+            display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.5);
+            color: #f8fafc;
+            font-size: 0.86rem;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .comment-input:focus {
+            border-color: rgba(56,189,248,0.5);
+        }
+
+        .btn-primary {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 10px 18px;
+            border: none; border-radius: 12px;
+            background: linear-gradient(135deg, #2563eb, #38bdf8);
+            color: #fff;
+            font-weight: 750; font-size: 0.86rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(37,99,235,0.3);
+        }
+
+        .btn-sm { padding: 8px 14px; font-size: 0.8rem; align-self: flex-end; }
+
+        /* Checklist */
+        .checklist {
+            display: flex; flex-direction: column; gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .checkbox-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px;
+            border: 1px solid rgba(148,163,184,0.08);
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.3);
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(30, 41, 59, 0.4);
+            border-color: rgba(56,189,248,0.2);
+        }
+
+        .checkbox-input {
+            width: 18px; height: 18px;
+            accent-color: #22d3ee;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            font-size: 0.84rem; color: #cbd5e1; cursor: pointer;
+        }
+
+        .checklist-progress { margin-top: 4px; }
+
+        .progress-bar {
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(148,163,184,0.12);
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #2563eb, #22d3ee);
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            font-size: 0.74rem; color: #64748b; font-weight: 600;
+        }
+
+        /* Workflow steps */
+        .workflow-steps {
+            display: flex; flex-direction: column; gap: 0;
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .workflow-steps::before {
+            content: '';
+            position: absolute; left: 11px; top: 16px; bottom: 16px;
+            width: 2px;
+            background: rgba(148,163,184,0.1);
+        }
+
+        .workflow-step {
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 0;
+            position: relative;
+        }
+
+        .step-indicator {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(148,163,184,0.2);
+            background: rgba(15,23,42,0.8);
+            display: grid; place-items: center;
+            position: absolute; left: -19px;
+            z-index: 1;
+        }
+
+        .workflow-step.completed .step-indicator {
+            border-color: #34d399;
+            background: rgba(52,211,153,0.15);
+            color: #34d399;
+        }
+
+        .workflow-step.active .step-indicator {
+            border-color: #22d3ee;
+            background: rgba(34,211,238,0.1);
+        }
+
+        .pulse-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #22d3ee;
+            box-shadow: 0 0 0 0 rgba(34,211,238,0.7);
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            70% { box-shadow: 0 0 0 8px rgba(34,211,238,0); }
+            100% { box-shadow: 0 0 0 0 rgba(34,211,238,0); }
+        }
+
+        .step-content {
+            display: flex; flex-direction: column;
+        }
+
+        .step-title {
+            font-size: 0.84rem; font-weight: 750; color: #e2e8f0;
+        }
+
+        .step-user {
+            font-size: 0.72rem; color: #64748b;
+        }
+
+        /* Decision Card */
+        .decision-card {
+            border-color: rgba(56,189,248,0.18);
+            background: linear-gradient(135deg, rgba(56,189,248,0.05), rgba(139,92,246,0.04), rgba(15,23,42,0.4));
+        }
+
+        .input-label {
+            font-size: 0.78rem; font-weight: 700; color: #94a3b8;
+            margin-bottom: 8px; display: block;
+        }
+
+        .decision-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.5);
+            color: #f8fafc;
+            font-size: 0.88rem;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .decision-textarea:focus {
+            border-color: rgba(56,189,248,0.5);
+        }
+
+        .decision-notes { margin-bottom: 16px; }
+
+        .decision-actions {
+            display: flex; flex-wrap: wrap; gap: 10px;
+        }
+
+        .btn-approve {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 20px;
+            border: none; border-radius: 14px;
+            background: linear-gradient(135deg, rgba(52,211,153,0.9), rgba(20,184,166,0.85));
+            color: #fff;
+            font-weight: 750; font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(20,184,166,0.2);
+        }
+
+        .btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 36px rgba(20,184,166,0.35);
+        }
+
+        .btn-reject {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 20px;
+            border: none; border-radius: 14px;
+            background: linear-gradient(135deg, rgba(251,113,133,0.85), rgba(239,68,68,0.8));
+            color: #fff;
+            font-weight: 750; font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(239,68,68,0.15);
+        }
+
+        .btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 36px rgba(239,68,68,0.3);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+            background: rgba(2,8,23,0.7);
+            backdrop-filter: blur(12px);
+            z-index: 80;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal.active {
+            opacity: 1; pointer-events: auto;
+        }
+
+        .modal-content {
+            width: min(420px, 100%);
+            padding: 28px;
+            border: 1px solid rgba(148,163,184,0.2);
+            border-radius: 24px;
+            background: linear-gradient(145deg, rgba(30,41,59,0.95), rgba(8,17,32,0.98));
+            box-shadow: 0 34px 100px rgba(2,8,23,0.6);
+            text-align: center;
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.25s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-icon {
+            width: 56px; height: 56px;
+            margin: 0 auto 16px;
+            border-radius: 16px;
+            display: grid; place-items: center;
+        }
+
+        .modal-icon.success {
+            background: rgba(52,211,153,0.15);
+            color: #34d399;
+        }
+
+        .modal-icon.error {
+            background: rgba(251,113,133,0.15);
+            color: #fb7185;
+        }
+
+        .modal-title {
+            font-size: 1.1rem; font-weight: 800; margin-bottom: 8px;
+        }
+
+        .modal-message {
+            color: #94a3b8; font-size: 0.88rem; margin-bottom: 20px; line-height: 1.5;
+        }
+
+        @media (max-width: 640px) {
+            .header { padding: 14px; }
+            .header-title { font-size: 1.1rem; }
+            .decision-actions { flex-direction: column; }
+            .decision-actions button { width: 100%; justify-content: center; }
+        }
+    </style>
 </head>  
 <body>
     <div class="container">
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <h1 class="header-title">Document Approval System</h1>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <a href="/dashboard" class="btn-secondary" style="padding:8px 12px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        Back
+                    </a>
+                    <h1 class="header-title">Document Approval</h1>
+                </div>
                 <div class="header-actions">
-                    <button class="btn-icon" id="refreshBtn" aria-label="Refresh">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <button class="btn-icon" id="refreshBtn" aria-label="Refresh" onclick="location.reload()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-           
-                        </svg>
-                    </button>
-                    <button class="btn-icon" id="settingsBtn" aria-label="Settings">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3"/>
                         </svg>
                     </button>
                 </div>
@@ -33,12 +761,12 @@
         </header>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <main>
             <!-- Document Info Card -->
             <div class="document-card">
                 <div class="document-header">
                     <div class="document-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                             <polyline points="14 2 14 8 20 8"/>
                         </svg>
@@ -47,24 +775,15 @@
                         <h2 class="document-title" id="documentTitle">Annual Financial Report 2024</h2>
                         <div class="document-meta">
                             <span class="meta-item">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <polyline points="12 6 12 12 16 14"/>
-                                </svg>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 Submitted: <span id="submittedDate">Jan 15, 2024</span>
                             </span>
                             <span class="meta-item">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="12" cy="7" r="4"/>
-                                </svg>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                 By: <span id="submittedBy">John Anderson</span>
                             </span>
                             <span class="meta-item">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-                                    <polyline points="13 2 13 9 20 9"/>
-                                </svg>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
                                 Size: <span id="fileSize">2.4 MB</span>
                             </span>
                         </div>
@@ -83,17 +802,13 @@
                     <div class="section-header">
                         <div class="section-title-wrapper">
                             <div class="ai-badge">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                                </svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                                 AI Generated
                             </div>
                             <h3 class="section-title">Document Summary</h3>
                         </div>
                         <button class="btn-secondary" id="regenerateSummary">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-                            </svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
                             Regenerate
                         </button>
                     </div>
@@ -104,7 +819,7 @@
                             <p>AI is analyzing the document...</p>
                         </div>
 
-                        <div id="summaryText" class="summary-text">
+                        <div id="summaryText">
                             <p class="summary-paragraph">This comprehensive financial report provides a detailed analysis of the company's fiscal performance for the year 2024. The document encompasses revenue streams, expenditure breakdowns, and strategic financial initiatives undertaken during the reporting period.</p>
                             
                             <div class="key-points">
@@ -129,7 +844,7 @@
                                 </div>
                             </div>
 
-                            <div class="sentiment-analysis">
+                            <div>
                                 <h4 class="sentiment-title">Sentiment Analysis</h4>
                                 <div class="sentiment-bar">
                                     <div class="sentiment-fill" style="width: 78%"></div>
@@ -142,25 +857,15 @@
 
                 <!-- Right Column: Approval Features -->
                 <section class="approval-section">
-                    <div class="section-header">
-                        <h3 class="section-title">Approval Actions</h3>
-                    </div>
-
                     <!-- Document Preview -->
                     <div class="feature-card">
                         <div class="feature-header">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             <h4 class="feature-title">Document Preview</h4>
                         </div>
                         <div class="preview-container">
                             <div class="preview-placeholder">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                    <polyline points="14 2 14 8 20 8"/>
-                                </svg>
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                                 <p>Click to view full document</p>
                             </div>
                             <button class="btn-link" id="viewDocumentBtn">View Full Document</button>
@@ -170,69 +875,40 @@
                     <!-- Version History -->
                     <div class="feature-card">
                         <div class="feature-header">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12 6 12 12 16 14"/>
-                            </svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                             <h4 class="feature-title">Version History</h4>
                         </div>
                         <div class="version-list">
-                            <div class="version-item active">
-                                <div class="version-dot"></div>
-                                <div class="version-info">
-                                    <span class="version-number">v3.0 (Current)</span>
-                                    <span class="version-date">Jan 15, 2024 - 2:30 PM</span>
-                                </div>
-                            </div>
-                            <div class="version-item">
-                                <div class="version-dot"></div>
-                                <div class="version-info">
-                                    <span class="version-number">v2.1</span>
-                                    <span class="version-date">Jan 12, 2024 - 4:15 PM</span>
-                                </div>
-                            </div>
-                            <div class="version-item">
-                                <div class="version-dot"></div>
-                                <div class="version-info">
-                                    <span class="version-number">v2.0</span>
-                                    <span class="version-date">Jan 10, 2024 - 10:00 AM</span>
-                                </div>
-                            </div>
+                            <div class="version-item active"><div class="version-dot"></div><div class="version-info"><span class="version-number">v3.0 (Current)</span><span class="version-date">Jan 15, 2024 - 2:30 PM</span></div></div>
+                            <div class="version-item"><div class="version-dot"></div><div class="version-info"><span class="version-number">v2.1</span><span class="version-date">Jan 12, 2024 - 4:15 PM</span></div></div>
+                            <div class="version-item"><div class="version-dot"></div><div class="version-info"><span class="version-number">v2.0</span><span class="version-date">Jan 10, 2024 - 10:00 AM</span></div></div>
                         </div>
                     </div>
 
-                    <!-- Comments & Annotations -->
+                    <!-- Comments -->
                     <div class="feature-card">
                         <div class="feature-header">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                            </svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                             <h4 class="feature-title">Comments & Feedback</h4>
                         </div>
                         <div class="comments-container">
                             <div class="comment-item">
                                 <div class="comment-avatar">JD</div>
                                 <div class="comment-content">
-                                    <div class="comment-header">
-                                        <span class="comment-author">Jane Doe</span>
-                                        <span class="comment-time">2 hours ago</span>
-                                    </div>
+                                    <div class="comment-header"><span class="comment-author">Jane Doe</span><span class="comment-time">2 hours ago</span></div>
                                     <p class="comment-text">Please verify the Q4 revenue figures on page 23.</p>
                                 </div>
                             </div>
                             <div class="comment-item">
                                 <div class="comment-avatar">MS</div>
                                 <div class="comment-content">
-                                    <div class="comment-header">
-                                        <span class="comment-author">Mike Smith</span>
-                                        <span class="comment-time">5 hours ago</span>
-                                    </div>
+                                    <div class="comment-header"><span class="comment-author">Mike Smith</span><span class="comment-time">5 hours ago</span></div>
                                     <p class="comment-text">Looks good overall. Minor formatting issue on page 15.</p>
                                 </div>
                             </div>
                         </div>
                         <div class="comment-input-wrapper">
-                            <textarea class="comment-input" placeholder="Add your comment..." id="commentInput"></textarea>
+                            <textarea class="comment-input" placeholder="Add your comment..." id="commentInput" rows="2"></textarea>
                             <button class="btn-primary btn-sm" id="addCommentBtn">Post Comment</button>
                         </div>
                     </div>
@@ -240,38 +916,18 @@
                     <!-- Approval Checklist -->
                     <div class="feature-card">
                         <div class="feature-header">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                <polyline points="22 4 12 14.01 9 11.01"/>
-                            </svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                             <h4 class="feature-title">Approval Checklist</h4>
                         </div>
-                        <div class="checklist">
-                            <label class="checkbox-item">
-                                <input type="checkbox" class="checkbox-input" id="check1" checked>
-                                <span class="checkbox-label">Content accuracy verified</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" class="checkbox-input" id="check2" checked>
-                                <span class="checkbox-label">Financial data cross-referenced</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" class="checkbox-input" id="check3">
-                                <span class="checkbox-label">Legal compliance reviewed</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" class="checkbox-input" id="check4">
-                                <span class="checkbox-label">Stakeholder approval obtained</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" class="checkbox-input" id="check5">
-                                <span class="checkbox-label">Final formatting complete</span>
-                            </label>
+                        <div class="checklist" id="checklist">
+                            <label class="checkbox-item"><input type="checkbox" class="checkbox-input" checked><span class="checkbox-label">Content accuracy verified</span></label>
+                            <label class="checkbox-item"><input type="checkbox" class="checkbox-input" checked><span class="checkbox-label">Financial data cross-referenced</span></label>
+                            <label class="checkbox-item"><input type="checkbox" class="checkbox-input"><span class="checkbox-label">Legal compliance reviewed</span></label>
+                            <label class="checkbox-item"><input type="checkbox" class="checkbox-input"><span class="checkbox-label">Stakeholder approval obtained</span></label>
+                            <label class="checkbox-item"><input type="checkbox" class="checkbox-input"><span class="checkbox-label">Final formatting complete</span></label>
                         </div>
                         <div class="checklist-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="progressFill" style="width: 40%"></div>
-                            </div>
+                            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 40%"></div></div>
                             <span class="progress-text" id="progressText">2 of 5 completed</span>
                         </div>
                     </div>
@@ -279,94 +935,39 @@
                     <!-- Approval Workflow -->
                     <div class="feature-card">
                         <div class="feature-header">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="1" x2="12" y2="23"/>
-                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                            </svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                             <h4 class="feature-title">Approval Workflow</h4>
                         </div>
                         <div class="workflow-steps">
-                            <div class="workflow-step completed">
-                                <div class="step-indicator">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                        <polyline points="20 6 9 17 4 12"/>
-                                    </svg>
-                                </div>
-                                <div class="step-content">
-                                    <span class="step-title">Submitted</span>
-                                    <span class="step-user">John Anderson</span>
-                                </div>
-                            </div>
-                            <div class="workflow-step completed">
-                                <div class="step-indicator">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                        <polyline points="20 6 9 17 4 12"/>
-                                    </svg>
-                                </div>
-                                <div class="step-content">
-                                    <span class="step-title">Department Review</span>
-                                    <span class="step-user">Sarah Johnson</span>
-                                </div>
-                            </div>
-                            <div class="workflow-step active">
-                                <div class="step-indicator">
-                                    <div class="pulse-dot"></div>
-                                </div>
-                                <div class="step-content">
-                                    <span class="step-title">Manager Approval</span>
-                                    <span class="step-user">You</span>
-                                </div>
-                            </div>
-                            <div class="workflow-step">
-                                <div class="step-indicator"></div>
-                                <div class="step-content">
-                                    <span class="step-title">Executive Approval</span>
-                                    <span class="step-user">Pending</span>
-                                </div>
-                            </div>
-                            <div class="workflow-step">
-                                <div class="step-indicator"></div>
-                                <div class="step-content">
-                                    <span class="step-title">Final Publication</span>
-                                    <span class="step-user">Pending</span>
-                                </div>
-                            </div>
+                            <div class="workflow-step completed"><div class="step-indicator"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div class="step-content"><span class="step-title">Submitted</span><span class="step-user">John Anderson</span></div></div>
+                            <div class="workflow-step completed"><div class="step-indicator"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div class="step-content"><span class="step-title">Department Review</span><span class="step-user">Sarah Johnson</span></div></div>
+                            <div class="workflow-step active"><div class="step-indicator"><div class="pulse-dot"></div></div><div class="step-content"><span class="step-title">Manager Approval</span><span class="step-user">You</span></div></div>
+                            <div class="workflow-step"><div class="step-indicator"></div><div class="step-content"><span class="step-title">Executive Approval</span><span class="step-user">Pending</span></div></div>
+                            <div class="workflow-step"><div class="step-indicator"></div><div class="step-content"><span class="step-title">Final Publication</span><span class="step-user">Pending</span></div></div>
                         </div>
                     </div>
 
                     <!-- Decision Actions -->
                     <div class="feature-card decision-card">
                         <div class="feature-header">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 11l3 3L22 4"/>
-                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                            </svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                             <h4 class="feature-title">Make Decision</h4>
                         </div>
                         <div class="decision-notes">
                             <label for="decisionNotes" class="input-label">Decision Notes (Optional)</label>
-                            <textarea id="decisionNotes" class="decision-textarea" placeholder="Add any notes or conditions for your decision..."></textarea>
+                            <textarea id="decisionNotes" class="decision-textarea" placeholder="Add any notes or conditions for your decision..." rows="3"></textarea>
                         </div>
                         <div class="decision-actions">
                             <button class="btn-approve" id="approveBtn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22 4 12 14.01 9 11.01"/>
-                                </svg>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                                 Approve Document
                             </button>
                             <button class="btn-reject" id="rejectBtn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="15" y1="9" x2="9" y2="15"/>
-                                    <line x1="9" y1="9" x2="15" y2="15"/>
-                                </svg>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                                 Reject Document
                             </button>
                             <button class="btn-secondary" id="requestChangesBtn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                </svg>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                                 Request Changes
                             </button>
                         </div>
@@ -376,7 +977,7 @@
         </main>
     </div>
 
-    <!-- Modal for notifications -->
+    <!-- Notification Modal -->
     <div class="modal" id="notificationModal">
         <div class="modal-content">
             <div class="modal-icon" id="modalIcon"></div>
@@ -386,6 +987,97 @@
         </div>
     </div>
 
-    <script src="approval-script.js"></script>
+    <script>
+        // Checklist progress
+        const checklist = document.getElementById('checklist');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        function updateProgress() {
+            const boxes = checklist.querySelectorAll('.checkbox-input');
+            const checked = Array.from(boxes).filter(b => b.checked).length;
+            const pct = Math.round((checked / boxes.length) * 100);
+            progressFill.style.width = pct + '%';
+            progressText.textContent = `${checked} of ${boxes.length} completed`;
+        }
+
+        checklist.addEventListener('change', updateProgress);
+
+        // Comment posting
+        document.getElementById('addCommentBtn').addEventListener('click', () => {
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const container = document.querySelector('.comments-container');
+            const div = document.createElement('div');
+            div.className = 'comment-item';
+            div.style.animation = 'slideUp 0.3s ease both';
+            div.innerHTML = `
+                <div class="comment-avatar">YO</div>
+                <div class="comment-content">
+                    <div class="comment-header"><span class="comment-author">You</span><span class="comment-time">Just now</span></div>
+                    <p class="comment-text">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+                </div>`;
+            container.appendChild(div);
+            input.value = '';
+        });
+
+        // Regenerate summary
+        document.getElementById('regenerateSummary').addEventListener('click', () => {
+            document.getElementById('summaryLoading').style.display = 'block';
+            document.getElementById('summaryText').style.display = 'none';
+            setTimeout(() => {
+                document.getElementById('summaryLoading').style.display = 'none';
+                document.getElementById('summaryText').style.display = 'block';
+            }, 2000);
+        });
+
+        // Decision actions
+        function showModal(type, title, message) {
+            const modal = document.getElementById('notificationModal');
+            const iconEl = document.getElementById('modalIcon');
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+
+            if (type === 'success') {
+                iconEl.className = 'modal-icon success';
+                iconEl.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+            } else {
+                iconEl.className = 'modal-icon error';
+                iconEl.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+            }
+
+            modal.classList.add('active');
+        }
+
+        document.getElementById('modalCloseBtn').addEventListener('click', () => {
+            document.getElementById('notificationModal').classList.remove('active');
+        });
+
+        document.getElementById('notificationModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('notificationModal')) {
+                document.getElementById('notificationModal').classList.remove('active');
+            }
+        });
+
+        document.getElementById('approveBtn').addEventListener('click', () => {
+            showModal('success', 'Document Approved', 'The document has been approved and forwarded to the next reviewer in the workflow.');
+        });
+
+        document.getElementById('rejectBtn').addEventListener('click', () => {
+            showModal('error', 'Document Rejected', 'The document has been rejected and the submitter will be notified.');
+        });
+
+        document.getElementById('requestChangesBtn').addEventListener('click', () => {
+            showModal('error', 'Changes Requested', 'A request for changes has been sent to the document owner.');
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('notificationModal').classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
