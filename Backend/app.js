@@ -16,6 +16,7 @@ const adminOnly = require("./middlewares/admin.middleware");
 const app = express();
 
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(morgan('dev'));
 app.use(express.json());
@@ -26,7 +27,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/", userRouter);
 app.get("/dashboard", auth, (req, res) => res.render("dashboard"));
-app.get("/admin/pending-docs", auth, adminOnly, (req, res) => res.render("admin.dashboard"));
+app.get("/admin/pending-docs", auth, adminOnly, (req, res) => res.render("admin/pending-docs"));
 app.use("/dashboard", dashboardRoutes);
 app.use("/documents", documentRoutes);
 app.use("/", activityRoutes);

@@ -1,3 +1,4 @@
+// NOTE: This file is NOT currently used. document.routes.js defines its own multer config inline.
 const multer = require("multer");
 const path = require("path");
 

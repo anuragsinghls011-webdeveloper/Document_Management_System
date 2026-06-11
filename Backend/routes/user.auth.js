@@ -1,3 +1,5 @@
+// NOTE: This file is NOT currently used. Auth is handled by middlewares/auth.middleware.js (cookie-based).
+// This alternative supports Bearer tokens but is not mounted anywhere.
 const jwt = require("jsonwebtoken");
 
 const authMiddleware = (req, res, next) => {

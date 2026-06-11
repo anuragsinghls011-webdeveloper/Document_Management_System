@@ -1,3 +1,5 @@
+// NOTE: This controller is NOT currently used. Auth is handled inline in routes/user.routes.js.
+// auth.routes.js imports these but is never mounted in app.js.
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");

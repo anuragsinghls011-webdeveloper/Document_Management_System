@@ -17,6 +17,10 @@ function normalizeStatus(status) {
   return STATUS_ALIASES[String(status || "").trim().toLowerCase()];
 }
 
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 
 exports.upload = async (req, res) => {
   try {
@@ -114,7 +118,7 @@ exports.search = async (req, res) => {
 
     
     if (q && q.trim() !== "") {
-      query.fileName = { $regex: q, $options: "i" };
+      query.fileName = { $regex: escapeRegex(q), $options: "i" };
     }
 
     
@@ -125,7 +129,7 @@ exports.search = async (req, res) => {
 
     
     if (type && type !== "all") {
-      query.fileType = { $regex: new RegExp(`^${type}$`, "i") };
+      query.fileType = { $regex: new RegExp(`^${escapeRegex(type)}$`, "i") };
     }
 
     

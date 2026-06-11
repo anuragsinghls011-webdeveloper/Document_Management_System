@@ -1,8 +1,9 @@
+const mongoose = require("mongoose");
 const Document = require("../models/document.model");
 
 exports.stats = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = new mongoose.Types.ObjectId(req.user.id);
     const total = await Document.countDocuments({ userId });
     const approved = await Document.countDocuments({ userId, status: "approved" });
     const pending = await Document.countDocuments({ userId, status: "pending" });

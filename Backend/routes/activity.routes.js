@@ -17,8 +17,8 @@ router.get("/activities/recent", auth, async (req, res) => {
 });
 router.post("/activities", auth, async (req, res) => {
   try {
-    const { type, details } = req.body;
-    const activity = new Activity({ type, details, user: req.user.id });
+    const { action, entityType, entityName, comment } = req.body;
+    const activity = new Activity({ action, entityType, entityName, comment, user: req.user.id });
     await activity.save();
     res.status(201).json(activity);
   } catch (err) {
