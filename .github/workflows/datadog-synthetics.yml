@@ -28,11 +28,15 @@ jobs:
 
     # Run Synthetic tests within your GitHub workflow.
     # For additional configuration options visit the action within the marketplace: https://github.com/marketplace/actions/datadog-synthetics-ci
+    - name: Skip Datadog Synthetic tests (missing secrets)
+      if: ${{ secrets.DD_API_KEY == '' || secrets.DD_APP_KEY == '' }}
+      run: echo "Skipping Datadog Synthetic tests because DD_API_KEY/DD_APP_KEY are not configured."
+
     - name: Run Datadog Synthetic tests
+      if: ${{ secrets.DD_API_KEY != '' && secrets.DD_APP_KEY != '' }}
       uses: DataDog/synthetics-ci-github-action@87b505388a22005bb8013481e3f73a367b9a53eb # v1.4.0
       with:
         api_key: ${{secrets.DD_API_KEY}}
         app_key: ${{secrets.DD_APP_KEY}}
         test_search_query: 'tag:e2e-tests' #Modify this tag to suit your tagging strategy
-
 
