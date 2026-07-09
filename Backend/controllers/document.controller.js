@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
+const path = require("path");
 const Document = require("../models/document.model");
+const Activity = require("../models/activity.model");
+const extractText = require("../services/ocr.service");
+const { extractKeywords, generateSummary } = require("../services/ai.service");
 
 const STATUS_ALIASES = {
   pending: "pending",
@@ -21,6 +25,40 @@ function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+async function enrichDocument(docId, filePath, originalName) {
+  let text = "";
+
+  try {
+    text = await extractText(filePath);
+  } catch (err) {
+    console.error("Text extraction failed for", originalName, err);
+  }
+
+  const keywords = extractKeywords(text);
+  const summary = generateSummary(text) || "No summary available.";
+
+  await Document.findByIdAndUpdate(docId, {
+    extractedText: text,
+    summary,
+    keywords,
+    status: "pending"
+  });
+}
+
+function queueDocumentEnrichment(docId, filePath, originalName) {
+  setImmediate(() => {
+    enrichDocument(docId, filePath, originalName).catch((err) => {
+      console.error("DOCUMENT ENRICHMENT ERROR", err);
+      Document.findByIdAndUpdate(docId, {
+        status: "pending",
+        summary: "No summary available."
+      }).catch((updateErr) => {
+        console.error("FAILED TO MARK DOCUMENT PENDING AFTER ENRICHMENT ERROR", updateErr);
+      });
+    });
+  });
+}
+
 
 exports.upload = async (req, res) => {
   try {
@@ -34,15 +72,27 @@ exports.upload = async (req, res) => {
       const doc = await Document.create({
         userId,
         fileName: file.originalname,
-        fileType: file.originalname.split(".").pop(),
+        fileType: path.extname(file.originalname).replace(/^\./, "") || "unknown",
         filePath: `uploads/${file.filename}`,
-        status: "pending"
+        extractedText: "",
+        summary: "",
+        keywords: [],
+        status: "processing"
       });
+
+      await Activity.create({
+        user: req.user.id,
+        action: "Uploaded document",
+        entityType: "Document",
+        entityName: doc.fileName
+      });
+
+      queueDocumentEnrichment(doc._id, file.path, file.originalname);
 
       console.log("DOCUMENT SAVED ", doc._id);
     }
 
-    res.json({ message: "Uploaded successfully" });
+    res.json({ message: "Uploaded successfully", processing: true });
 
   } catch (err) {
     console.error("UPLOAD ERROR ", err);
@@ -68,31 +118,33 @@ exports.stats = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user.id);
 
-    const total = await Document.countDocuments({ userId });
-
-    const today = await Document.countDocuments({
-      userId,
-      createdAt: {
-        $gte: new Date(new Date().setHours(0, 0, 0, 0))
-      }
-    });
-
-    const pending = await Document.countDocuments({
-      userId,
-      status: "pending"
-    });
-
-    const archived = await Document.countDocuments({
-      userId,
-      status: "archived"
-    });
+    const [total, today, pending, archived, monthlyAgg] = await Promise.all([
+      Document.countDocuments({ userId }),
+      Document.countDocuments({
+        userId,
+        createdAt: {
+          $gte: new Date(new Date().setHours(0, 0, 0, 0))
+        }
+      }),
+      Document.countDocuments({ userId, status: "pending" }),
+      Document.countDocuments({ userId, status: "archived" }),
+      Document.aggregate([
+        { $match: { userId } },
+        {
+          $group: {
+            _id: { $month: "$createdAt" },
+            count: { $sum: 1 }
+          }
+        }
+      ])
+    ]);
 
     const monthly = Array(12).fill(0);
-    const docs = await Document.find({ userId });
-
-    docs.forEach(doc => {
-      const month = new Date(doc.createdAt).getMonth();
-      monthly[month]++;
+    monthlyAgg.forEach(entry => {
+      const monthIndex = entry._id - 1;
+      if (monthIndex >= 0 && monthIndex < 12) {
+        monthly[monthIndex] = entry.count;
+      }
     });
 
     res.json({
@@ -135,6 +187,10 @@ exports.search = async (req, res) => {
     
     if (date) {
       const start = new Date(date);
+      if (Number.isNaN(start.getTime())) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+
       const end = new Date(date);
       end.setHours(23, 59, 59, 999);
 

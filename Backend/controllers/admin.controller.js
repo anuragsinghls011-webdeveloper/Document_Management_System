@@ -1,5 +1,10 @@
+const mongoose = require("mongoose");
 const Document = require("../models/document.model");
 const Activity = require("../models/activity.model");
+
+function isValidDocumentId(id) {
+  return mongoose.isValidObjectId(id);
+}
 
 // Fetch pending documents
 exports.pendingDocs = async (req, res) => {
@@ -18,6 +23,10 @@ exports.pendingDocs = async (req, res) => {
 // Fetch single document
 exports.getDocument = async (req, res) => {
   try {
+    if (!isValidDocumentId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid document id" });
+    }
+
     const doc = await Document.findById(req.params.id).populate("userId", "username email");
 
     if (!doc) {
@@ -34,6 +43,10 @@ exports.getDocument = async (req, res) => {
 // Approve document
 exports.approveDoc = async (req, res) => {
   try {
+    if (!isValidDocumentId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid document id" });
+    }
+
     const doc = await Document.findById(req.params.id);
 
     if (!doc) {
@@ -64,6 +77,11 @@ exports.rejectDoc = async (req, res) => {
   try {
     const { reason, comment } = req.body;
     const rejectionReason = reason || comment || "";
+
+    if (!isValidDocumentId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid document id" });
+    }
+
     const doc = await Document.findById(req.params.id);
 
     if (!doc) {
@@ -94,6 +112,10 @@ exports.requestChanges = async (req, res) => {
   try {
     const { comment } = req.body;
     const reviewComment = comment ? comment.trim() : "";
+
+    if (!isValidDocumentId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid document id" });
+    }
 
     if (!reviewComment) {
       return res.status(400).json({

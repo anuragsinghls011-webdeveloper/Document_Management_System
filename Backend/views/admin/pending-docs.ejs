@@ -158,6 +158,36 @@
             white-space: nowrap;
         }
 
+        .status-badge.approved {
+            border-color: rgba(52,211,153,0.25);
+            background: rgba(52,211,153,0.1);
+            color: #34d399;
+        }
+        .status-badge.approved .status-dot {
+            background: #34d399;
+            box-shadow: 0 0 8px rgba(52,211,153,0.6);
+        }
+
+        .status-badge.rejected {
+            border-color: rgba(251,113,133,0.25);
+            background: rgba(251,113,133,0.1);
+            color: #fb7185;
+        }
+        .status-badge.rejected .status-dot {
+            background: #fb7185;
+            box-shadow: 0 0 8px rgba(251,113,133,0.6);
+        }
+
+        .status-badge.changes_requested {
+            border-color: rgba(251,146,60,0.22);
+            background: rgba(251,146,60,0.1);
+            color: #fdba74;
+        }
+        .status-badge.changes_requested .status-dot {
+            background: #fb923c;
+            box-shadow: 0 0 8px rgba(251,146,60,0.6);
+        }
+
         .status-dot {
             width: 8px; height: 8px;
             border-radius: 50%;
@@ -988,6 +1018,14 @@
     </div>
 
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const docId = urlParams.get('id');
+
+        if (!docId) {
+            alert("No document selected for review.");
+            window.location.href = "/admin/dashboard";
+        }
+
         // Checklist progress
         const checklist = document.getElementById('checklist');
         const progressFill = document.getElementById('progressFill');
@@ -1023,20 +1061,85 @@
             input.value = '';
         });
 
-        // Regenerate summary
-        document.getElementById('regenerateSummary').addEventListener('click', () => {
-            document.getElementById('summaryLoading').style.display = 'block';
-            document.getElementById('summaryText').style.display = 'none';
-            setTimeout(() => {
-                document.getElementById('summaryLoading').style.display = 'none';
-                document.getElementById('summaryText').style.display = 'block';
-            }, 2000);
-        });
+        // Load document details
+        async function loadDocDetails() {
+            try {
+                const res = await fetch(`/admin/document/${docId}`, { credentials: "include" });
+                if (!res.ok) {
+                    alert("Failed to load document details.");
+                    window.location.href = "/admin/dashboard";
+                    return;
+                }
+                const data = await res.json();
+                const doc = data.document;
 
-        // Decision actions
-        function showModal(type, title, message) {
+                if (!doc) {
+                    alert("Document not found.");
+                    window.location.href = "/admin/dashboard";
+                    return;
+                }
+
+                document.getElementById('documentTitle').textContent = doc.fileName;
+                document.getElementById('submittedDate').textContent = new Date(doc.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                document.getElementById('submittedBy').textContent = doc.userId?.username || "Unknown";
+                document.getElementById('fileSize').textContent = (doc.fileType || "unknown").toUpperCase();
+                
+                // Status badge
+                const statusBadge = document.getElementById('statusBadge');
+                statusBadge.textContent = doc.status.replace(/_/g, ' ');
+                statusBadge.className = `status-badge ${doc.status}`;
+
+                // View link
+                const viewBtn = document.getElementById('viewDocumentBtn');
+                if (viewBtn) {
+                    viewBtn.onclick = () => window.open(`/${doc.filePath}`, '_blank');
+                }
+                const previewPlaceholder = document.querySelector('.preview-placeholder');
+                if (previewPlaceholder) {
+                    previewPlaceholder.style.cursor = 'pointer';
+                    previewPlaceholder.onclick = () => window.open(`/${doc.filePath}`, '_blank');
+                }
+
+                // AI summary
+                const summaryTextEl = document.getElementById('summaryText');
+                if (summaryTextEl) {
+                    let keywordsHtml = '';
+                    if (doc.keywords && doc.keywords.length > 0) {
+                        keywordsHtml = `
+                            <div class="key-points" style="margin-top:20px;">
+                                <h4 class="key-points-title">Extracted Keywords</h4>
+                                <ul class="key-points-list">
+                                    ${doc.keywords.map(kw => `<li>${kw}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    summaryTextEl.innerHTML = `
+                        <p class="summary-paragraph">${doc.summary || 'No summary generated.'}</p>
+                        ${keywordsHtml}
+                        <div class="extracted-entities" style="margin-top:20px;">
+                            <h4 class="entities-title">Document Metadata</h4>
+                            <div class="entity-tags">
+                                <span class="entity-tag">Type: ${doc.fileType?.toUpperCase() || 'Unknown'}</span>
+                                <span class="entity-tag">Status: ${doc.status}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+            } catch (err) {
+                console.error("Load doc details failed", err);
+                alert("An error occurred loading document details.");
+                window.location.href = "/admin/dashboard";
+            }
+        }
+
+        // Notification modals
+        function showModal(type, title, message, onConfirm) {
             const modal = document.getElementById('notificationModal');
             const iconEl = document.getElementById('modalIcon');
+            const closeBtn = document.getElementById('modalCloseBtn');
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalMessage').textContent = message;
 
@@ -1049,11 +1152,15 @@
             }
 
             modal.classList.add('active');
-        }
 
-        document.getElementById('modalCloseBtn').addEventListener('click', () => {
-            document.getElementById('notificationModal').classList.remove('active');
-        });
+            const handleClose = () => {
+                modal.classList.remove('active');
+                if (onConfirm) onConfirm();
+                closeBtn.removeEventListener('click', handleClose);
+            };
+
+            closeBtn.addEventListener('click', handleClose);
+        }
 
         document.getElementById('notificationModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('notificationModal')) {
@@ -1061,16 +1168,74 @@
             }
         });
 
-        document.getElementById('approveBtn').addEventListener('click', () => {
-            showModal('success', 'Document Approved', 'The document has been approved and forwarded to the next reviewer in the workflow.');
+        // Approve action
+        document.getElementById('approveBtn').addEventListener('click', async () => {
+            try {
+                const res = await fetch(`/admin/approve/${docId}`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                if (res.ok) {
+                    showModal('success', 'Document Approved', 'The document has been approved and marked as completed.', () => {
+                        window.location.href = "/admin/dashboard";
+                    });
+                } else {
+                    const data = await res.json();
+                    showModal('error', 'Approval Failed', data.message || 'Server error occurred during approval.');
+                }
+            } catch (err) {
+                showModal('error', 'Approval Failed', 'Network or server failure.');
+            }
         });
 
-        document.getElementById('rejectBtn').addEventListener('click', () => {
-            showModal('error', 'Document Rejected', 'The document has been rejected and the submitter will be notified.');
+        // Reject action
+        document.getElementById('rejectBtn').addEventListener('click', async () => {
+            const notes = document.getElementById('decisionNotes').value.trim();
+            try {
+                const res = await fetch(`/admin/reject/${docId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason: notes }),
+                    credentials: 'include'
+                });
+                if (res.ok) {
+                    showModal('success', 'Document Rejected', 'The document has been rejected and the submitter has been notified.', () => {
+                        window.location.href = "/admin/dashboard";
+                    });
+                } else {
+                    const data = await res.json();
+                    showModal('error', 'Rejection Failed', data.message || 'Server error occurred.');
+                }
+            } catch (err) {
+                showModal('error', 'Rejection Failed', 'Network or server failure.');
+            }
         });
 
-        document.getElementById('requestChangesBtn').addEventListener('click', () => {
-            showModal('error', 'Changes Requested', 'A request for changes has been sent to the document owner.');
+        // Request changes action
+        document.getElementById('requestChangesBtn').addEventListener('click', async () => {
+            const notes = document.getElementById('decisionNotes').value.trim();
+            if (!notes) {
+                showModal('error', 'Comment Required', 'Please add decision notes or comments specifying the required changes.');
+                return;
+            }
+            try {
+                const res = await fetch(`/admin/request-changes/${docId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ comment: notes }),
+                    credentials: 'include'
+                });
+                if (res.ok) {
+                    showModal('success', 'Changes Requested', 'The document owner has been notified of the requested changes.', () => {
+                        window.location.href = "/admin/dashboard";
+                    });
+                } else {
+                    const data = await res.json();
+                    showModal('error', 'Request Failed', data.message || 'Server error occurred.');
+                }
+            } catch (err) {
+                showModal('error', 'Request Failed', 'Network or server failure.');
+            }
         });
 
         document.addEventListener('keydown', (e) => {
@@ -1078,6 +1243,8 @@
                 document.getElementById('notificationModal').classList.remove('active');
             }
         });
+
+        loadDocDetails();
     </script>
 </body>
 </html>

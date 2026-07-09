@@ -2,8 +2,30 @@ const express = require('express');
 const router = (express.Router());
 const { body, validationResult } = require('express-validator');
 const User = require('../models/user.model');
+const Activity = require("../models/activity.model");
 const bcrypt = require('bcrypt');
 const jwt=require("jsonwebtoken");
+const rateLimit = require("express-rate-limit");
+
+const isProduction = process.env.NODE_ENV === "production";
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many login attempts. Please try again later." }
+});
+
+function getCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "strict" : "lax",
+    maxAge: 24 * 60 * 60 * 1000,
+    path: "/"
+  };
+}
 
 
 router.get("/test",(req,res)=>{
@@ -17,22 +39,26 @@ router.get('/register',(req,res)=>{
 router.post(
   "/register",
 
-  body("username").trim().notEmpty().withMessage("Username is required"),
-  body("email").trim().isEmail().withMessage("Enter a valid email address"),
+  body("username").trim().isLength({ min: 3 }).withMessage("Username must be at least 3 characters long"),
+  body("email").trim().isEmail().normalizeEmail().withMessage("Enter a valid email address"),
   body("password")
     .trim()
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long")
+    .matches(/[A-Z]/)
+    .withMessage("Password must include at least one uppercase letter")
+    .matches(/[a-z]/)
+    .withMessage("Password must include at least one lowercase letter")
+    .matches(/[0-9]/)
+    .withMessage("Password must include at least one number"),
   body("confirm-password")
     .trim()
-    .isLength({ min: 6 })
-    .withMessage("Confirm password must be at least 6 characters long"),
+    .isLength({ min: 8 })
+    .withMessage("Confirm password must be at least 8 characters long"),
 
   async (req, res) => {
     try {
       const errors = validationResult(req);
-
-      console.log(errors.array()); 
 
       if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -70,6 +96,13 @@ router.post(
 
       await newUser.save(); 
 
+      await Activity.create({
+        user: newUser._id,
+        action: "Registered account",
+        entityType: "User",
+        entityName: newUser.username
+      });
+
       if (req.headers['accept']?.includes('application/json')) {
         return res.json({ success: true, redirect: "/login" });
       }
@@ -88,7 +121,7 @@ router.post(
 router.get('/login',(req,res)=>{
     res.render('login');
 })
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -125,8 +158,7 @@ router.post('/login', async (req, res) => {
     );
 
     res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "lax"
+      ...getCookieOptions()
     });
 
     if (req.headers['accept']?.includes('application/json')) {
@@ -140,6 +172,16 @@ router.post('/login', async (req, res) => {
     }
     return res.status(500).send("Login failed");
   }
+});
+
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", getCookieOptions());
+
+  if (req.headers['accept']?.includes('application/json')) {
+    return res.json({ success: true });
+  }
+
+  return res.redirect("/");
 });
 
 

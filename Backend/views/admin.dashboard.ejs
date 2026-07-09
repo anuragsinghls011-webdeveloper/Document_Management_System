@@ -282,6 +282,21 @@
       box-shadow: 0 14px 30px rgba(239, 68, 68, 0.3);
     }
 
+    .btn-review {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(37, 99, 235, 0.9));
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-review:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.4);
+    }
+
     .empty-state {
       padding: 48px 24px;
       text-align: center;
@@ -511,13 +526,17 @@
                     <polyline points="14 2 14 8 20 8"/>
                   </svg>
                 </div>
-                <span class="file-name">${escapeHtml(doc.fileName)}</span>
+                <a href="/admin/pending-docs?id=${doc._id}" class="file-name" style="color:#22d3ee; text-decoration:none; font-weight:600; transition:color 0.2s;" onmouseover="this.style.color='#38bdf8'" onmouseout="this.style.color='#22d3ee'">${escapeHtml(doc.fileName)}</a>
               </div>
             </td>
             <td>${escapeHtml(doc.userId?.email || "-")}</td>
             <td><span class="status-badge pending">${escapeHtml(doc.status)}</span></td>
             <td>
               <div class="actions-cell">
+                <a class="action-btn btn-review" href="/admin/pending-docs?id=${doc._id}">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Review
+                </a>
                 <button class="action-btn btn-approve" onclick="showConfirm('approve', '${doc._id}', '${escapeHtml(doc.fileName)}')">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                   Approve

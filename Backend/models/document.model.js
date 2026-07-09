@@ -72,4 +72,7 @@ documentSchema.index({
   keywords: "text"
 });
 
+documentSchema.index({ userId: 1, createdAt: -1 });
+documentSchema.index({ userId: 1, status: 1, createdAt: -1 });
+
 module.exports = mongoose.model("Document", documentSchema);
