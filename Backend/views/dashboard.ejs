@@ -1,865 +1,922 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Powered Intelligent Document Management System</title>
-  <meta name="description" content="Premium enterprise AI-powered document management workspace.">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/enterprise.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
-  <script defer src="/assets/js/enterprise.js"></script>
-  <style>
-    :root {
-      --shell-radius: 30px;
-      --shell-border: rgba(255, 255, 255, 0.08);
-      --glass-bg: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-    }
-    .dashboard-title { font-size: clamp(2rem, 3.2vw, 3.2rem); }
-    .hero-shell { padding-top: 12px; }
-    .dashboard-shell { width: min(100%, 1600px); margin: 0 auto; }
-    .sidebar-shell { padding: 14px; }
-    .sidebar-section { display: grid; gap: 8px; }
-    .section-card { padding: 18px; }
-    .status-rail { display: flex; align-items: center; gap: 8px; }
-    .status-rail .rail { flex: 1; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.06); overflow: hidden; }
-    .status-rail .rail > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #4F8BFF, #8A5CFF); }
-    .workflow-grid { display: grid; gap: 14px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .workflow-step { min-height: 140px; padding: 18px; }
-    .doc-shell { overflow: hidden; }
-    .doc-row-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .topbar { min-height: 82px; }
-    .panel-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); margin: 12px 0; }
-    .muted-label { color: #B6BCC8; font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; }
-    .hero-gradient { background: linear-gradient(135deg, rgba(79,139,255,0.12), rgba(138,92,255,0.12)); }
-    .table-cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .page-content { scroll-margin-top: 104px; }
-    .panel,
-    .glass-card,
-    .summary-panel,
-    .modal-content,
-    .drawer-panel {
-      border-radius: var(--shell-radius);
-      border-color: var(--shell-border);
-      background: var(--glass-bg);
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
-    }
-    .hero-panel {
-      padding: clamp(24px, 3vw, 40px);
-      min-height: 420px;
-      background:
-        radial-gradient(860px 460px at 18% 12%, rgba(79,139,255,0.18), transparent 56%),
-        radial-gradient(620px 360px at 86% 18%, rgba(138,92,255,0.16), transparent 52%),
-        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-      overflow: hidden;
-    }
-    .hero-panel::after {
-      content: "";
-      position: absolute;
-      inset: auto -10% -40% auto;
-      width: 420px;
-      height: 420px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(79,139,255,0.18), transparent 65%);
-      filter: blur(12px);
-      pointer-events: none;
-    }
-    .hero-title {
-      font-size: clamp(2.7rem, 5vw, 5.2rem);
-      letter-spacing: -0.075em;
-      line-height: 0.9;
-      max-width: 12ch;
-      margin: 14px 0 16px;
-      text-wrap: balance;
-    }
-    .hero-copy {
-      max-width: 70ch;
-      font-size: 1.02rem;
-      line-height: 1.75;
-      color: var(--muted);
-    }
-    .hero-copy strong { color: var(--text); }
-    .hero-actions { margin-top: 24px; }
-    @media (max-width: 1180px) {
-      .workflow-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 760px) {
-      .workflow-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard | Document Management System</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            /* Colors */
+            --bg-color: #0b0f19;
+            --surface-color: rgba(20, 27, 45, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            /* Animated Background Blob */
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.12), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.12), transparent 25%);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid var(--surface-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--text-main);
+            text-decoration: none;
+            background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item:hover::before, .nav-item.active::before {
+            transform: translateX(0);
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            animation: slideDown 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .header-title h1 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--surface-border);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            width: 300px;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            outline: none;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .search-bar i {
+            color: var(--text-muted);
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-muted);
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: var(--danger-color);
+            border-radius: 50%;
+            border: 2px solid var(--bg-color);
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+            border-radius: 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--surface-border);
+            transition: all 0.2s ease;
+        }
+
+        .profile-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .profile-img {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.6s ease backwards;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .icon-blue { background: rgba(99, 102, 241, 0.1); color: var(--primary-color); }
+        .icon-green { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .icon-orange { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .icon-purple { background: rgba(139, 92, 246, 0.1); color: var(--secondary-color); }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-trend {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .trend-up { color: var(--success-color); }
+        .trend-down { color: var(--danger-color); }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .chart-card {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .chart-actions select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            outline: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        .chart-actions select option {
+            background: var(--bg-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Recent Activity Table */
+        .table-card {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            animation: slideUp 0.7s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .btn-text {
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .btn-text:hover {
+            color: var(--primary-hover);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--surface-border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            font-size: 0.95rem;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .doc-name {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .doc-icon {
+            width: 2.25rem;
+            height: 2.25rem;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-completed { background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-processing { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .status-failed { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Animation Delays for Staggered Effect */
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        .chart-card:nth-child(1) { animation-delay: 0.3s; }
+        .chart-card:nth-child(2) { animation-delay: 0.4s; }
+        .table-card { animation-delay: 0.5s; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .header-actions .search-bar {
+                display: none; /* Hide on mobile for simplicity */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
 
-  <button id="scrollTopBtn" class="scroll-top-btn" type="button" aria-label="Scroll to top">
-    <i data-feather="chevron-up"></i>
-  </button>
-
-  <div id="appShell" class="dashboard-shell app-shell">
-    <aside id="sidebar" class="sidebar sidebar-shell">
-      <div class="brand">
-        <div class="brand-lockup">
-          <div class="ai-logo" aria-hidden="true"><i data-feather="cpu"></i></div>
-          <div class="brand-copy">
-            <p class="brand-title">AIDMS</p>
-            <p class="brand-subtitle">Intelligent Document OS</p>
-          </div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="logo">
+            <i class='bx bxs-box'></i>
+            DocuFlow
+        </a>
+        <ul class="nav-links">
+            <li><a href="/dashboard" class="nav-item active"><i class='bx bx-grid-alt'></i> Dashboard</a></li>
+            <li><a href="/documents" class="nav-item"><i class='bx bx-file'></i> Documents</a></li>
+            <li><a href="/workflows" class="nav-item"><i class='bx bx-git-branch'></i> Workflows</a></li>
+            <li><a href="/analytics" class="nav-item"><i class='bx bx-chart'></i> Analytics</a></li>
+            <li><a href="/settings" class="nav-item"><i class='bx bx-cog'></i> Settings</a></li>
+        </ul>
+        
+        <div style="margin-top: auto;">
+            <div style="background: rgba(99, 102, 241, 0.1); padding: 1.25rem; border-radius: 1rem; border: 1px solid rgba(99, 102, 241, 0.2); text-align: center;">
+                <i class='bx bx-cloud-upload' style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                <h4 style="font-size: 0.875rem; margin-bottom: 0.25rem;">Storage Used</h4>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">75% of 100GB</p>
+                <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                    <div style="width: 75%; height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border-radius: 3px;"></div>
+                </div>
+            </div>
         </div>
-        <button id="sidebar-toggle" class="icon-button" type="button" aria-label="Collapse sidebar">
-          <i data-feather="chevrons-left"></i>
-        </button>
-      </div>
-
-      <nav id="sidebar-nav" class="nav" aria-label="Main navigation">
-        <a href="#dashboard" class="nav-link active" data-target="dashboard" data-tooltip="Dashboard"><i data-feather="grid"></i><span class="nav-label">Dashboard</span></a>
-        <a href="#documents" class="nav-link" data-target="documents" data-tooltip="Documents"><i data-feather="file-text"></i><span class="nav-label">Documents</span></a>
-        <a href="#workflows" class="nav-link" data-target="workflows" data-tooltip="Workflows"><i data-feather="git-branch"></i><span class="nav-label">Workflows</span></a>
-        <a href="#ai-insights" class="nav-link" data-target="ai-insights" data-tooltip="AI Insights"><i data-feather="cpu"></i><span class="nav-label">AI Insights</span></a>
-        <a href="#smart-search" class="nav-link" data-target="smart-search" data-tooltip="Smart Search"><i data-feather="search"></i><span class="nav-label">Smart Search</span></a>
-        <a href="#approvals" class="nav-link" data-target="approvals" data-tooltip="Approvals"><i data-feather="check-circle"></i><span class="nav-label">Approvals</span></a>
-        <a href="#analytics" class="nav-link" data-target="analytics" data-tooltip="Analytics"><i data-feather="bar-chart-2"></i><span class="nav-label">Analytics</span></a>
-        <a href="#team" class="nav-link" data-target="team" data-tooltip="Team"><i data-feather="users"></i><span class="nav-label">Team</span></a>
-        <a href="#settings" class="nav-link" data-target="settings" data-tooltip="Settings"><i data-feather="settings"></i><span class="nav-label">Settings</span></a>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="profile-card">
-          <div class="avatar online">U</div>
-          <div class="user-meta">
-            <p class="user-name">Standard User</p>
-            <p class="user-role">Document Contributor</p>
-          </div>
-          <span class="role-badge">Online</span>
-        </div>
-        <button id="assistantQuickAction" class="assistant-action" type="button"><i data-feather="zap"></i><span class="assist-label">Ask document AI</span></button>
-        <form action="/logout" method="POST" class="m-0">
-          <button id="logoutBtn" class="logout-action w-full" type="submit"><i data-feather="log-out"></i><span class="assist-label">Log out</span></button>
-        </form>
-      </div>
     </aside>
 
-    <div class="main-shell">
-      <header class="topbar">
-        <button id="mobileMenu" class="icon-button mobile-menu" type="button" aria-label="Open menu"><i data-feather="menu"></i></button>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-title">
+                <h1>Overview Analytics</h1>
+                <p>Welcome back! Here's what's happening with your documents today.</p>
+            </div>
+            <div class="header-actions">
+                <div class="search-bar">
+                    <i class='bx bx-search'></i>
+                    <input type="text" placeholder="Search documents...">
+                </div>
+                <button class="icon-btn">
+                    <i class='bx bx-bell'></i>
+                    <span class="notification-badge"></span>
+                </button>
+                <div class="profile-btn">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="Profile" class="profile-img">
+                    <span style="font-weight: 500; font-size: 0.875rem; margin-right: 0.5rem;">Admin</span>
+                </div>
+            </div>
+        </header>
 
-        <div class="ai-search">
-          <i data-feather="search"></i>
-          <input id="searchInput" type="text" autocomplete="off" placeholder="Ask AI to find documents, workflows, approvals...">
-          <span class="shortcut">Ctrl K</span>
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Total Documents</div>
+                    <div class="stat-icon icon-blue"><i class='bx bx-file'></i></div>
+                </div>
+                <div class="stat-value">12,485</div>
+                <div class="stat-trend trend-up">
+                    <i class='bx bx-trending-up'></i>
+                    <span>+14.5% from last month</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Processed Today</div>
+                    <div class="stat-icon icon-green"><i class='bx bx-check-shield'></i></div>
+                </div>
+                <div class="stat-value">428</div>
+                <div class="stat-trend trend-up">
+                    <i class='bx bx-trending-up'></i>
+                    <span>+5.2% from yesterday</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Pending Review</div>
+                    <div class="stat-icon icon-orange"><i class='bx bx-time-five'></i></div>
+                </div>
+                <div class="stat-value">64</div>
+                <div class="stat-trend trend-down">
+                    <i class='bx bx-trending-down'></i>
+                    <span>-2.1% from yesterday</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Processing Accuracy</div>
+                    <div class="stat-icon icon-purple"><i class='bx bx-target-lock'></i></div>
+                </div>
+                <div class="stat-value">98.2%</div>
+                <div class="stat-trend trend-up">
+                    <i class='bx bx-trending-up'></i>
+                    <span>+0.8% from last month</span>
+                </div>
+            </div>
         </div>
 
-        <div class="top-actions">
-          <button id="quickUploadBtn" class="button primary" type="button"><i data-feather="upload-cloud"></i><span>Upload</span></button>
-          <button id="activityFeedBtn" class="icon-button" type="button" aria-label="Activity feed"><i data-feather="activity"></i></button>
-          <button id="notificationBtn" class="icon-button" type="button" aria-label="Notifications"><i data-feather="bell"></i><span class="notification-dot"></span></button>
-          <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle theme"><i data-feather="moon"></i></button>
-          <button id="avatarBtn" class="avatar" type="button" aria-label="User profile">U</button>
-        </div>
-      </header>
-
-      <div id="activityPopover" class="activity-popover hidden">
-        <div class="panel-header">
-          <div>
-            <h3 class="panel-title">Activity Feed</h3>
-            <p class="panel-subtitle">Live workflow events</p>
-          </div>
-          <span class="panel-pill"><span class="pulse-dot"></span> Live</span>
-        </div>
-        <div id="activityPopoverList" class="timeline"></div>
-      </div>
-
-      <main class="content">
-        <section id="dashboard" class="page-content">
-          <div class="hero-grid">
-            <article class="hero-panel">
-              <div class="eyebrow"><span class="pulse-dot"></span><span id="aiStatus">The document intelligence market is live</span></div>
-              <h1 class="hero-title"><span id="greeting">Good Evening, User</span><br><span class="gradient-text">Where documents become intelligence.</span></h1>
-              <p class="hero-copy">The workspace processed <strong id="heroProcessed">0</strong> documents today, surfaced the highest-priority approvals, and routed the next actions across your operational flow.</p>
-              <div class="hero-actions">
-                <button id="heroUploadBtn" class="button primary" type="button"><i data-feather="upload-cloud"></i>Quick upload</button>
-                <button id="heroSearchBtn" class="button" type="button"><i data-feather="command"></i>Open AI command</button>
-                <button class="button" type="button" data-nav-target="workflows"><i data-feather="git-branch"></i>Review workflow</button>
-              </div>
-            </article>
-
-            <aside class="panel summary-panel">
-              <div class="panel-header" style="margin-bottom: 14px;">
-                <div>
-                  <h2 class="panel-title">Built in, not bolted on</h2>
-                  <p class="panel-subtitle">Every control ships with the workspace.</p>
-                </div>
-                <span class="panel-pill"><i data-feather="layers"></i>Included</span>
-              </div>
-              <div class="summary-chip">
-                <div>
-                  <span>Workflow Summary</span>
-                  <strong id="heroQueue">0 approvals queued</strong>
-                </div>
-                <div class="chip-icon"><i data-feather="check-circle"></i></div>
-              </div>
-              <div class="summary-chip">
-                <div>
-                  <span>AI Confidence</span>
-                  <strong id="heroConfidence">96.8%</strong>
-                </div>
-                <div class="chip-icon"><i data-feather="target"></i></div>
-              </div>
-              <div class="summary-chip">
-                <div>
-                  <span>Automation Health</span>
-                  <strong>Optimal</strong>
-                </div>
-                <div class="chip-icon"><i data-feather="shield"></i></div>
-              </div>
-            </aside>
-          </div>
-
-          <div class="hero-grid" style="margin-top: 18px;">
-            <article class="panel section-card">
-              <div class="panel-header">
-                <div>
-                  <h2 class="panel-title">Three steps from upload to approval</h2>
-                  <p class="panel-subtitle">A compact view of the workspace pipeline.</p>
-                </div>
-              </div>
-              <div class="workflow-grid">
-                <div class="workflow-step glass-card">
-                  <div class="eyebrow"><span class="pulse-dot"></span><span>01 Intake</span></div>
-                  <h3 class="panel-title" style="margin-top: 10px; font-size: 1rem;">Upload and classify</h3>
-                  <p class="panel-subtitle">Drop files in once. OCR, tags, and confidence arrive automatically.</p>
-                </div>
-                <div class="workflow-step glass-card">
-                  <div class="eyebrow"><span class="pulse-dot"></span><span>02 Review</span></div>
-                  <h3 class="panel-title" style="margin-top: 10px; font-size: 1rem;">Validate and comment</h3>
-                  <p class="panel-subtitle">Use the queue, preview drawer, and notes to make a fast decision.</p>
-                </div>
-                <div class="workflow-step glass-card">
-                  <div class="eyebrow"><span class="pulse-dot"></span><span>03 Route</span></div>
-                  <h3 class="panel-title" style="margin-top: 10px; font-size: 1rem;">Approve or escalate</h3>
-                  <p class="panel-subtitle">Send documents forward with a single action and a full audit trail.</p>
-                </div>
-                <div class="workflow-step glass-card">
-                  <div class="eyebrow"><span class="pulse-dot"></span><span>04 Learn</span></div>
-                  <h3 class="panel-title" style="margin-top: 10px; font-size: 1rem;">Improve the model</h3>
-                  <p class="panel-subtitle">The workspace adapts from your actions and improves future routing.</p>
-                </div>
-              </div>
-            </article>
-          </div>
-
-          <div class="metrics-grid">
-            <article class="glass-card metric-card">
-              <div class="metric-top"><div class="metric-icon"><i data-feather="file-text"></i></div><span class="trend"><i data-feather="trending-up"></i>12%</span></div>
-              <p class="metric-label">Total Documents</p>
-              <p class="metric-value" id="totalDocs">0</p>
-              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#38bdf8" d="M2 30 C18 18, 26 22, 40 14 S70 12, 82 20 S102 26, 118 8"></path></svg>
-            </article>
-            <article class="glass-card metric-card"><div class="metric-top"><div class="metric-icon violet"><i data-feather="cpu"></i></div><span class="trend"><i data-feather="zap"></i>Live</span></div><p class="metric-label">AI Processed</p><p class="metric-value" id="aiProcessed">0</p><svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#8b5cf6" d="M2 28 C18 30, 24 12, 40 18 S62 34, 76 16 S96 4, 118 12"></path></svg></article>
-            <article class="glass-card metric-card"><div class="metric-top"><div class="metric-icon orange"><i data-feather="clock"></i></div><span class="trend warn"><i data-feather="alert-triangle"></i>Queue</span></div><p class="metric-label">Pending Approvals</p><p class="metric-value" id="pendingApproval">0</p><svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#fb923c" d="M2 26 C14 14, 28 18, 40 24 S60 32, 72 20 S94 14, 118 18"></path></svg></article>
-            <article class="glass-card metric-card"><div class="metric-top"><div class="metric-icon emerald"><i data-feather="git-branch"></i></div><span class="trend"><i data-feather="activity"></i>4 lanes</span></div><p class="metric-label">Active Workflows</p><p class="metric-value" id="activeWorkflows">0</p><svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#34d399" d="M2 31 C20 28, 28 8, 44 10 S70 32, 88 17 S104 20, 118 7"></path></svg></article>
-            <article class="glass-card metric-card"><div class="metric-top"><div class="metric-icon"><i data-feather="archive"></i></div><span class="trend"><i data-feather="database"></i>Safe</span></div><p class="metric-label">Archived Files</p><p class="metric-value" id="archivedDocs">0</p><svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#22d3ee" d="M2 24 C20 24, 25 28, 38 20 S62 18, 76 14 S96 18, 118 10"></path></svg></article>
-            <article class="glass-card metric-card"><div class="metric-top"><div class="metric-icon violet"><i data-feather="target"></i></div><span class="trend"><i data-feather="check"></i>High</span></div><p class="metric-label">AI Accuracy Rate</p><p class="metric-value"><span id="accuracyRate">0</span>%</p><svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#ec4899" d="M2 31 C18 27, 29 24, 42 17 S70 14, 82 10 S102 8, 118 5"></path></svg></article>
-          </div>
-
-          <div class="dashboard-grid">
-            <article class="panel span-8">
-              <div class="panel-header">
-                <div>
-                  <h2 class="panel-title">Document Intelligence Analytics</h2>
-                  <p class="panel-subtitle">Monthly ingestion, AI routing, and approval motion in one view.</p>
-                </div>
-                <span class="panel-pill"><i data-feather="bar-chart-2"></i> Predictive</span>
-              </div>
-              <div class="chart-layout">
-                <div class="chart-wrap"><canvas id="activityChart"></canvas></div>
-                <div>
-                  <div class="panel-header" style="margin-bottom: 10px;">
-                    <div>
-                      <h3 class="panel-title" style="font-size: 0.9rem;">Activity Heatmap</h3>
-                      <p class="panel-subtitle">Last 5 weeks</p>
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Processing Volume</h2>
+                    <div class="chart-actions">
+                        <select>
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                            <option>This Year</option>
+                        </select>
                     </div>
-                  </div>
-                  <div id="heatmapGrid" class="heatmap"></div>
                 </div>
-              </div>
-            </article>
+                <div class="chart-container">
+                    <canvas id="volumeChart"></canvas>
+                </div>
+            </div>
 
-            <aside class="panel span-4">
-              <div class="panel-header">
-                <div>
-                  <h2 class="panel-title">Recent Activity</h2>
-                  <p class="panel-subtitle">Uploads, approvals, AI actions, and transitions.</p>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Document Types</h2>
+                    <div class="chart-actions">
+                        <button class="icon-btn" style="width: 2rem; height: 2rem;"><i class='bx bx-dots-vertical-rounded'></i></button>
+                    </div>
                 </div>
-                <span class="panel-pill"><span class="pulse-dot"></span> Now</span>
-              </div>
-              <div id="activityList" class="timeline"><div class="skeleton-state"><span class="skeleton-line"></span></div></div>
-            </aside>
+                <div class="chart-container">
+                    <canvas id="typeChart"></canvas>
+                </div>
+            </div>
+        </div>
 
-            <article class="panel span-4">
-              <div class="panel-header">
-                <div>
-                  <h2 class="panel-title">AI Insights</h2>
-                  <p class="panel-subtitle">Recommendations generated from document flow.</p>
-                </div>
-                <span class="panel-pill"><i data-feather="cpu"></i> AI</span>
-              </div>
-              <div id="insightsList" class="insights-list"></div>
-            </article>
-
-            <article class="panel span-4">
-              <div class="panel-header">
-                <div>
-                  <h2 class="panel-title">Workflow Graph</h2>
-                  <p class="panel-subtitle">AI routing paths and approval chain.</p>
-                </div>
-                <span class="panel-pill"><i data-feather="git-branch"></i> Node view</span>
-              </div>
-              <div class="workflow-map">
-                <svg class="workflow-lines" viewBox="0 0 640 320" preserveAspectRatio="none" aria-hidden="true"><path d="M92 88 C190 70 210 44 296 54"></path><path d="M370 88 C450 100 492 122 548 142"></path><path d="M306 106 C250 160 244 230 306 244"></path><path d="M386 242 C450 226 500 206 548 174"></path></svg>
-                <div class="node input"><span class="node-dot"></span><small>Intake</small><strong>Smart upload</strong></div>
-                <div class="node ai"><span class="node-dot"></span><small>AI</small><strong>Classify and extract</strong></div>
-                <div class="node review"><span class="node-dot"></span><small>Review</small><strong>Human validation</strong></div>
-                <div class="node approval"><span class="node-dot"></span><small>Approval</small><strong>Route and archive</strong></div>
-              </div>
-            </article>
-
-            <article class="panel span-4">
-              <div class="panel-header">
-                <div>
-                  <h2 class="panel-title">Workflow Performance</h2>
-                  <p class="panel-subtitle">SLA health, bottlenecks, and automation speed.</p>
-                </div>
-              </div>
-              <div class="mini-grid">
-                <div class="mini-tile"><strong id="slaTile">98%</strong><span>SLA met</span></div>
-                <div class="mini-tile"><strong id="cycleTile">2.4h</strong><span>Avg cycle</span></div>
-                <div class="mini-tile"><strong id="autoTile">74%</strong><span>Auto routed</span></div>
-              </div>
-              <div style="margin-top: 16px;" class="progress-track"><span style="width: 74%;"></span></div>
-              <p class="panel-subtitle" style="margin-top: 12px;">AI routing is handling most low-risk documents before reviewer handoff.</p>
-            </article>
-
-            <article class="panel span-8">
-              <div class="panel-header">
-                <div>
-                  <h2 class="panel-title">Recently Updated Documents</h2>
-                  <p class="panel-subtitle">Enterprise table with AI category, status, confidence, and quick preview.</p>
-                </div>
-                <button class="button" type="button" data-nav-target="documents"><i data-feather="file-text"></i>Open documents</button>
-              </div>
-              <div class="table-wrap doc-shell">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Document Name</th>
-                      <th>AI Category</th>
-                      <th>Owner</th>
-                      <th>Workflow</th>
-                      <th>Approval</th>
-                      <th>Modified</th>
-                      <th>Confidence</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="dashboard-documents-body"><tr><td colspan="8" class="skeleton-state"><span class="skeleton-line"></span></td></tr></tbody>
+        <!-- Recent Activity Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h2 class="table-title">Recent Document Activity</h2>
+                <button class="btn-text">View All</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Document Name</th>
+                            <th>Category</th>
+                            <th>Uploaded By</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="doc-name">
+                                    <div class="doc-icon"><i class='bx bxs-file-pdf'></i></div>
+                                    <div>
+                                        <div style="font-weight: 500; color: var(--text-main);">Q2_Financial_Report.pdf</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">2.4 MB</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Finance</td>
+                            <td>Sarah Jenkins</td>
+                            <td>Just now</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                            <td>
+                                <button class="action-btn"><i class='bx bx-download'></i></button>
+                                <button class="action-btn"><i class='bx bx-show'></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="doc-name">
+                                    <div class="doc-icon"><i class='bx bxs-file-doc'></i></div>
+                                    <div>
+                                        <div style="font-weight: 500; color: var(--text-main);">Employee_Contract_Template.docx</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">1.1 MB</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>HR</td>
+                            <td>Michael Chen</td>
+                            <td>15 mins ago</td>
+                            <td><span class="status-badge status-processing">Processing</span></td>
+                            <td>
+                                <button class="action-btn"><i class='bx bx-download'></i></button>
+                                <button class="action-btn"><i class='bx bx-show'></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="doc-name">
+                                    <div class="doc-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger-color);"><i class='bx bxs-file-image'></i></div>
+                                    <div>
+                                        <div style="font-weight: 500; color: var(--text-main);">Vendor_Invoice_8932.png</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">4.5 MB</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Procurement</td>
+                            <td>System API</td>
+                            <td>1 hour ago</td>
+                            <td><span class="status-badge status-failed">Failed OCR</span></td>
+                            <td>
+                                <button class="action-btn"><i class='bx bx-refresh'></i></button>
+                                <button class="action-btn"><i class='bx bx-show'></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="doc-name">
+                                    <div class="doc-icon"><i class='bx bxs-file-pdf'></i></div>
+                                    <div>
+                                        <div style="font-weight: 500; color: var(--text-main);">Marketing_Strategy_2024.pdf</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">8.2 MB</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Marketing</td>
+                            <td>Emma Davis</td>
+                            <td>3 hours ago</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                            <td>
+                                <button class="action-btn"><i class='bx bx-download'></i></button>
+                                <button class="action-btn"><i class='bx bx-show'></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <section id="documents" class="page-content hidden">
-          <div class="page-heading">
-            <div><h1>Documents</h1><p>AI-tagged document operations with filtering, sorting, preview drawer, and upload flow.</p></div>
-            <button id="upload-btn" class="button primary" type="button"><i data-feather="upload-cloud"></i>Upload document</button>
-          </div>
-
-          <article class="panel">
-            <div class="table-tools">
-              <div class="filter-grid">
-                <input id="docSearchInput" class="input" type="search" placeholder="Search document name or tag">
-                <select id="statusFilter" class="select"><option value="all">All statuses</option><option value="approved">Approved</option><option value="pending">Pending</option><option value="processing">Processing</option><option value="review">In review</option><option value="rejected">Rejected</option><option value="archived">Archived</option></select>
-                <select id="typeFilter" class="select"><option value="all">All types</option><option value="PDF">PDF</option><option value="DOCX">DOCX</option><option value="XLSX">XLSX</option><option value="PNG">PNG</option><option value="JPG">JPG</option></select>
-                <input id="dateFilter" class="select" type="date">
-              </div>
-              <button id="resetFiltersBtn" class="button" type="button"><i data-feather="refresh-cw"></i>Reset</button>
             </div>
-            <div class="table-wrap doc-shell">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th><button class="sort-button" type="button" data-sort="fileName">Document Name <i data-feather="chevron-down"></i></button></th>
-                    <th>AI Category</th>
-                    <th>Owner</th>
-                    <th><button class="sort-button" type="button" data-sort="status">Workflow <i data-feather="chevron-down"></i></button></th>
-                    <th>Approval</th>
-                    <th><button class="sort-button" type="button" data-sort="createdAt">Last Modified <i data-feather="chevron-down"></i></button></th>
-                    <th><button class="sort-button" type="button" data-sort="confidence">Confidence <i data-feather="chevron-down"></i></button></th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="documents-table-body"><tr><td colspan="8" class="skeleton-state"><span class="skeleton-line"></span></td></tr></tbody>
-              </table>
-            </div>
-            <div id="documentsPagination" class="pagination"></div>
-          </article>
-        </section>
-
-        <section id="workflows" class="page-content hidden">
-          <div class="page-heading">
-            <div><h1>Workflows</h1><p>Move documents across the approval lifecycle with AI confidence, priority, and routing status visible in every card.</p></div>
-            <button class="button primary" type="button"><i data-feather="plus"></i>New workflow</button>
-          </div>
-          <article class="panel"><div id="kanbanBoard" class="kanban"></div></article>
-        </section>
-
-        <section id="ai-insights" class="page-content hidden">
-          <div class="page-heading">
-            <div><h1>AI Insights</h1><p>Smart alerts, anomalies, bottlenecks, and automation opportunities for the document workspace.</p></div>
-            <button class="button" type="button" id="refreshInsightsBtn"><i data-feather="refresh-cw"></i>Refresh</button>
-          </div>
-          <article class="panel"><div id="insightsPageList" class="insights-list"></div></article>
-        </section>
-
-        <section id="smart-search" class="page-content hidden">
-          <div class="page-heading">
-            <div><h1>Smart Search</h1><p>Natural language retrieval for pending approvals, finance files, contracts, and OCR text.</p></div>
-            <button id="smartSearchOpenBtn" class="button primary" type="button"><i data-feather="command"></i>Open command</button>
-          </div>
-          <article class="panel">
-            <div class="mini-grid">
-              <button class="suggestion-button smart-prompt" type="button" data-query="Find all pending finance invoices from March.">
-                <span class="file-glyph"><i data-feather="search"></i></span>
-                <span><strong class="doc-title">Pending finance invoices</strong><span class="doc-sub">Find all pending finance invoices from March.</span></span>
-                <i data-feather="arrow-up-right"></i>
-              </button>
-              <button class="suggestion-button smart-prompt" type="button" data-query="Show contracts with low AI confidence.">
-                <span class="file-glyph"><i data-feather="target"></i></span>
-                <span><strong class="doc-title">Low confidence contracts</strong><span class="doc-sub">Show contracts with low AI confidence.</span></span>
-                <i data-feather="arrow-up-right"></i>
-              </button>
-              <button class="suggestion-button smart-prompt" type="button" data-query="List approval delays older than two days.">
-                <span class="file-glyph"><i data-feather="clock"></i></span>
-                <span><strong class="doc-title">Approval delays</strong><span class="doc-sub">List approval delays older than two days.</span></span>
-                <i data-feather="arrow-up-right"></i>
-              </button>
-            </div>
-          </article>
-        </section>
-
-        <section id="approvals" class="page-content hidden">
-          <div class="page-heading">
-            <div><h1>Approvals</h1><p>Priority queue for reviewer handoffs, AI checks, and policy-controlled approvals.</p></div>
-            <a class="button primary" href="/admin/pending-docs"><i data-feather="shield"></i>Admin queue</a>
-          </div>
-          <article class="panel"><div id="approvalQueue" class="timeline"></div></article>
-        </section>
-
-        <section id="analytics" class="page-content hidden">
-          <div class="page-heading">
-            <div><h1>Analytics</h1><p>Operational visibility for document volume, review speed, SLA health, and AI automation lift.</p></div>
-          </div>
-          <div class="dashboard-grid">
-            <article class="panel span-8">
-              <div class="panel-header"><div><h2 class="panel-title">Document Trends</h2><p class="panel-subtitle">Same live activity data in expanded analytics mode.</p></div></div>
-              <div class="chart-wrap"><canvas id="analyticsChart"></canvas></div>
-            </article>
-            <article class="panel span-4">
-              <div class="mini-grid">
-                <div class="mini-tile"><strong id="analyticsDocs">0</strong><span>Total docs</span></div>
-                <div class="mini-tile"><strong id="analyticsPending">0</strong><span>Pending</span></div>
-                <div class="mini-tile"><strong id="analyticsArchived">0</strong><span>Archived</span></div>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <section id="team" class="page-content hidden">
-          <div class="page-heading">
-            <div><h1>Team</h1><p>Reviewer workload, ownership, and collaboration signals for document operations.</p></div>
-            <button class="button" type="button"><i data-feather="users"></i>Invite member</button>
-          </div>
-          <article class="panel"><div class="mini-grid"><div class="mini-tile"><strong>8</strong><span>Reviewers</span></div><div class="mini-tile"><strong>3</strong><span>Active admins</span></div><div class="mini-tile"><strong>92%</strong><span>Load balance</span></div></div></article>
-        </section>
-
-        <section id="settings" class="page-content hidden">
-          <div class="page-heading">
-            <div><h1>Settings</h1><p>Workspace intelligence, security, notification, and integration controls.</p></div>
-          </div>
-          <article class="panel">
-            <div class="insights-list">
-              <div class="insight-item"><div class="insight-icon"><i data-feather="lock"></i></div><div><p class="insight-title">Policy guardrails</p><p class="insight-copy">Approval routing is aligned with document category and user role.</p></div></div>
-              <div class="insight-item"><div class="insight-icon"><i data-feather="sliders"></i></div><div><p class="insight-title">AI confidence threshold</p><p class="insight-copy">Documents below 86% confidence are routed to manual review.</p></div></div>
-              <div class="insight-item"><div class="insight-icon"><i data-feather="shield"></i></div><div><p class="insight-title">Security posture</p><p class="insight-copy">Session management, encryption, and audit trails are active for the workspace.</p></div></div>
-            </div>
-          </article>
-        </section>
-      </main>
-    </div>
-  </div>
-
-  <div id="upload-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="uploadTitle">
-    <div class="modal-content">
-      <div class="modal-head">
-        <div>
-          <h2 id="uploadTitle" class="modal-title">Upload New Document</h2>
-          <p class="panel-subtitle">AI classification starts as soon as the file lands.</p>
         </div>
-        <button id="close-upload-modal-btn" class="icon-button" type="button" aria-label="Close upload"><i data-feather="x"></i></button>
-      </div>
-      <div class="modal-body">
-        <div id="dropzone" class="dropzone">
-          <div>
-            <i data-feather="upload-cloud" style="width: 48px; height: 48px; margin: 0 auto 14px; color: var(--cyan);"></i>
-            <p style="margin: 0; color: white; font-weight: 800;">Drop documents here</p>
-            <p class="panel-subtitle" style="margin-top: 8px;">PDF, DOCX, XLSX, and scanned images up to 10MB.</p>
-          </div>
-          <input id="file-input" class="hidden" type="file" multiple>
-        </div>
-        <div id="upload-progress-container" style="margin-top: 14px;"></div>
-      </div>
-    </div>
-  </div>
+    </main>
 
-  <div id="ai-search-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="aiSearchTitle">
-    <div class="modal-content">
-      <div class="modal-head">
-        <div>
-          <h2 id="aiSearchTitle" class="modal-title">AI Command Search</h2>
-          <p class="panel-subtitle">Try: "Find all pending finance invoices from March."</p>
-        </div>
-        <button id="closeSearchModal" class="icon-button" type="button" aria-label="Close AI search"><i data-feather="x"></i></button>
-      </div>
-      <div class="modal-body">
-        <input id="aiSearchInput" class="search-modal-input" type="text" autocomplete="off" placeholder="Ask a natural language document question">
-        <div id="aiSuggestions" class="suggestions"></div>
-      </div>
-    </div>
-  </div>
+    <!-- Chart Initializations -->
+    <script>
+        // Common Chart Defaults for Dark Theme
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+        
+        // Processing Volume Chart
+        const ctxVolume = document.getElementById('volumeChart').getContext('2d');
+        
+        // Gradient for line chart
+        const gradientBlue = ctxVolume.createLinearGradient(0, 0, 0, 300);
+        gradientBlue.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+        gradientBlue.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
 
-  <aside id="previewDrawer" class="drawer" aria-hidden="true">
-    <div class="drawer-panel">
-      <div class="panel-header">
-        <div>
-          <h2 id="previewTitle" class="panel-title">Document Preview</h2>
-          <p id="previewMeta" class="panel-subtitle"></p>
-        </div>
-        <button id="closePreviewDrawer" class="icon-button" type="button" aria-label="Close preview"><i data-feather="x"></i></button>
-      </div>
-      <div id="previewContent" class="insights-list"></div>
-    </div>
-  </aside>
+        new Chart(ctxVolume, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Processed Documents',
+                    data: [320, 450, 410, 580, 520, 210, 190],
+                    borderColor: '#6366f1',
+                    backgroundColor: gradientBlue,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#0b0f19',
+                    pointBorderColor: '#6366f1',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.4 // Smooth curves
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(20, 27, 45, 0.9)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#f8fafc',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' Documents';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
+                        },
+                        border: { display: false }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        border: { display: false }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+            }
+        });
 
-  <script>
-    if (window.feather) feather.replace();
-
-    const appShell = document.getElementById("appShell");
-    const sidebar = document.getElementById("sidebar");
-    const sidebarToggle = document.getElementById("sidebar-toggle");
-    const mobileMenu = document.getElementById("mobileMenu");
-    const sidebarNav = document.getElementById("sidebar-nav");
-    const pageContents = document.querySelectorAll(".page-content");
-    const searchInput = document.getElementById("searchInput");
-    const themeToggle = document.getElementById("theme-toggle");
-    const uploadModal = document.getElementById("upload-modal");
-    const uploadButtons = [document.getElementById("quickUploadBtn"), document.getElementById("heroUploadBtn"), document.getElementById("upload-btn")].filter(Boolean);
-    const closeUploadModalBtn = document.getElementById("close-upload-modal-btn");
-    const dropzone = document.getElementById("dropzone");
-    const fileInput = document.getElementById("file-input");
-    const uploadProgressContainer = document.getElementById("upload-progress-container");
-    const aiSearchModal = document.getElementById("ai-search-modal");
-    const aiSearchInput = document.getElementById("aiSearchInput");
-    const aiSuggestions = document.getElementById("aiSuggestions");
-    const closeSearchModal = document.getElementById("closeSearchModal");
-    const documentsTableBody = document.getElementById("documents-table-body");
-    const dashboardDocumentsBody = document.getElementById("dashboard-documents-body");
-    const documentsPagination = document.getElementById("documentsPagination");
-    const previewDrawer = document.getElementById("previewDrawer");
-    const closePreviewDrawer = document.getElementById("closePreviewDrawer");
-    const activityPopover = document.getElementById("activityPopover");
-    const activityFeedBtn = document.getElementById("activityFeedBtn");
-    const notificationBtn = document.getElementById("notificationBtn");
-    const scrollTopBtn = document.getElementById("scrollTopBtn");
-    const sidebarBackdrop = document.getElementById("sidebarBackdrop");
-
-    const state = { documents: [], visibleDocuments: [], stats: { total: 0, today: 0, pending: 0, archived: 0, monthly: Array(12).fill(0) }, activities: [], page: 1, pageSize: 7, sortKey: "createdAt", sortDirection: "desc" };
-    const workflowItems = [
-      { id: "doc-1", title: "Q3_Financial_Report.pdf", type: "PDF", status: "pending", priority: "High", aiConfidence: 98, assignee: "AS" },
-      { id: "doc-2", title: "Metro_Safety_Audit_v2.docx", type: "DOCX", status: "processing", priority: "Medium", aiConfidence: 87, assignee: "JD" },
-      { id: "doc-3", title: "Vendor_Contract_778.pdf", type: "PDF", status: "review", priority: "High", aiConfidence: 91, assignee: "AS" },
-      { id: "doc-4", title: "HR_Policy_Update.pdf", type: "PDF", status: "approved", priority: "Low", aiConfidence: 99, assignee: "AI" },
-      { id: "doc-5", title: "Invoice_9901.png", type: "IMG", status: "pending", priority: "Medium", aiConfidence: 76, assignee: "OP" }
-    ];
-
-    let activityChart;
-    let analyticsChart;
-    let debounceTimer;
-
-    function escapeHtml(value) {
-      return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-    function formatStatus(status) { return String(status || "pending").replace(/_/g, " "); }
-    function getDocumentId(doc) { return doc._id || doc.id || doc.fileName; }
-    function hashString(value) { return String(value || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0); }
-    function getConfidence(doc) { if (typeof doc.confidence === "number") return doc.confidence; return Math.min(99, 82 + (hashString(doc.fileName) % 17)); }
-    function getCategory(doc) {
-      const keywords = Array.isArray(doc.keywords) ? doc.keywords.filter(Boolean) : [];
-      if (keywords.length) return keywords[0];
-      const type = String(doc.fileType || "").toLowerCase();
-      const name = String(doc.fileName || "").toLowerCase();
-      if (name.includes("invoice") || name.includes("finance")) return "Finance";
-      if (name.includes("contract") || name.includes("vendor")) return "Contracts";
-      if (name.includes("audit") || name.includes("safety")) return "Compliance";
-      if (name.includes("hr") || name.includes("policy")) return "Policy";
-      if (type === "pdf") return "Knowledge";
-      if (type === "xlsx") return "Spreadsheet";
-      if (type === "docx") return "Document";
-      return "General";
-    }
-    function formatDate(value) { if (!value) return "-"; return new Date(value).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
-    function relativeTime(value) { if (!value) return "Just now"; const diff = Date.now() - new Date(value).getTime(); const minutes = Math.max(1, Math.round(diff / 60000)); if (minutes < 60) return `${minutes}m ago`; const hours = Math.round(minutes / 60); if (hours < 24) return `${hours}h ago`; return `${Math.round(hours / 24)}d ago`; }
-    function setGreeting() { const hour = new Date().getHours(); const label = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening"; document.getElementById("greeting").textContent = `${label}, User`; }
-    function toggleModal(modal, show) { modal.classList.toggle("hidden", !show); }
-
-    function navigate(targetId) {
-      document.querySelectorAll(".nav-link").forEach(link => link.classList.toggle("active", link.dataset.target === targetId));
-      const currentPage = document.querySelector(".page-content:not(.hidden)");
-      const target = document.getElementById(targetId);
-      if (currentPage && currentPage !== target) {
-        currentPage.classList.add("page-exiting");
-        setTimeout(() => {
-          pageContents.forEach(page => { page.classList.add("hidden"); page.classList.remove("page-exiting", "page-entering"); });
-          if (target) { target.classList.remove("hidden"); target.classList.add("page-entering"); }
-          if (activityChart) activityChart.resize();
-          if (analyticsChart) analyticsChart.resize();
-          if (window.feather) feather.replace();
-        }, 170);
-      } else {
-        pageContents.forEach(page => page.classList.add("hidden"));
-        if (target) { target.classList.remove("hidden"); target.classList.add("page-entering"); }
-        if (window.feather) feather.replace();
-      }
-      if (window.innerWidth < 981) { sidebar.classList.remove("open"); sidebarBackdrop.classList.remove("active"); }
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    sidebarToggle.addEventListener("click", () => { sidebar.classList.toggle("collapsed"); appShell.classList.toggle("sidebar-collapsed"); });
-    mobileMenu.addEventListener("click", () => { sidebar.classList.add("open"); sidebarBackdrop.classList.add("active"); });
-    sidebarBackdrop.addEventListener("click", () => { sidebar.classList.remove("open"); sidebarBackdrop.classList.remove("active"); });
-    sidebarNav.addEventListener("click", event => { const link = event.target.closest(".nav-link"); if (!link) return; event.preventDefault(); navigate(link.dataset.target); });
-    document.addEventListener("click", event => { const navButton = event.target.closest("[data-nav-target]"); if (navButton) navigate(navButton.dataset.navTarget); });
-    themeToggle.addEventListener("click", () => { document.body.classList.toggle("focus-theme"); themeToggle.innerHTML = document.body.classList.contains("focus-theme") ? '<i data-feather="sun"></i>' : '<i data-feather="moon"></i>'; if (window.feather) feather.replace(); });
-    uploadButtons.forEach(button => button.addEventListener("click", () => toggleModal(uploadModal, true)));
-    closeUploadModalBtn.addEventListener("click", () => toggleModal(uploadModal, false));
-    uploadModal.addEventListener("click", event => { if (event.target === uploadModal) toggleModal(uploadModal, false); });
-    dropzone.addEventListener("click", () => fileInput.click());
-    dropzone.addEventListener("dragover", event => { event.preventDefault(); dropzone.classList.add("dropzone-active"); });
-    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dropzone-active"));
-    dropzone.addEventListener("drop", event => { event.preventDefault(); dropzone.classList.remove("dropzone-active"); uploadFiles(event.dataTransfer.files); });
-    fileInput.addEventListener("change", () => uploadFiles(fileInput.files));
-
-    async function uploadFiles(files) {
-      if (!files || !files.length) return;
-      const formData = new FormData();
-      Array.from(files).forEach(file => formData.append("documents", file));
-      uploadProgressContainer.innerHTML = '<div class="insight-item"><div class="insight-icon"><i data-feather="upload-cloud"></i></div><div><p class="insight-title">Uploading documents</p><p class="insight-copy">AI intake will refresh automatically after upload.</p></div></div>';
-      if (window.feather) feather.replace();
-      try {
-        const res = await fetch("/documents/upload", { method: "POST", body: formData, credentials: "include" });
-        if (!res.ok) { uploadProgressContainer.innerHTML = `<p class="panel-subtitle">Upload failed: ${escapeHtml(await res.text())}</p>`; return; }
-        uploadProgressContainer.innerHTML = '<div class="insight-item"><div class="insight-icon"><i data-feather="check-circle"></i></div><div><p class="insight-title">Upload complete</p><p class="insight-copy">Dashboard intelligence has been refreshed.</p></div></div>';
-        if (window.feather) feather.replace();
-        setTimeout(() => toggleModal(uploadModal, false), 650);
-        fileInput.value = "";
-        await Promise.all([loadDocuments(), loadDashboardStats(), loadRecentActivity()]);
-      } catch (err) {
-        console.error(err);
-        uploadProgressContainer.innerHTML = '<p class="panel-subtitle">Upload failed. Please try again.</p>';
-      }
-    }
-
-    function animateNumber(id, target, options = {}) {
-      const element = document.getElementById(id); if (!element) return;
-      const duration = options.duration || 850; const decimals = options.decimals || 0; const start = Number(String(element.textContent).replace(/[^0-9.]/g, "")) || 0; const startTime = performance.now();
-      function tick(now) { const progress = Math.min((now - startTime) / duration, 1); const eased = 1 - Math.pow(1 - progress, 3); const value = start + (target - start) * eased; element.textContent = decimals ? value.toFixed(decimals) : Math.round(value); if (progress < 1) requestAnimationFrame(tick); }
-      requestAnimationFrame(tick);
-    }
-
-    async function loadDashboardStats() {
-      try { const res = await fetch("/documents/stats", { credentials: "include" }); if (res.ok) state.stats = await res.json(); } catch (err) { console.error("Stats error", err); }
-      updateMetrics(); renderCharts(state.stats.monthly || Array(12).fill(0)); renderHeatmap(); renderInsights();
-    }
-
-    function updateMetrics() {
-      const total = Number(state.stats.total || state.documents.length || 0);
-      const pending = Number(state.stats.pending || state.documents.filter(doc => doc.status === "pending").length || 0);
-      const archived = Number(state.stats.archived || state.documents.filter(doc => doc.status === "archived").length || 0);
-      const today = Number(state.stats.today || 0);
-      const processed = Math.max(total - pending, today);
-      const activeWorkflows = workflowItems.filter(item => item.status !== "approved").length;
-      const accuracy = total ? Math.min(99.3, 94.8 + Math.min(total, 12) * 0.18) : 96.8;
-      animateNumber("totalDocs", total); animateNumber("aiProcessed", processed); animateNumber("pendingApproval", pending); animateNumber("activeWorkflows", activeWorkflows); animateNumber("archivedDocs", archived); animateNumber("accuracyRate", accuracy, { decimals: 1 });
-      document.getElementById("heroProcessed").textContent = processed;
-      document.getElementById("heroQueue").textContent = `${pending} approvals queued`;
-      document.getElementById("heroConfidence").textContent = `${accuracy.toFixed(1)}%`;
-      document.getElementById("analyticsDocs").textContent = total;
-      document.getElementById("analyticsPending").textContent = pending;
-      document.getElementById("analyticsArchived").textContent = archived;
-      document.getElementById("slaTile").textContent = `${Math.max(90, 98 - Math.min(pending, 6))}%`;
-      document.getElementById("cycleTile").textContent = `${Math.max(1.2, (2.4 - Math.min(pending, 5) * 0.1)).toFixed(1)}h`;
-      document.getElementById("autoTile").textContent = `${Math.max(58, Math.min(92, 74 + Math.min(total, 10)))}%`;
-    }
-
-    function renderCharts(monthly) {
-      const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const routed = monthly.map((value, index) => Math.max(0, Math.round(value * 0.72 + (index % 3))));
-      const renderLineChart = (canvasId, primary, secondary, setter, existing) => {
-        const canvas = document.getElementById(canvasId); if (!canvas) return; if (existing) existing.destroy(); const ctx = canvas.getContext("2d"); const gradient = ctx.createLinearGradient(0, 0, 0, 320); gradient.addColorStop(0, "rgba(56, 189, 248, 0.28)"); gradient.addColorStop(1, "rgba(56, 189, 248, 0)"); const violetGradient = ctx.createLinearGradient(0, 0, 0, 320); violetGradient.addColorStop(0, "rgba(139, 92, 246, 0.22)"); violetGradient.addColorStop(1, "rgba(139, 92, 246, 0)"); const chart = new Chart(ctx, { type: "line", data: { labels, datasets: [ { label: "Documents", data: primary, borderColor: "#38bdf8", backgroundColor: gradient, fill: true, tension: 0.42, pointRadius: 4, pointHoverRadius: 7, pointBackgroundColor: "#081120", pointBorderColor: "#22d3ee", pointBorderWidth: 2 }, { label: "AI routed", data: secondary, borderColor: "#8b5cf6", backgroundColor: violetGradient, fill: true, tension: 0.42, pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: "#081120", pointBorderColor: "#c4b5fd", pointBorderWidth: 2 } ] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 900, easing: "easeOutQuart" }, interaction: { intersect: false, mode: "index" }, plugins: { legend: { labels: { color: "#cbd5e1", boxWidth: 10, usePointStyle: true } }, tooltip: { backgroundColor: "rgba(15, 23, 42, 0.94)", borderColor: "rgba(148, 163, 184, 0.18)", borderWidth: 1, padding: 12, titleColor: "#f8fafc", bodyColor: "#cbd5e1" } }, scales: { x: { grid: { color: "rgba(148, 163, 184, 0.06)" }, ticks: { color: "#94a3b8" } }, y: { beginAtZero: true, grid: { color: "rgba(148, 163, 184, 0.08)" }, ticks: { color: "#94a3b8", precision: 0 } } } } }); setter(chart); };
-      renderLineChart("activityChart", monthly, routed, chart => activityChart = chart, activityChart);
-      renderLineChart("analyticsChart", monthly, routed, chart => analyticsChart = chart, analyticsChart);
-    }
-
-    function renderHeatmap() { const grid = document.getElementById("heatmapGrid"); if (!grid) return; const seed = state.documents.length + (state.stats.pending || 0); grid.innerHTML = Array.from({ length: 35 }, (_, index) => { const intensity = 0.11 + (((index * 13 + seed * 7) % 70) / 100); return `<span class="heat-cell" style="--heat: ${intensity.toFixed(2)}" title="${Math.round(intensity * 100)} activity score"></span>`; }).join(""); }
-
-    async function loadDocuments() {
-      try { const res = await fetch("/documents/my", { credentials: "include" }); if (!res.ok) return; state.documents = await res.json(); } catch (err) { console.error("Documents error", err); }
-      state.visibleDocuments = [...state.documents]; state.page = 1; sortVisibleDocuments(); renderDocuments(); renderDashboardDocuments(); renderApprovalQueue(); updateMetrics(); renderInsights(); renderHeatmap(); if (!state.activities.length) renderRecentActivity(); renderAISuggestions(aiSearchInput.value);
-    }
-
-    function sortVisibleDocuments() { const direction = state.sortDirection === "asc" ? 1 : -1; state.visibleDocuments.sort((a, b) => { const key = state.sortKey; const aValue = key === "confidence" ? getConfidence(a) : (a[key] || ""); const bValue = key === "confidence" ? getConfidence(b) : (b[key] || ""); if (key === "createdAt") return (new Date(aValue).getTime() - new Date(bValue).getTime()) * direction; return String(aValue).localeCompare(String(bValue)) * direction; }); }
-
-    function renderDocuments() { const start = (state.page - 1) * state.pageSize; const docs = state.visibleDocuments.slice(start, start + state.pageSize); documentsTableBody.innerHTML = renderDocumentRows(docs, true); renderPagination(); if (window.feather) feather.replace(); }
-    function renderDashboardDocuments() { dashboardDocumentsBody.innerHTML = renderDocumentRows(state.documents.slice(0, 5), false); if (window.feather) feather.replace(); }
-    function renderDocumentRows(docs, includeEmpty) {
-      if (!docs.length) return `<tr><td colspan="8" class="empty-state">${includeEmpty ? "No documents match this view." : "Upload documents to activate the intelligence layer."}</td></tr>`;
-      return docs.map(doc => { const id = escapeHtml(getDocumentId(doc)); const confidence = getConfidence(doc); const status = formatStatus(doc.status); const statusClass = escapeHtml(doc.status || "pending"); const type = escapeHtml(String(doc.fileType || "FILE").toUpperCase()); const category = escapeHtml(getCategory(doc)); const fileName = escapeHtml(doc.fileName); const path = escapeHtml(doc.filePath || ""); return `<tr><td><div class="doc-name"><span class="file-glyph"><i data-feather="file-text"></i></span><span><button class="doc-title" type="button" data-preview="${id}">${fileName}</button><span class="doc-sub">${type} &middot; AI tagged</span></span></div></td><td><span class="badge"><i data-feather="tag"></i>${category}</span></td><td>You</td><td><span class="badge ${statusClass}">${status}</span></td><td><span class="badge ${statusClass}">${status === "approved" ? "Approved" : status === "rejected" ? "Rejected" : "Needs review"}</span></td><td>${formatDate(doc.updatedAt || doc.createdAt)}</td><td><div class="confidence"><span>${confidence}%</span><span class="confidence-bar"><span style="width:${confidence}%;"></span></span></div></td><td><div class="doc-row-actions"><button class="icon-button" type="button" data-preview="${id}" title="Preview"><i data-feather="eye"></i></button><a class="icon-button" href="/${path}" target="_blank" rel="noreferrer" title="Open"><i data-feather="external-link"></i></a></div></td></tr>`; }).join("");
-    }
-
-    function renderPagination() { const totalPages = Math.max(1, Math.ceil(state.visibleDocuments.length / state.pageSize)); documentsPagination.innerHTML = `<button class="button" type="button" data-page="prev" ${state.page === 1 ? "disabled" : ""}><i data-feather="chevron-left"></i>Prev</button><span class="panel-subtitle">Page ${state.page} of ${totalPages}</span><button class="button" type="button" data-page="next" ${state.page === totalPages ? "disabled" : ""}>Next<i data-feather="chevron-right"></i></button>`; if (window.feather) feather.replace(); }
-    documentsPagination.addEventListener("click", event => { const button = event.target.closest("[data-page]"); if (!button) return; const totalPages = Math.max(1, Math.ceil(state.visibleDocuments.length / state.pageSize)); if (button.dataset.page === "prev") state.page = Math.max(1, state.page - 1); if (button.dataset.page === "next") state.page = Math.min(totalPages, state.page + 1); renderDocuments(); });
-
-    document.addEventListener("click", event => { const previewButton = event.target.closest("[data-preview]"); if (previewButton) { const doc = state.documents.find(item => String(getDocumentId(item)) === String(previewButton.dataset.preview)); if (doc) openPreview(doc); } const sortButton = event.target.closest("[data-sort]"); if (sortButton) { const key = sortButton.dataset.sort; if (state.sortKey === key) state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc"; else { state.sortKey = key; state.sortDirection = key === "fileName" ? "asc" : "desc"; } sortVisibleDocuments(); renderDocuments(); } });
-    closePreviewDrawer.addEventListener("click", closePreview); previewDrawer.addEventListener("click", event => { if (event.target === previewDrawer) closePreview(); });
-
-    function openPreview(doc) {
-      const confidence = getConfidence(doc);
-      document.getElementById("previewTitle").textContent = doc.fileName || "Document";
-      document.getElementById("previewMeta").textContent = `${String(doc.fileType || "file").toUpperCase()} - ${formatDate(doc.createdAt)} - ${confidence}% AI confidence`;
-      document.getElementById("previewContent").innerHTML = `<div class="insight-item"><div class="insight-icon"><i data-feather="tag"></i></div><div><p class="insight-title">AI Category</p><p class="insight-copy">${escapeHtml(getCategory(doc))}</p></div></div><div class="insight-item"><div class="insight-icon"><i data-feather="activity"></i></div><div><p class="insight-title">Workflow Status</p><p class="insight-copy">${escapeHtml(formatStatus(doc.status))}</p></div></div><div class="insight-item"><div class="insight-icon"><i data-feather="message-square"></i></div><div><p class="insight-title">AI Summary</p><p class="insight-copy">${escapeHtml(doc.summary || "No summary available yet. OCR and AI enrichment can populate this area after processing.")}</p></div></div><div class="insight-item"><div class="insight-icon"><i data-feather="download"></i></div><div><p class="insight-title">Document Link</p><p class="insight-copy"><a href="/${escapeHtml(doc.filePath || "")}" target="_blank" rel="noreferrer" style="color: var(--cyan);">Open original file</a></p></div></div>`;
-      previewDrawer.classList.add("open"); previewDrawer.setAttribute("aria-hidden", "false"); if (window.feather) feather.replace();
-    }
-    function closePreview() { previewDrawer.classList.remove("open"); previewDrawer.setAttribute("aria-hidden", "true"); }
-
-    const docSearchInput = document.getElementById("docSearchInput"); const statusFilter = document.getElementById("statusFilter"); const typeFilter = document.getElementById("typeFilter"); const dateFilter = document.getElementById("dateFilter"); const resetFiltersBtn = document.getElementById("resetFiltersBtn");
-    [docSearchInput, statusFilter, typeFilter, dateFilter].forEach(input => { input.addEventListener(input.tagName === "SELECT" ? "change" : "input", triggerSearch); });
-    resetFiltersBtn.addEventListener("click", () => { docSearchInput.value = ""; statusFilter.value = "all"; typeFilter.value = "all"; dateFilter.value = ""; state.visibleDocuments = [...state.documents]; state.page = 1; sortVisibleDocuments(); renderDocuments(); });
-
-    function triggerSearch() {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(async () => {
-        const q = docSearchInput.value.trim(); const status = statusFilter.value; const type = typeFilter.value; const date = dateFilter.value;
-        if (!q && status === "all" && type === "all" && !date) { state.visibleDocuments = [...state.documents]; state.page = 1; sortVisibleDocuments(); renderDocuments(); return; }
-        const params = new URLSearchParams(); if (q) params.append("q", q); if (status && status !== "all") params.append("status", status); if (type && type !== "all") params.append("type", type); if (date) params.append("date", date);
-        try { const res = await fetch(`/documents/search?${params.toString()}`, { credentials: "include" }); state.visibleDocuments = res.ok ? await res.json() : []; state.page = 1; sortVisibleDocuments(); renderDocuments(); } catch (err) { console.error("Search/filter error", err); }
-      }, 260);
-    }
-
-    function renderInsights() {
-      const pending = state.stats.pending || state.documents.filter(doc => doc.status === "pending").length;
-      const lowConfidence = state.documents.filter(doc => getConfidence(doc) < 88).length;
-      const insights = [
-        { icon: "zap", title: "Automation suggestion", copy: pending > 0 ? `${pending} pending documents can be grouped into a priority review sprint.` : "Approval queue is clear. Keep auto-routing active for new uploads." },
-        { icon: "alert-triangle", title: "Document anomaly", copy: lowConfidence ? `${lowConfidence} documents have confidence below 88% and should be checked manually.` : "No low-confidence anomalies detected in the current workspace." },
-        { icon: "git-branch", title: "Workflow bottleneck", copy: "Review lane has the highest handoff time. AI suggests routing finance files directly to approvers." },
-        { icon: "clock", title: "Approval delay", copy: "Escalate files that remain pending for more than 48 hours to maintain SLA health." }
-      ];
-      const markup = insights.map(item => `<div class="insight-item"><div class="insight-icon"><i data-feather="${item.icon}"></i></div><div><p class="insight-title">${escapeHtml(item.title)}</p><p class="insight-copy">${escapeHtml(item.copy)}</p></div></div>`).join("");
-      document.getElementById("insightsList").innerHTML = markup; document.getElementById("insightsPageList").innerHTML = markup; if (window.feather) feather.replace();
-    }
-    document.getElementById("refreshInsightsBtn").addEventListener("click", renderInsights);
-
-    async function loadRecentActivity() { try { const res = await fetch("/activities/recent", { credentials: "include" }); state.activities = res.ok ? await res.json() : []; } catch (err) { console.error("Recent activity error", err); } renderRecentActivity(); }
-    function renderRecentActivity() {
-      const fallback = state.documents.slice(0, 5).map(doc => ({ user: { username: "AI Intake" }, action: "uploaded and queued", entityName: doc.fileName, entityType: "document", createdAt: doc.createdAt }));
-      const activities = state.activities.length ? state.activities : fallback;
-      const markup = activities.length ? activities.map(activity => { const actor = activity.user?.username || "User"; const initials = actor.split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase() || "AI"; return `<div class="timeline-item"><div class="timeline-avatar">${escapeHtml(initials)}</div><div><p class="timeline-title"><strong>${escapeHtml(actor)}</strong> ${escapeHtml(activity.action || "updated")} <span style="color: var(--cyan);">${escapeHtml(activity.entityName || "")}</span></p><div class="timeline-meta"><span class="badge">${escapeHtml(activity.entityType || "workflow")}</span><span>${relativeTime(activity.createdAt)}</span></div></div></div>`; }).join("") : '<div class="empty-state">No recent activity yet.</div>';
-      document.getElementById("activityList").innerHTML = markup; document.getElementById("activityPopoverList").innerHTML = markup; if (window.feather) feather.replace();
-    }
-    activityFeedBtn.addEventListener("click", () => activityPopover.classList.toggle("hidden")); notificationBtn.addEventListener("click", () => activityPopover.classList.toggle("hidden"));
-    document.addEventListener("click", event => { const clickedActivity = activityPopover.contains(event.target) || activityFeedBtn.contains(event.target) || notificationBtn.contains(event.target); if (!clickedActivity) activityPopover.classList.add("hidden"); });
-
-    function renderApprovalQueue() {
-      const approvals = state.documents.filter(doc => ["pending", "processing", "review", "changes_requested"].includes(doc.status));
-      document.getElementById("approvalQueue").innerHTML = approvals.length ? approvals.map(doc => `<div class="timeline-item"><div class="timeline-avatar">${String(getCategory(doc)).slice(0, 2).toUpperCase()}</div><div><p class="timeline-title">${escapeHtml(doc.fileName)}</p><div class="timeline-meta"><span class="badge ${escapeHtml(doc.status)}">${escapeHtml(formatStatus(doc.status))}</span><span>${getConfidence(doc)}% AI confidence</span><button class="button" type="button" data-preview="${escapeHtml(getDocumentId(doc))}"><i data-feather="eye"></i>Preview</button></div></div></div>`).join("") : '<div class="empty-state">No approval items are waiting right now.</div>';
-      if (window.feather) feather.replace();
-    }
-
-    function renderKanban() {
-      const columns = [
-        { key: "pending", title: "Pending", color: "var(--orange)" },
-        { key: "processing", title: "AI Processing", color: "var(--cyan)" },
-        { key: "review", title: "In Review", color: "var(--violet)" },
-        { key: "approved", title: "Approved", color: "var(--emerald)" }
-      ];
-      document.getElementById("kanbanBoard").innerHTML = columns.map(column => { const items = workflowItems.filter(item => item.status === column.key); return `<section class="kanban-column"><div class="kanban-head"><div class="kanban-title"><span class="status-dot" style="background:${column.color};"></span>${column.title}</div><span class="badge">${items.length}</span></div><div class="kanban-dropzone" data-status="${column.key}">${items.map(createKanbanCard).join("")}</div></section>`; }).join("");
-      if (window.feather) feather.replace();
-    }
-    function createKanbanCard(item) {
-      const progress = item.status === "pending" ? 16 : item.status === "processing" ? 46 : item.status === "review" ? 74 : 100;
-      return `<article class="kanban-card" draggable="true" data-workflow-id="${item.id}"><div class="metric-top"><span class="badge ${item.priority === "High" ? "rejected" : item.priority === "Medium" ? "pending" : "approved"}">${item.priority}</span><button class="icon-button" type="button" title="More"><i data-feather="more-horizontal"></i></button></div><p class="timeline-title" style="margin-top:12px;">${escapeHtml(item.title)}</p><div class="timeline-meta"><span class="badge"><i data-feather="file-text"></i>${escapeHtml(item.type)}</span><span>${item.aiConfidence}% AI match</span></div><div class="metric-top" style="margin-top:13px;"><span class="panel-subtitle">Assigned to ${escapeHtml(item.assignee)}</span><span class="avatar" style="width:28px;height:28px;border-radius:10px;font-size:0.7rem;">${escapeHtml(item.assignee.slice(0,2))}</span></div><div class="progress-track" style="margin-top:12px;"><span style="width:${progress}%;"></span></div></article>`;
-    }
-    document.getElementById("kanbanBoard").addEventListener("dragstart", event => { const card = event.target.closest(".kanban-card"); if (!card) return; card.classList.add("dragging"); event.dataTransfer.setData("text/plain", card.dataset.workflowId); });
-    document.getElementById("kanbanBoard").addEventListener("dragend", event => { const card = event.target.closest(".kanban-card"); if (card) card.classList.remove("dragging"); document.querySelectorAll(".kanban-dropzone").forEach(zone => zone.classList.remove("is-over")); });
-    document.getElementById("kanbanBoard").addEventListener("dragover", event => { const zone = event.target.closest(".kanban-dropzone"); if (!zone) return; event.preventDefault(); zone.classList.add("is-over"); });
-    document.getElementById("kanbanBoard").addEventListener("dragleave", event => { const zone = event.target.closest(".kanban-dropzone"); if (zone) zone.classList.remove("is-over"); });
-    document.getElementById("kanbanBoard").addEventListener("drop", event => { const zone = event.target.closest(".kanban-dropzone"); if (!zone) return; event.preventDefault(); const id = event.dataTransfer.getData("text/plain"); const item = workflowItems.find(entry => entry.id === id); if (item) { item.status = zone.dataset.status; renderKanban(); updateMetrics(); } });
-
-    function openSearchModal(query = "") { toggleModal(aiSearchModal, true); aiSearchInput.value = query; renderAISuggestions(query); setTimeout(() => aiSearchInput.focus(), 40); }
-    function closeAISearch() { toggleModal(aiSearchModal, false); searchInput.value = ""; }
-    searchInput.addEventListener("focus", () => openSearchModal(searchInput.value));
-    searchInput.addEventListener("click", () => openSearchModal(searchInput.value));
-    document.getElementById("heroSearchBtn").addEventListener("click", () => openSearchModal());
-    document.getElementById("assistantQuickAction").addEventListener("click", () => openSearchModal());
-    document.getElementById("smartSearchOpenBtn").addEventListener("click", () => openSearchModal());
-    closeSearchModal.addEventListener("click", closeAISearch);
-    aiSearchModal.addEventListener("click", event => { if (event.target === aiSearchModal) closeAISearch(); });
-    document.addEventListener("keydown", event => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); openSearchModal(); } if (event.key === "Escape") { closeAISearch(); closePreview(); toggleModal(uploadModal, false); activityPopover.classList.add("hidden"); } });
-    aiSearchInput.addEventListener("input", () => renderAISuggestions(aiSearchInput.value));
-    aiSearchInput.addEventListener("keydown", event => { if (event.key === "ArrowDown") { event.preventDefault(); const first = aiSuggestions.querySelector("button"); if (first) first.focus(); } if (event.key === "Enter") { event.preventDefault(); const first = aiSuggestions.querySelector("button"); if (first) first.click(); } });
-    document.querySelectorAll(".smart-prompt").forEach(button => button.addEventListener("click", () => openSearchModal(button.dataset.query)));
-
-    function renderAISuggestions(query = "") {
-      const normalized = query.trim().toLowerCase();
-      let matches = state.documents.filter(doc => { const keywords = Array.isArray(doc.keywords) ? doc.keywords : []; const haystack = [doc.fileName, doc.fileType, doc.status, getCategory(doc), ...keywords].join(" ").toLowerCase(); return !normalized || haystack.includes(normalized) || normalized.split(/\s+/).some(token => haystack.includes(token)); }).slice(0, 5);
-      if (!matches.length && state.documents.length) matches = state.documents.slice(0, 3);
-      const promptSuggestions = ["Find all pending finance invoices from March.", "Show documents with low AI confidence.", "Which approvals are delayed today?"];
-      const docsMarkup = matches.map(doc => `<button class="suggestion-button" type="button" data-preview="${escapeHtml(getDocumentId(doc))}"><span class="file-glyph"><i data-feather="file-text"></i></span><span><strong class="doc-title">${escapeHtml(doc.fileName)}</strong><span class="doc-sub">${escapeHtml(getCategory(doc))} - ${escapeHtml(formatStatus(doc.status))} - ${getConfidence(doc)}% confidence</span></span><i data-feather="arrow-up-right"></i></button>`).join("");
-      const promptsMarkup = promptSuggestions.map(prompt => `<button class="suggestion-button" type="button" data-search-prompt="${escapeHtml(prompt)}"><span class="file-glyph"><i data-feather="command"></i></span><span><strong class="doc-title">${escapeHtml(prompt)}</strong><span class="doc-sub">Semantic query suggestion</span></span><i data-feather="send"></i></button>`).join("");
-      aiSuggestions.innerHTML = docsMarkup + promptsMarkup; if (window.feather) feather.replace();
-    }
-    aiSuggestions.addEventListener("click", event => { const promptButton = event.target.closest("[data-search-prompt]"); if (promptButton) { aiSearchInput.value = promptButton.dataset.searchPrompt; renderAISuggestions(aiSearchInput.value); return; } const previewButton = event.target.closest("[data-preview]"); if (previewButton) { const doc = state.documents.find(item => String(getDocumentId(item)) === String(previewButton.dataset.preview)); if (doc) { closeAISearch(); openPreview(doc); } } });
-
-    function renderUploadCount() { /* placeholder for future file count UI */ }
-
-    scrollTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
-    window.addEventListener("scroll", () => { scrollTopBtn.classList.toggle("visible", window.scrollY > 400); }, { passive: true });
-
-    function syncThemeDefaults() { document.body.classList.remove("focus-theme"); }
-    syncThemeDefaults();
-    setGreeting();
-    renderKanban();
-    renderHeatmap();
-    renderInsights();
-    loadDocuments();
-    loadDashboardStats();
-    loadRecentActivity();
-    if (window.feather) feather.replace();
-  </script>
+        // Document Types Doughnut Chart
+        const ctxType = document.getElementById('typeChart').getContext('2d');
+        new Chart(ctxType, {
+            type: 'doughnut',
+            data: {
+                labels: ['Invoices', 'Contracts', 'Reports', 'Receipts', 'Other'],
+                datasets: [{
+                    data: [35, 25, 20, 15, 5],
+                    backgroundColor: [
+                        '#6366f1', // Indigo
+                        '#8b5cf6', // Purple
+                        '#10b981', // Emerald
+                        '#f59e0b', // Amber
+                        '#64748b'  // Slate
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(20, 27, 45, 0.9)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#f8fafc',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return ' ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

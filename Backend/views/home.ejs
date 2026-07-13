@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CogniVault | AI-Powered Document Intelligence</title>
-    
+
     <!-- Fonts: Inter for UI/Body, Playfair Display for elegant headings, JetBrains Mono for technical details -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -37,40 +40,60 @@
             background-color: #09090b;
             color: #f4f4f5;
         }
+
         /* Custom scrollbar for a sleek look */
         ::-webkit-scrollbar {
             width: 8px;
         }
+
         ::-webkit-scrollbar-track {
-            background: #09090b; 
+            background: #09090b;
         }
+
         ::-webkit-scrollbar-thumb {
-            background: #27272a; 
+            background: #27272a;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
-            background: #3f3f46; 
+            background: #3f3f46;
         }
+
         .border-thin {
             border: 1px solid #27272a;
         }
-        .border-b-thin { border-bottom: 1px solid #27272a; }
-        .border-r-thin { border-right: 1px solid #27272a; }
-        .border-t-thin { border-top: 1px solid #27272a; }
-        .border-l-thin { border-left: 1px solid #27272a; }
-        
+
+        .border-b-thin {
+            border-bottom: 1px solid #27272a;
+        }
+
+        .border-r-thin {
+            border-right: 1px solid #27272a;
+        }
+
+        .border-t-thin {
+            border-top: 1px solid #27272a;
+        }
+
+        .border-l-thin {
+            border-left: 1px solid #27272a;
+        }
+
         #hero-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1; /* Place behind content */
-            pointer-events: none; /* Let clicks pass through */
+            z-index: -1;
+            /* Place behind content */
+            pointer-events: none;
+            /* Let clicks pass through */
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
+
 <body class="antialiased selection:bg-zinc-100 selection:text-zinc-950">
 
     <nav class="fixed top-0 w-full z-50 bg-zinc-950/80 backdrop-blur-md border-b-thin">
@@ -80,32 +103,44 @@
                     <!-- Logo -->
                     <a href="#" class="flex items-center gap-2 group">
                         <span class="text-xl">◈</span>
-                        <span class="font-mono font-medium tracking-widest text-lg group-hover:text-zinc-300 transition-colors">COGNIVAULT</span>
+                        <span
+                            class="font-mono font-medium tracking-widest text-lg group-hover:text-zinc-300 transition-colors">COGNIVAULT</span>
                     </a>
-                    
+
                     <!-- Desktop Menu -->
                     <div class="hidden md:flex space-x-6">
-                        <a href="#features" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Features</a>
-                        <a href="#pricing" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Pricing</a>
-                        <a href="#compare" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Compare</a>
-                        <a href="#" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Docs</a>
+                        <a href="#features"
+                            class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Features</a>
+                        <a href="#pricing"
+                            class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Pricing</a>
+                        <a href="#compare"
+                            class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Compare</a>
+                        <a href="#"
+                            class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Docs</a>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="flex items-center space-x-4">
                     <button class="hidden md:block p-2 text-zinc-400 hover:text-white transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
                     </button>
-                    <a href="#" class="text-sm font-medium text-zinc-300 hover:text-white hidden sm:block">Sign in</a>
-                    <a href="#" class="bg-zinc-100 text-zinc-950 px-4 py-2 text-sm font-semibold rounded hover:bg-white transition-colors">Deploy Vault</a>
+                    <a href="/login" class="text-sm font-medium text-zinc-300 hover:text-white hidden sm:block">Sign
+                        in</a>
+                    <a href="#"
+                        class="bg-zinc-100 text-zinc-950 px-4 py-2 text-sm font-semibold rounded hover:bg-white transition-colors">Deploy
+                        Vault</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <main class="pt-32 pb-16">
-        <section class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-12 lg:pt-24 pb-24 border-b-thin overflow-hidden">
+        <section
+            class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-12 lg:pt-24 pb-24 border-b-thin overflow-hidden">
             <canvas id="hero-canvas"></canvas>
             <p class="font-mono text-xs tracking-[0.2em] text-zinc-500 uppercase mb-6">The Intelligent Archive</p>
             <h1 class="text-5xl md:text-7xl lg:text-8xl font-serif tracking-tight leading-none mb-8">
@@ -113,13 +148,16 @@
                 <span class="italic text-zinc-400">Become Knowledge</span>
             </h1>
             <p class="mt-4 max-w-2xl mx-auto text-lg text-zinc-400 font-light leading-relaxed">
-                Your files. Your knowledge graph. Your data privacy. A document management system that reads, understands, and synthesizes your data—no manual tagging, pure intelligence.
+                Your files. Your knowledge graph. Your data privacy. A document management system that reads,
+                understands, and synthesizes your data—no manual tagging, pure intelligence.
             </p>
             <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-                <a href="#" class="bg-zinc-100 text-zinc-950 px-8 py-4 text-sm font-semibold rounded hover:bg-white transition-colors flex items-center justify-center gap-2">
+                <a href="#"
+                    class="bg-zinc-100 text-zinc-950 px-8 py-4 text-sm font-semibold rounded hover:bg-white transition-colors flex items-center justify-center gap-2">
                     Start Synthesizing
                 </a>
-                <a href="#features" class="border-thin px-8 py-4 text-sm font-semibold rounded hover:bg-zinc-900 transition-colors flex items-center justify-center gap-2">
+                <a href="#features"
+                    class="border-thin px-8 py-4 text-sm font-semibold rounded hover:bg-zinc-900 transition-colors flex items-center justify-center gap-2">
                     Explore the Vault <span class="font-mono text-xs ml-2">↓</span>
                 </a>
             </div>
@@ -132,13 +170,18 @@
                         <span class="text-zinc-600">◈</span> For Enterprises
                     </h2>
                     <p class="text-zinc-400 leading-relaxed font-light mb-4">
-                        You own the data layer. You own the compliance. CogniVault is the intelligence engine, not a black-box landlord.
+                        You own the data layer. You own the compliance. CogniVault is the intelligence engine, not a
+                        black-box landlord.
                     </p>
                     <ul class="space-y-3 font-mono text-sm text-zinc-300">
-                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Self-hosted or single-tenant cloud</li>
-                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> SOC2 & HIPAA compliant architecture</li>
-                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Granular RBAC and access logs</li>
-                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Leave anytime. Export all parsed metadata.</li>
+                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Self-hosted or
+                            single-tenant cloud</li>
+                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> SOC2 & HIPAA compliant
+                            architecture</li>
+                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Granular RBAC and access
+                            logs</li>
+                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Leave anytime. Export
+                            all parsed metadata.</li>
                     </ul>
                 </div>
                 <div>
@@ -146,13 +189,18 @@
                         <span class="text-zinc-600">◈</span> For Teams
                     </h2>
                     <p class="text-zinc-400 leading-relaxed font-light mb-4">
-                        Discover insights buried in decades of PDFs, emails, and contracts. Stop searching for keywords, start asking questions.
+                        Discover insights buried in decades of PDFs, emails, and contracts. Stop searching for keywords,
+                        start asking questions.
                     </p>
                     <ul class="space-y-3 font-mono text-sm text-zinc-300">
-                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Chat directly with any document</li>
-                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Instant semantic search across millions of pages</li>
-                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Automated tagging and classification</li>
-                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> One vault, infinite knowledge.</li>
+                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Chat directly with any
+                            document</li>
+                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Instant semantic search
+                            across millions of pages</li>
+                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> Automated tagging and
+                            classification</li>
+                        <li class="flex items-start gap-2"><span class="text-zinc-600">▪</span> One vault, infinite
+                            knowledge.</li>
                     </ul>
                 </div>
             </div>
@@ -167,29 +215,38 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Step 1 -->
                 <div class="border-thin p-8 hover:bg-zinc-900/50 transition-colors relative group overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 text-6xl text-zinc-800 font-serif opacity-50 group-hover:scale-110 transition-transform">I</div>
+                    <div
+                        class="absolute top-0 right-0 p-4 text-6xl text-zinc-800 font-serif opacity-50 group-hover:scale-110 transition-transform">
+                        I</div>
                     <div class="text-3xl mb-6 text-zinc-300">🜁</div>
                     <h3 class="text-xl font-mono mb-4">Ingestion</h3>
                     <p class="text-zinc-400 text-sm leading-relaxed">
-                        Connect your cloud storage, drag-and-drop folders, or use our API. We ingest PDFs, DOCX, scans, and emails. We dissolve the clutter.
+                        Connect your cloud storage, drag-and-drop folders, or use our API. We ingest PDFs, DOCX, scans,
+                        and emails. We dissolve the clutter.
                     </p>
                 </div>
                 <!-- Step 2 -->
                 <div class="border-thin p-8 hover:bg-zinc-900/50 transition-colors relative group overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 text-6xl text-zinc-800 font-serif opacity-50 group-hover:scale-110 transition-transform">II</div>
+                    <div
+                        class="absolute top-0 right-0 p-4 text-6xl text-zinc-800 font-serif opacity-50 group-hover:scale-110 transition-transform">
+                        II</div>
                     <div class="text-3xl mb-6 text-zinc-300">🜂</div>
                     <h3 class="text-xl font-mono mb-4">Comprehension</h3>
                     <p class="text-zinc-400 text-sm leading-relaxed">
-                        Our LLMs read every line. OCR extracts text from images. Entities are mapped, summaries are generated, and a vector index is built.
+                        Our LLMs read every line. OCR extracts text from images. Entities are mapped, summaries are
+                        generated, and a vector index is built.
                     </p>
                 </div>
                 <!-- Step 3 -->
                 <div class="border-thin p-8 hover:bg-zinc-900/50 transition-colors relative group overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 text-6xl text-zinc-800 font-serif opacity-50 group-hover:scale-110 transition-transform">III</div>
+                    <div
+                        class="absolute top-0 right-0 p-4 text-6xl text-zinc-800 font-serif opacity-50 group-hover:scale-110 transition-transform">
+                        III</div>
                     <div class="text-3xl mb-6 text-zinc-300">🜃</div>
                     <h3 class="text-xl font-mono mb-4">Retrieval</h3>
                     <p class="text-zinc-400 text-sm leading-relaxed">
-                        Query your vault in natural language. The AI synthesizes answers, citing exact pages and paragraphs. Knowledge flows directly to you.
+                        Query your vault in natural language. The AI synthesizes answers, citing exact pages and
+                        paragraphs. Knowledge flows directly to you.
                     </p>
                 </div>
             </div>
@@ -203,7 +260,8 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 border-t-thin border-b-thin">
                 <!-- Feature 1 -->
-                <div class="p-8 sm:p-12 border-r-thin border-b-thin lg:border-b-0 hover:bg-zinc-900/30 transition-colors">
+                <div
+                    class="p-8 sm:p-12 border-r-thin border-b-thin lg:border-b-0 hover:bg-zinc-900/30 transition-colors">
                     <div class="flex justify-between items-start mb-12">
                         <div>
                             <h3 class="text-xl font-semibold mb-2">Semantic Search</h3>
@@ -247,7 +305,8 @@
                             <span class="text-zinc-500 block mb-1">Tax_Form_W9.jpg</span>
                             <span class="text-emerald-400">Verified</span>
                         </div>
-                        <div class="border-thin p-3 rounded bg-zinc-950 border-dashed flex items-center justify-center text-zinc-600">
+                        <div
+                            class="border-thin p-3 rounded bg-zinc-950 border-dashed flex items-center justify-center text-zinc-600">
                             + 10k more
                         </div>
                     </div>
@@ -261,14 +320,16 @@
                     <h2 class="text-4xl font-serif mb-6">Zero to Searching</h2>
                     <p class="text-2xl font-light text-zinc-300 mb-6">Live in 15 minutes</p>
                     <p class="text-zinc-400 text-sm leading-relaxed mb-8">
-                        Not months of implementation. Not endless consulting hours. One session, five steps, enterprise-grade AI search ready out of the box. No complex schemas to configure.
+                        Not months of implementation. Not endless consulting hours. One session, five steps,
+                        enterprise-grade AI search ready out of the box. No complex schemas to configure.
                     </p>
                     <div class="inline-block border-thin p-4 font-mono text-sm">
                         <span class="text-zinc-500">Traditional ERP takes 3–6 months.</span><br>
                         <span class="text-zinc-300">CogniVault takes ~15 minutes to first query.</span>
                     </div>
                     <h3 class="text-white font-bold text-xl mb-3">AI-First Processing</h3>
-                    <p class="text-blue-200/60 text-sm leading-relaxed">OCR text extraction, auto-categorization, and intelligent routing powered by cutting-edge AI models.</p>
+                    <p class="text-blue-200/60 text-sm leading-relaxed">OCR text extraction, auto-categorization, and
+                        intelligent routing powered by cutting-edge AI models.</p>
                 </div>
 
                 <div class="space-y-4">
@@ -300,7 +361,8 @@
                         </div>
                         <span class="font-mono text-xs text-zinc-500">5 min</span>
                     </div>
-                    <div class="flex items-center justify-between border-thin bg-zinc-100 text-zinc-950 p-4 shadow-lg shadow-zinc-100/10">
+                    <div
+                        class="flex items-center justify-between border-thin bg-zinc-100 text-zinc-950 p-4 shadow-lg shadow-zinc-100/10">
                         <div class="flex items-center gap-4">
                             <span class="font-mono text-zinc-500">05</span>
                             <span class="font-medium">Ask Your First Question</span>
@@ -321,27 +383,34 @@
                 <!-- Starter -->
                 <div class="border-thin p-8 flex flex-col hover:border-zinc-500 transition-colors">
                     <div class="text-zinc-500 mb-4">◇ Starter</div>
-                    <p class="text-sm text-zinc-400 mb-6 h-10">For small teams building their first intelligent archive.</p>
+                    <p class="text-sm text-zinc-400 mb-6 h-10">For small teams building their first intelligent archive.
+                    </p>
                     <div class="text-3xl font-serif mb-2">$49<span class="text-lg text-zinc-500">/mo</span></div>
                     <p class="font-mono text-xs text-zinc-500 mb-8">+ $0.01 per document processed</p>
-                    
+
                     <ul class="space-y-4 text-sm text-zinc-300 mb-8 flex-grow">
                         <li class="flex items-center gap-2">✓ Up to 10,000 documents</li>
                         <li class="flex items-center gap-2">✓ Standard Semantic Search</li>
                         <li class="flex items-center gap-2">✓ Basic OCR capabilities</li>
                         <li class="flex items-center gap-2">✓ 3 User seats</li>
                     </ul>
-                    <a href="#" class="block text-center border-thin py-3 text-sm font-medium hover:bg-zinc-900 transition-colors">Start Free Trial</a>
+                    <a href="#"
+                        class="block text-center border-thin py-3 text-sm font-medium hover:bg-zinc-900 transition-colors">Start
+                        Free Trial</a>
                 </div>
 
                 <!-- Growth (Highlighted) -->
-                <div class="border-thin border-zinc-500 p-8 flex flex-col relative bg-zinc-900/20 shadow-2xl shadow-zinc-500/5">
-                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-zinc-100 text-zinc-950 px-3 py-1 text-xs font-mono font-bold tracking-wider">MOST POPULAR</div>
+                <div
+                    class="border-thin border-zinc-500 p-8 flex flex-col relative bg-zinc-900/20 shadow-2xl shadow-zinc-500/5">
+                    <div
+                        class="absolute -top-3 left-1/2 -translate-x-1/2 bg-zinc-100 text-zinc-950 px-3 py-1 text-xs font-mono font-bold tracking-wider">
+                        MOST POPULAR</div>
                     <div class="text-zinc-100 mb-4">◈ Growth</div>
-                    <p class="text-sm text-zinc-400 mb-6 h-10">For scaling businesses with heavy documentation needs.</p>
+                    <p class="text-sm text-zinc-400 mb-6 h-10">For scaling businesses with heavy documentation needs.
+                    </p>
                     <div class="text-3xl font-serif mb-2">$199<span class="text-lg text-zinc-500">/mo</span></div>
                     <p class="font-mono text-xs text-zinc-500 mb-8">+ $0.005 per document processed</p>
-                    
+
                     <ul class="space-y-4 text-sm text-zinc-300 mb-8 flex-grow">
                         <li class="flex items-center gap-2">✓ Up to 500,000 documents</li>
                         <li class="flex items-center gap-2">✓ Advanced LLM Chat Interface</li>
@@ -349,16 +418,19 @@
                         <li class="flex items-center gap-2">✓ 15 User seats</li>
                         <li class="flex items-center gap-2">✓ Custom API Access</li>
                     </ul>
-                    <a href="#" class="block text-center bg-zinc-100 text-zinc-950 py-3 text-sm font-medium hover:bg-white transition-colors">Start Growth Plan</a>
+                    <a href="#"
+                        class="block text-center bg-zinc-100 text-zinc-950 py-3 text-sm font-medium hover:bg-white transition-colors">Start
+                        Growth Plan</a>
                 </div>
 
                 <!-- Enterprise -->
                 <div class="border-thin p-8 flex flex-col hover:border-zinc-500 transition-colors">
                     <div class="text-zinc-500 mb-4">⬡ Enterprise</div>
-                    <p class="text-sm text-zinc-400 mb-6 h-10">For massive scale, compliance, and dedicated architecture.</p>
+                    <p class="text-sm text-zinc-400 mb-6 h-10">For massive scale, compliance, and dedicated
+                        architecture.</p>
                     <div class="text-3xl font-serif mb-2">Custom</div>
                     <p class="font-mono text-xs text-zinc-500 mb-8">Volume-based processing discounts</p>
-                    
+
                     <ul class="space-y-4 text-sm text-zinc-300 mb-8 flex-grow">
                         <li class="flex items-center gap-2">✓ Unlimited documents</li>
                         <li class="flex items-center gap-2">✓ VPC / On-Prem Deployment</li>
@@ -366,7 +438,9 @@
                         <li class="flex items-center gap-2">✓ SOC2 & HIPAA Guarantees</li>
                         <li class="flex items-center gap-2">✓ Dedicated Success Manager</li>
                     </ul>
-                    <a href="#" class="block text-center border-thin py-3 text-sm font-medium hover:bg-zinc-900 transition-colors">Contact Sales</a>
+                    <a href="#"
+                        class="block text-center border-thin py-3 text-sm font-medium hover:bg-zinc-900 transition-colors">Contact
+                        Sales</a>
                 </div>
             </div>
         </section>
@@ -437,10 +511,12 @@
                     </p>
                 </div>
                 <div class="flex gap-4">
-                    <a href="#" class="bg-zinc-100 text-zinc-950 px-6 py-3 text-sm font-semibold rounded hover:bg-white transition-colors">
+                    <a href="#"
+                        class="bg-zinc-100 text-zinc-950 px-6 py-3 text-sm font-semibold rounded hover:bg-white transition-colors">
                         Deploy Now
                     </a>
-                    <a href="#" class="border-thin px-6 py-3 text-sm font-semibold rounded hover:bg-zinc-900 transition-colors">
+                    <a href="#"
+                        class="border-thin px-6 py-3 text-sm font-semibold rounded hover:bg-zinc-900 transition-colors">
                         View Docs
                     </a>
                 </div>
@@ -500,7 +576,7 @@
             // Scene setup
             const scene = new THREE.Scene();
             // Optional: slight fog to fade out particles in the distance
-            scene.fog = new THREE.FogExp2(0x09090b, 0.001); 
+            scene.fog = new THREE.FogExp2(0x09090b, 0.001);
 
             // Camera setup
             const camera = new THREE.PerspectiveCamera(75, section.clientWidth / section.clientHeight, 0.1, 1000);
@@ -516,7 +592,7 @@
             const particlesCount = 700; // Number of particles
             const posArray = new Float32Array(particlesCount * 3);
 
-            for(let i = 0; i < particlesCount * 3; i++) {
+            for (let i = 0; i < particlesCount * 3; i++) {
                 // Spread particles across a wide area
                 posArray[i] = (Math.random() - 0.5) * 1000;
             }
@@ -564,10 +640,10 @@
                 // Mouse interaction - smooth movement
                 targetX = mouseX * 0.001;
                 targetY = mouseY * 0.001;
-                
+
                 particlesMesh.rotation.y += 0.05 * (targetX - particlesMesh.rotation.y);
                 particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
-                
+
                 // Slight floating effect on Z axis
                 particlesMesh.position.y = Math.sin(elapsedTime * 0.5) * 10;
 
@@ -588,4 +664,5 @@
     </script>
 
 </body>
+
 </html>

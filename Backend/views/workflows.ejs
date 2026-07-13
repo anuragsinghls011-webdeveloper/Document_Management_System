@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Builder | Document Management System</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <!-- Tailwind CSS for React components -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                        },
+                        dark: {
+                            900: '#0b0f19',
+                            800: '#141b2d',
+                            700: '#1e293b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- React Flow -->
+    <link href="https://unpkg.com/reactflow@11.10.1/dist/style.css" rel="stylesheet" />
+    <script src="https://unpkg.com/reactflow@11.10.1/dist/umd/index.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --surface-color: rgba(20, 27, 45, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --sidebar-width: 260px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Legacy Sidebar Styles */
+        .app-sidebar {
+            width: var(--sidebar-width);
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid var(--surface-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+        }
+        .logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.5rem; font-weight: 700; margin-bottom: 3rem; color: var(--text-main); text-decoration: none; background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo i { background: linear-gradient(135deg, var(--primary-color), #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1rem; border-radius: 0.75rem; color: var(--text-muted); text-decoration: none; font-weight: 500; transition: all 0.25s; position: relative; overflow: hidden; }
+        .nav-item:hover, .nav-item.active { color: var(--text-main); background: rgba(255, 255, 255, 0.03); }
+        .nav-item.active { border-left: 3px solid var(--primary-color); }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* ReactFlow Custom Styles */
+        .react-flow__node {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        .react-flow__handle {
+            width: 8px;
+            height: 8px;
+            background: #6366f1;
+        }
+        .react-flow__panel {
+            background: rgba(20, 27, 45, 0.8);
+            border-radius: 8px;
+            padding: 4px;
+        }
+    </style>
+</head>
+<body class="dark text-slate-200">
+
+    <!-- Legacy Sidebar -->
+    <aside class="app-sidebar shrink-0">
+        <a href="/" class="logo">
+            <i class='bx bxs-box'></i>
+            DocuFlow
+        </a>
+        <ul class="nav-links">
+            <li><a href="/dashboard" class="nav-item"><i class='bx bx-grid-alt'></i> Dashboard</a></li>
+            <li><a href="/documents" class="nav-item"><i class='bx bx-file'></i> Documents</a></li>
+            <li><a href="/workflows" class="nav-item active"><i class='bx bx-git-branch'></i> Workflows</a></li>
+            <li><a href="/analytics" class="nav-item"><i class='bx bx-chart'></i> Analytics</a></li>
+            <li><a href="/settings" class="nav-item"><i class='bx bx-cog'></i> Settings</a></li>
+        </ul>
+    </aside>
+
+    <!-- React App Container -->
+    <main class="main-content relative bg-dark-900" id="root">
+        <!-- React will mount here -->
+        <div class="flex items-center justify-center h-full">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500"></div>
+        </div>
+    </main>
+
+    <script type="text/babel" data-type="module">
+        const { useState, useCallback, useRef, useEffect } = React;
+        const { 
+            ReactFlow, 
+            ReactFlowProvider, 
+            addEdge, 
+            useNodesState, 
+            useEdgesState, 
+            Controls, 
+            Background, 
+            Panel,
+            MarkerType,
+            Handle,
+            Position
+        } = window.ReactFlow;
+
+        // Custom Node Component
+        const CustomNode = ({ data, selected }) => {
+            const icons = {
+                start: "bx-play-circle text-green-400",
+                upload: "bx-upload text-blue-400",
+                ocr: "bx-scan text-purple-400",
+                ai: "bx-brain text-pink-400",
+                approval: "bx-check-shield text-orange-400",
+                decision: "bx-git-compare text-yellow-400",
+                notification: "bx-bell text-cyan-400",
+                archive: "bx-archive text-gray-400",
+                end: "bx-stop-circle text-red-400"
+            };
+
+            return (
+                <div className={`flex items-center bg-dark-800 border-2 ${selected ? 'border-brand-500' : 'border-slate-700'} rounded-lg p-3 min-w-[150px]`}>
+                    {data.type !== 'start' && <Handle type="target" position={Position.Left} className="!bg-slate-500" />}
+                    <i className={`bx ${icons[data.type] || 'bx-cube'} text-2xl mr-3`}></i>
+                    <div>
+                        <div className="text-sm font-semibold text-slate-200">{data.label}</div>
+                        <div className="text-xs text-slate-500 uppercase">{data.type}</div>
+                    </div>
+                    {data.type !== 'end' && <Handle type="source" position={Position.Right} className="!bg-brand-500" />}
+                </div>
+            );
+        };
+
+        const nodeTypes = { custom: CustomNode };
+
+        const initialNodes = [
+            { id: 'start', type: 'custom', position: { x: 100, y: 200 }, data: { label: 'Start Workflow', type: 'start' } }
+        ];
+
+        let id = 1;
+        const getId = () => `node_${id++}`;
+
+        const Sidebar = () => {
+            const onDragStart = (event, nodeType, label) => {
+                event.dataTransfer.setData('application/reactflow', nodeType);
+                event.dataTransfer.setData('application/reactflow-label', label);
+                event.dataTransfer.effectAllowed = 'move';
+            };
+
+            const nodeCategories = [
+                { type: 'upload', label: 'Upload Doc', icon: 'bx-upload' },
+                { type: 'ocr', label: 'OCR Engine', icon: 'bx-scan' },
+                { type: 'ai', label: 'AI Extraction', icon: 'bx-brain' },
+                { type: 'approval', label: 'Approval Step', icon: 'bx-check-shield' },
+                { type: 'decision', label: 'Decision (If/Else)', icon: 'bx-git-compare' },
+                { type: 'notification', label: 'Notification', icon: 'bx-bell' },
+                { type: 'archive', label: 'Archive', icon: 'bx-archive' },
+                { type: 'end', label: 'End Workflow', icon: 'bx-stop-circle' },
+            ];
+
+            return (
+                <div className="w-64 bg-dark-800 border-r border-slate-700/50 flex flex-col h-full z-10 shrink-0">
+                    <div className="p-4 border-b border-slate-700/50">
+                        <h2 className="text-lg font-semibold text-slate-200">Node Library</h2>
+                        <p className="text-xs text-slate-500 mt-1">Drag nodes onto the canvas</p>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                        {nodeCategories.map((node) => (
+                            <div 
+                                key={node.type}
+                                className="flex items-center gap-3 p-3 bg-dark-900 border border-slate-700 rounded-lg cursor-grab hover:border-brand-500 transition-colors"
+                                onDragStart={(event) => onDragStart(event, node.type, node.label)}
+                                draggable
+                            >
+                                <i className={`bx ${node.icon} text-xl text-slate-400`}></i>
+                                <span className="text-sm font-medium text-slate-300">{node.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const ConfigPanel = ({ selectedNode, updateNodeData }) => {
+            if (!selectedNode) {
+                return (
+                    <div className="w-80 bg-dark-800 border-l border-slate-700/50 flex flex-col h-full p-6 items-center justify-center text-center shrink-0">
+                        <i className="bx bx-pointer text-4xl text-slate-600 mb-3"></i>
+                        <h3 className="text-slate-400 font-medium">No Node Selected</h3>
+                        <p className="text-xs text-slate-500 mt-2">Click a node on the canvas to configure it.</p>
+                    </div>
+                );
+            }
+
+            const { data } = selectedNode;
+
+            const handleChange = (field, value) => {
+                updateNodeData(selectedNode.id, { ...data, [field]: value });
+            };
+
+            return (
+                <div className="w-80 bg-dark-800 border-l border-slate-700/50 flex flex-col h-full shrink-0 z-10">
+                    <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
+                        <h2 className="text-lg font-semibold text-slate-200">Configuration</h2>
+                        <span className="text-xs px-2 py-1 bg-slate-700 rounded text-slate-300 uppercase">{data.type}</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                        
+                        {/* Common Field */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-slate-400">Node Label</label>
+                            <input 
+                                type="text" 
+                                value={data.label || ''} 
+                                onChange={(e) => handleChange('label', e.target.value)}
+                                className="w-full bg-dark-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
+                            />
+                        </div>
+
+                        {/* Dynamic Fields based on type */}
+                        {data.type === 'approval' && (
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-400">Approver Role</label>
+                                    <select 
+                                        value={data.role || ''} 
+                                        onChange={(e) => handleChange('role', e.target.value)}
+                                        className="w-full bg-dark-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
+                                    >
+                                        <option value="">Select Role</option>
+                                        <option value="Manager">Manager</option>
+                                        <option value="Department Head">Department Head</option>
+                                        <option value="Finance">Finance Director</option>
+                                    </select>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={data.allowReject || false}
+                                        onChange={(e) => handleChange('allowReject', e.target.checked)}
+                                        id="allowReject"
+                                        className="accent-brand-500"
+                                    />
+                                    <label htmlFor="allowReject" className="text-sm text-slate-300">Allow Rejection</label>
+                                </div>
+                            </div>
+                        )}
+
+                        {data.type === 'ocr' && (
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-400">OCR Engine</label>
+                                    <select 
+                                        value={data.engine || 'standard'} 
+                                        onChange={(e) => handleChange('engine', e.target.value)}
+                                        className="w-full bg-dark-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
+                                    >
+                                        <option value="standard">Standard Fast OCR</option>
+                                        <option value="vision">Google Cloud Vision</option>
+                                        <option value="tesseract">Tesseract Premium</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
+
+                        {data.type === 'ai' && (
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-400">Extraction Prompt</label>
+                                    <textarea 
+                                        value={data.prompt || ''} 
+                                        onChange={(e) => handleChange('prompt', e.target.value)}
+                                        rows="4"
+                                        placeholder="e.g. Extract invoice total and date..."
+                                        className="w-full bg-dark-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 resize-none"
+                                    ></textarea>
+                                </div>
+                            </div>
+                        )}
+                        
+                    </div>
+                </div>
+            );
+        };
+
+        const WorkflowBuilder = () => {
+            const reactFlowWrapper = useRef(null);
+            const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+            const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+            const [reactFlowInstance, setReactFlowInstance] = useState(null);
+            const [workflowName, setWorkflowName] = useState("Untitled Workflow");
+            const [workflowId, setWorkflowId] = useState(null);
+            const [isSaving, setIsSaving] = useState(false);
+
+            const onConnect = useCallback(
+                (params) => setEdges((eds) => addEdge({ ...params, type: 'smoothstep', animated: true, markerEnd: { type: MarkerType.ArrowClosed } }, eds)),
+                []
+            );
+
+            const onDragOver = useCallback((event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+            }, []);
+
+            const onDrop = useCallback(
+                (event) => {
+                    event.preventDefault();
+
+                    const type = event.dataTransfer.getData('application/reactflow');
+                    const label = event.dataTransfer.getData('application/reactflow-label');
+
+                    if (typeof type === 'undefined' || !type) return;
+
+                    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+                    const position = reactFlowInstance.project({
+                        x: event.clientX - reactFlowBounds.left,
+                        y: event.clientY - reactFlowBounds.top,
+                    });
+
+                    const newNode = {
+                        id: getId(),
+                        type: 'custom',
+                        position,
+                        data: { label, type },
+                    };
+
+                    setNodes((nds) => nds.concat(newNode));
+                },
+                [reactFlowInstance]
+            );
+
+            const updateNodeData = (nodeId, newData) => {
+                setNodes((nds) =>
+                    nds.map((node) => {
+                        if (node.id === nodeId) {
+                            return { ...node, data: newData };
+                        }
+                        return node;
+                    })
+                );
+            };
+
+            const selectedNode = nodes.find(n => n.selected);
+
+            const saveWorkflow = async (isPublish = false) => {
+                setIsSaving(true);
+                try {
+                    const payload = {
+                        name: workflowName,
+                        nodes: reactFlowInstance.getNodes(),
+                        edges: reactFlowInstance.getEdges()
+                    };
+
+                    const url = workflowId ? `/api/workflows/${workflowId}` : '/api/workflows';
+                    const method = workflowId ? 'PUT' : 'POST';
+
+                    const res = await fetch(url, {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await res.json();
+                    if (result.success) {
+                        setWorkflowId(result.workflow._id);
+                        alert(`Workflow ${isPublish ? 'Published' : 'Saved'}!`);
+                        if (isPublish) {
+                            await fetch(`/api/workflows/${result.workflow._id}/publish`, { method: 'POST' });
+                        }
+                    } else {
+                        alert("Error saving: " + result.message);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Network error");
+                }
+                setIsSaving(false);
+            };
+
+            const executeWorkflow = async () => {
+                if (!workflowId) return alert("Please save the workflow first!");
+                try {
+                    const res = await fetch(`/api/workflows/${workflowId}/execute`, { method: 'POST' });
+                    const result = await res.json();
+                    if (result.success) {
+                        alert(`Execution started! ID: ${result.executionId}`);
+                    } else {
+                        alert("Error executing: " + result.message);
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            };
+
+            return (
+                <div className="flex flex-col h-full w-full">
+                    {/* Topbar */}
+                    <div className="h-14 bg-dark-800 border-b border-slate-700/50 flex items-center justify-between px-4 shrink-0 z-10">
+                        <div className="flex items-center gap-4">
+                            <input 
+                                type="text"
+                                value={workflowName}
+                                onChange={e => setWorkflowName(e.target.value)}
+                                className="bg-transparent text-lg font-semibold text-slate-200 border-b border-transparent focus:border-brand-500 focus:outline-none px-1 py-0.5 w-64"
+                            />
+                            {workflowId && <span className="text-xs text-brand-500 px-2 py-1 bg-brand-500/10 rounded">Saved</span>}
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button onClick={() => executeWorkflow()} className="px-4 py-1.5 text-sm font-medium text-slate-300 bg-slate-700 hover:bg-slate-600 rounded flex items-center gap-2 transition">
+                                <i className="bx bx-play"></i> Test Execution
+                            </button>
+                            <button onClick={() => saveWorkflow(false)} disabled={isSaving} className="px-4 py-1.5 text-sm font-medium text-slate-300 border border-slate-600 hover:bg-slate-700 rounded transition">
+                                {isSaving ? 'Saving...' : 'Save Draft'}
+                            </button>
+                            <button onClick={() => saveWorkflow(true)} disabled={isSaving} className="px-4 py-1.5 text-sm font-medium text-white bg-brand-600 hover:bg-brand-500 rounded shadow transition">
+                                Publish Workflow
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-1 overflow-hidden relative">
+                        <Sidebar />
+                        
+                        <div className="flex-1 h-full relative" ref={reactFlowWrapper}>
+                            <ReactFlow
+                                nodes={nodes}
+                                edges={edges}
+                                onNodesChange={onNodesChange}
+                                onEdgesChange={onEdgesChange}
+                                onConnect={onConnect}
+                                onInit={setReactFlowInstance}
+                                onDrop={onDrop}
+                                onDragOver={onDragOver}
+                                nodeTypes={nodeTypes}
+                                fitView
+                                className="bg-dark-900"
+                            >
+                                <Background color="#1e293b" gap={16} size={1} />
+                                <Controls className="bg-dark-800 border-slate-700 fill-slate-300" />
+                            </ReactFlow>
+                        </div>
+
+                        <ConfigPanel selectedNode={selectedNode} updateNodeData={updateNodeData} />
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <ReactFlowProvider>
+                    <WorkflowBuilder />
+                </ReactFlowProvider>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

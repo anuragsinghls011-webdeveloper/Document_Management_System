@@ -7,6 +7,7 @@ const controller = require("../controllers/document.controller");
 const router = express.Router();
 
 router.post("/upload", auth, upload.array("documents", 100), controller.upload);
+router.get("/", auth, controller.getDocuments);
 router.get("/my", auth, controller.myDocuments);
 router.get("/stats", auth, controller.stats);
 router.get("/search", auth, controller.search);

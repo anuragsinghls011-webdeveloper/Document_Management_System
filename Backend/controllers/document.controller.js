@@ -101,6 +101,26 @@ exports.upload = async (req, res) => {
 };
 
 
+exports.getDocuments = async (req, res) => {
+  try {
+    const isAdmin = req.user && req.user.role === "admin";
+
+    if (isAdmin && req.query.all === "true") {
+      const docs = await Document.find().sort({ createdAt: -1 });
+      return res.json(docs);
+    }
+
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const docs = await Document.find({ userId }).sort({ createdAt: -1 });
+
+    res.json(docs);
+  } catch (err) {
+    console.error("FETCH DOCS ERROR ", err);
+    res.status(500).send("Failed to fetch documents");
+  }
+};
+
+
 exports.myDocuments = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user.id);

@@ -11,6 +11,8 @@ const adminRoutes = require("./routes/admin.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const documentRoutes = require("./routes/document.routes");
 const activityRoutes = require("./routes/activity.routes");
+const documentsRoute = require('./routes/documents.routes');
+const workflowsRoute = require('./routes/workflows.routes');
 const auth = require("./middlewares/auth.middleware");
 const adminOnly = require("./middlewares/admin.middleware");
 
@@ -44,7 +46,9 @@ app.get("/dashboard", auth, (req, res) => res.render("dashboard"));
 app.get("/admin/dashboard", auth, adminOnly, (req, res) => res.render("admin.dashboard"));
 app.get("/admin/pending-docs", auth, adminOnly, (req, res) => res.render("admin/pending-docs"));
 app.use("/dashboard", dashboardRoutes);
-app.use("/documents", documentRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/documents", documentsRoute);
+app.use("/", workflowsRoute); // workflows APIs and view
 app.use("/", activityRoutes);
 app.use("/admin", adminRoutes);
 

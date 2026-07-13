@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documents | Document Management System</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Colors matching dashboard */
+            --bg-color: #0b0f19;
+            --surface-color: rgba(20, 27, 45, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.12), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.12), transparent 25%);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid var(--surface-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--text-main);
+            text-decoration: none;
+            background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item:hover::before, .nav-item.active::before {
+            transform: translateX(0);
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            animation: slideDown 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .header-title h1 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* Toolbar (Filters & Search) */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(12px);
+            animation: slideUp 0.5s ease backwards;
+            animation-delay: 0.1s;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.6rem 1.25rem;
+            border-radius: 2rem;
+            width: 350px;
+            transition: all 0.3s ease;
+        }
+
+        .search-container:focus-within {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .search-container i {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .search-container input {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            outline: none;
+            width: 100%;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .filter-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-main);
+            padding: 0.6rem 2.5rem 0.6rem 1rem;
+            border-radius: 0.5rem;
+            outline: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .filter-select option {
+            background: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Documents Grid / List */
+        .documents-container {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 1.25rem;
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+            animation: slideUp 0.6s ease backwards;
+            animation-delay: 0.2s;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1.25rem 1.5rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--surface-border);
+            background: rgba(255, 255, 255, 0.02);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: scale(1.002);
+        }
+
+        .doc-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .doc-icon {
+            width: 2.75rem;
+            height: 2.75rem;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+        
+        tbody tr:hover .doc-icon {
+            transform: scale(1.1);
+        }
+
+        .icon-pdf { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+        .icon-doc { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .icon-img { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .icon-xls { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+
+        .doc-name {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .doc-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .status-badge {
+            padding: 0.35rem 0.85rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            letter-spacing: 0.03em;
+        }
+
+        .status-verified { background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .status-rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+
+        .action-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-view:hover { color: var(--primary-color); background: rgba(99, 102, 241, 0.1); }
+        .btn-download:hover { color: var(--success-color); background: rgba(16, 185, 129, 0.1); }
+        .btn-delete:hover { color: var(--danger-color); background: rgba(239, 68, 68, 0.1); }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--surface-border);
+        }
+
+        .page-info {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .page-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .page-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .toolbar {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            .search-container {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            table th:nth-child(3), table td:nth-child(3),
+            table th:nth-child(4), table td:nth-child(4) {
+                display: none; /* Hide less important columns on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="logo">
+            <i class='bx bxs-box'></i>
+            DocuFlow
+        </a>
+        <ul class="nav-links">
+            <li><a href="/dashboard" class="nav-item"><i class='bx bx-grid-alt'></i> Dashboard</a></li>
+            <li><a href="/documents" class="nav-item active"><i class='bx bx-file'></i> Documents</a></li>
+            <li><a href="/workflows" class="nav-item"><i class='bx bx-git-branch'></i> Workflows</a></li>
+            <li><a href="/analytics" class="nav-item"><i class='bx bx-chart'></i> Analytics</a></li>
+            <li><a href="/settings" class="nav-item"><i class='bx bx-cog'></i> Settings</a></li>
+        </ul>
+        
+        <div style="margin-top: auto;">
+            <div style="background: rgba(99, 102, 241, 0.1); padding: 1.25rem; border-radius: 1rem; border: 1px solid rgba(99, 102, 241, 0.2); text-align: center;">
+                <i class='bx bx-cloud-upload' style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                <h4 style="font-size: 0.875rem; margin-bottom: 0.25rem;">Storage Used</h4>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">75% of 100GB</p>
+                <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                    <div style="width: 75%; height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border-radius: 3px;"></div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-title">
+                <h1>Document Repository</h1>
+                <p>Manage, search, and organize all your enterprise documents.</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="alert('Upload modal would open here')">
+                    <i class='bx bx-upload' style="font-size: 1.2rem;"></i>
+                    Upload Document
+                </button>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="search-container">
+                <i class='bx bx-search'></i>
+                <input type="text" placeholder="Search by name, content, or metadata...">
+            </div>
+            <div class="filters">
+                <select class="filter-select">
+                    <option value="">All Categories</option>
+                    <option value="finance">Finance & Tax</option>
+                    <option value="hr">Human Resources</option>
+                    <option value="legal">Legal & Contracts</option>
+                    <option value="marketing">Marketing</option>
+                </select>
+                <select class="filter-select">
+                    <option value="">Any Status</option>
+                    <option value="verified">Verified</option>
+                    <option value="pending">Pending</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <select class="filter-select">
+                    <option value="">Upload Date</option>
+                    <option value="today">Today</option>
+                    <option value="week">Last 7 Days</option>
+                    <option value="month">Last 30 Days</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Documents Table -->
+        <div class="documents-container">
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>File Details</th>
+                            <th>Category</th>
+                            <th>Uploaded By</th>
+                            <th>Date Modified</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Doc 1 -->
+                        <tr>
+                            <td>
+                                <div class="doc-info">
+                                    <div class="doc-icon icon-pdf"><i class='bx bxs-file-pdf'></i></div>
+                                    <div>
+                                        <div class="doc-name">
+                                            Q2_Financial_Report_Final.pdf
+                                        </div>
+                                        <div class="doc-meta">
+                                            <span>2.4 MB</span>
+                                            <span style="color: rgba(255,255,255,0.2)">|</span>
+                                            <span>v1.2</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>Finance</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <img src="https://ui-avatars.com/api/?name=Sarah+Jenkins&background=8b5cf6&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
+                                    Sarah Jenkins
+                                </div>
+                            </td>
+                            <td>Oct 24, 2024</td>
+                            <td><span class="status-badge status-verified"><i class='bx bx-check-circle'></i> Verified</span></td>
+                            <td>
+                                <div class="action-btns" style="justify-content: flex-end;">
+                                    <button class="action-btn btn-view" title="View"><i class='bx bx-show'></i></button>
+                                    <button class="action-btn btn-download" title="Download"><i class='bx bx-download'></i></button>
+                                    <button class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Doc 2 -->
+                        <tr>
+                            <td>
+                                <div class="doc-info">
+                                    <div class="doc-icon icon-doc"><i class='bx bxs-file-doc'></i></div>
+                                    <div>
+                                        <div class="doc-name">
+                                            Employee_Handbook_2024.docx
+                                        </div>
+                                        <div class="doc-meta">
+                                            <span>1.1 MB</span>
+                                            <span style="color: rgba(255,255,255,0.2)">|</span>
+                                            <span>v3.0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>HR</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=10b981&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
+                                    Michael Chen
+                                </div>
+                            </td>
+                            <td>Oct 23, 2024</td>
+                            <td><span class="status-badge status-pending"><i class='bx bx-time-five'></i> Pending</span></td>
+                            <td>
+                                <div class="action-btns" style="justify-content: flex-end;">
+                                    <button class="action-btn btn-view" title="View"><i class='bx bx-show'></i></button>
+                                    <button class="action-btn btn-download" title="Download"><i class='bx bx-download'></i></button>
+                                    <button class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Doc 3 -->
+                        <tr>
+                            <td>
+                                <div class="doc-info">
+                                    <div class="doc-icon icon-xls"><i class='bx bxs-spreadsheet'></i></div>
+                                    <div>
+                                        <div class="doc-name">
+                                            Client_Billing_Oct.xlsx
+                                        </div>
+                                        <div class="doc-meta">
+                                            <span>856 KB</span>
+                                            <span style="color: rgba(255,255,255,0.2)">|</span>
+                                            <span>v1.0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>Finance</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
+                                    Admin
+                                </div>
+                            </td>
+                            <td>Oct 22, 2024</td>
+                            <td><span class="status-badge status-verified"><i class='bx bx-check-circle'></i> Verified</span></td>
+                            <td>
+                                <div class="action-btns" style="justify-content: flex-end;">
+                                    <button class="action-btn btn-view" title="View"><i class='bx bx-show'></i></button>
+                                    <button class="action-btn btn-download" title="Download"><i class='bx bx-download'></i></button>
+                                    <button class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Doc 4 -->
+                        <tr>
+                            <td>
+                                <div class="doc-info">
+                                    <div class="doc-icon icon-img"><i class='bx bxs-image'></i></div>
+                                    <div>
+                                        <div class="doc-name">
+                                            Vendor_Invoice_8932.png
+                                        </div>
+                                        <div class="doc-meta">
+                                            <span>4.5 MB</span>
+                                            <span style="color: rgba(255,255,255,0.2)">|</span>
+                                            <span>Scan</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>Legal</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 1.5rem; height: 1.5rem; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;">API</div>
+                                    System API
+                                </div>
+                            </td>
+                            <td>Oct 21, 2024</td>
+                            <td><span class="status-badge status-rejected"><i class='bx bx-x-circle'></i> OCR Failed</span></td>
+                            <td>
+                                <div class="action-btns" style="justify-content: flex-end;">
+                                    <button class="action-btn btn-view" title="View"><i class='bx bx-show'></i></button>
+                                    <button class="action-btn btn-download" title="Download"><i class='bx bx-download'></i></button>
+                                    <button class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Doc 5 -->
+                        <tr>
+                            <td>
+                                <div class="doc-info">
+                                    <div class="doc-icon icon-pdf"><i class='bx bxs-file-pdf'></i></div>
+                                    <div>
+                                        <div class="doc-name">
+                                            Marketing_Strategy_2025.pdf
+                                        </div>
+                                        <div class="doc-meta">
+                                            <span>8.2 MB</span>
+                                            <span style="color: rgba(255,255,255,0.2)">|</span>
+                                            <span>v2.1</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>Marketing</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <img src="https://ui-avatars.com/api/?name=Emma+Davis&background=f59e0b&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
+                                    Emma Davis
+                                </div>
+                            </td>
+                            <td>Oct 20, 2024</td>
+                            <td><span class="status-badge status-verified"><i class='bx bx-check-circle'></i> Verified</span></td>
+                            <td>
+                                <div class="action-btns" style="justify-content: flex-end;">
+                                    <button class="action-btn btn-view" title="View"><i class='bx bx-show'></i></button>
+                                    <button class="action-btn btn-download" title="Download"><i class='bx bx-download'></i></button>
+                                    <button class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination">
+                <div class="page-info">
+                    Showing <span style="color: var(--text-main); font-weight: 500;">1</span> to <span style="color: var(--text-main); font-weight: 500;">5</span> of <span style="color: var(--text-main); font-weight: 500;">12,485</span> entries
+                </div>
+                <div class="page-controls">
+                    <button class="page-btn" disabled><i class='bx bx-chevron-left'></i> Prev</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <span style="color: var(--text-muted); padding: 0.5rem;">...</span>
+                    <button class="page-btn">84</button>
+                    <button class="page-btn">Next <i class='bx bx-chevron-right'></i></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Optional JS for interactions like search filtering could go here
+        const searchInput = document.querySelector('.search-container input');
+        searchInput.addEventListener('focus', () => {
+            document.querySelector('.search-container i').style.color = 'var(--primary-color)';
+        });
+        searchInput.addEventListener('blur', () => {
+            document.querySelector('.search-container i').style.color = 'var(--text-muted)';
+        });
+    </script>
+</body>
+</html>
