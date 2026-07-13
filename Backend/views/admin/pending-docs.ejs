@@ -1,1250 +1,440 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Approval — KMRL DMS</title>
-    <meta name="description" content="Review and approve documents with AI-generated summaries and approval workflow.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            min-height: 100vh;
-            background:
-                radial-gradient(1100px 620px at 10% -10%, rgba(56, 189, 248, 0.1), transparent 62%),
-                radial-gradient(1000px 640px at 88% 8%, rgba(139, 92, 246, 0.08), transparent 64%),
-                linear-gradient(135deg, #081120, #0B1220 48%, #111827);
-            color: #f8fafc;
-            overflow-x: hidden;
-            opacity: 0;
-            animation: pageIn 0.6s ease 0.1s forwards;
-        }
-
-        @keyframes pageIn { to { opacity: 1; } }
-
-        body::before {
-            content: "";
-            position: fixed; inset: 0;
-            pointer-events: none;
-            background-image:
-                linear-gradient(rgba(148,163,184,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(148,163,184,0.03) 1px, transparent 1px);
-            background-size: 48px 48px;
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 78%);
-            z-index: -1;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.9); }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(56,189,248,0.4), rgba(139,92,246,0.4)); border-radius: 999px; }
-
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 24px 20px;
-        }
-
-        /* Header */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 18px 22px;
-            border: 1px solid rgba(148,163,184,0.12);
-            border-radius: 20px;
-            background: rgba(8, 17, 32, 0.7);
-            backdrop-filter: blur(18px);
-            margin-bottom: 20px;
-            animation: slideDown 0.5s ease 0.15s both;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .header-content {
-            display: flex; align-items: center; gap: 14px; flex: 1;
-            justify-content: space-between;
-        }
-
-        .header-title {
-            font-size: 1.4rem;
-            font-weight: 850;
-        }
-
-        .header-actions {
-            display: flex; gap: 8px;
-        }
-
-        .btn-icon {
-            display: grid;
-            width: 40px; height: 40px;
-            place-items: center;
-            border: 1px solid rgba(148,163,184,0.12);
-            border-radius: 14px;
-            background: rgba(15, 23, 42, 0.5);
-            color: #94a3b8;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-icon:hover {
-            transform: translateY(-2px);
-            border-color: rgba(56,189,248,0.35);
-            color: #fff;
-            background: rgba(30, 41, 59, 0.8);
-        }
-
-        /* Document Card */
-        .document-card {
-            padding: 20px;
-            border: 1px solid rgba(148,163,184,0.12);
-            border-radius: 20px;
-            background: linear-gradient(145deg, rgba(30,41,59,0.7), rgba(8,17,32,0.6));
-            backdrop-filter: blur(18px);
-            margin-bottom: 20px;
-            animation: slideUp 0.6s ease 0.2s both;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .document-header {
-            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-        }
-
-        .document-icon {
-            width: 54px; height: 54px;
-            display: grid; place-items: center;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(56,189,248,0.18), rgba(139,92,246,0.14));
-            color: #22d3ee;
-            flex-shrink: 0;
-        }
-
-        .document-info { flex: 1; min-width: 0; }
-
-        .document-title {
-            font-size: 1.1rem; font-weight: 800;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-
-        .document-meta {
-            display: flex; flex-wrap: wrap; gap: 14px;
-            margin-top: 6px;
-        }
-
-        .meta-item {
-            display: inline-flex; align-items: center; gap: 5px;
-            color: #94a3b8; font-size: 0.78rem;
-        }
-
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 6px 14px;
-            border: 1px solid rgba(251,146,60,0.22);
-            border-radius: 999px;
-            background: rgba(251,146,60,0.1);
-            color: #fdba74;
-            font-size: 0.76rem; font-weight: 800;
-            white-space: nowrap;
-        }
-
-        .status-badge.approved {
-            border-color: rgba(52,211,153,0.25);
-            background: rgba(52,211,153,0.1);
-            color: #34d399;
-        }
-        .status-badge.approved .status-dot {
-            background: #34d399;
-            box-shadow: 0 0 8px rgba(52,211,153,0.6);
-        }
-
-        .status-badge.rejected {
-            border-color: rgba(251,113,133,0.25);
-            background: rgba(251,113,133,0.1);
-            color: #fb7185;
-        }
-        .status-badge.rejected .status-dot {
-            background: #fb7185;
-            box-shadow: 0 0 8px rgba(251,113,133,0.6);
-        }
-
-        .status-badge.changes_requested {
-            border-color: rgba(251,146,60,0.22);
-            background: rgba(251,146,60,0.1);
-            color: #fdba74;
-        }
-        .status-badge.changes_requested .status-dot {
-            background: #fb923c;
-            box-shadow: 0 0 8px rgba(251,146,60,0.6);
-        }
-
-        .status-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: #fb923c;
-            box-shadow: 0 0 8px rgba(251,146,60,0.6);
-        }
-
-        /* Content Grid */
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 20px;
-            animation: slideUp 0.6s ease 0.35s both;
-        }
-
-        @media (max-width: 900px) {
-            .content-grid { grid-template-columns: 1fr; }
-            .document-header { flex-direction: column; align-items: flex-start; }
-        }
-
-        /* Section */
-        .section-header {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
-        }
-
-        .section-title-wrapper {
-            display: flex; flex-direction: column; gap: 6px;
-        }
-
-        .ai-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 10px;
-            border: 1px solid rgba(34,211,238,0.2);
-            border-radius: 999px;
-            background: rgba(8, 47, 73, 0.22);
-            color: #a5f3fc;
-            font-size: 0.7rem; font-weight: 800;
-            width: fit-content;
-        }
-
-        .section-title {
-            font-size: 1rem; font-weight: 800; color: #f8fafc;
-        }
-
-        .btn-secondary {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 8px 14px;
-            border: 1px solid rgba(148,163,184,0.14);
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.6);
-            color: #cbd5e1;
-            font-size: 0.82rem; font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-            border-color: rgba(56,189,248,0.3);
-            color: #fff;
-        }
-
-        /* Feature cards */
-        .ai-summary-section, .approval-section {
-            display: flex; flex-direction: column; gap: 16px;
-        }
-
-        .feature-card {
-            padding: 18px;
-            border: 1px solid rgba(148,163,184,0.1);
-            border-radius: 20px;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(8px);
-        }
-
-        .feature-header {
-            display: flex; align-items: center; gap: 10px;
-            margin-bottom: 14px; color: #e2e8f0;
-        }
-
-        .feature-title {
-            font-size: 0.92rem; font-weight: 750;
-        }
-
-        /* Summary content */
-        .summary-content {
-            padding: 18px;
-            border: 1px solid rgba(148,163,184,0.1);
-            border-radius: 20px;
-            background: rgba(15, 23, 42, 0.4);
-        }
-
-        .summary-paragraph {
-            color: #cbd5e1; font-size: 0.88rem; line-height: 1.7;
-            margin-bottom: 16px;
-        }
-
-        .key-points { margin-bottom: 18px; }
-
-        .key-points-title, .entities-title, .sentiment-title {
-            font-size: 0.82rem; font-weight: 800; color: #e2e8f0;
-            margin-bottom: 10px;
-        }
-
-        .key-points-list {
-            list-style: none; padding: 0;
-            display: flex; flex-direction: column; gap: 8px;
-        }
-
-        .key-points-list li {
-            position: relative;
-            padding-left: 18px;
-            color: #94a3b8;
-            font-size: 0.84rem; line-height: 1.5;
-        }
-
-        .key-points-list li::before {
-            content: '';
-            position: absolute; left: 0; top: 8px;
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: #22d3ee;
-            box-shadow: 0 0 8px rgba(34,211,238,0.5);
-        }
-
-        .entity-tags {
-            display: flex; flex-wrap: wrap; gap: 8px;
-            margin-bottom: 18px;
-        }
-
-        .entity-tag {
-            padding: 5px 10px;
-            border: 1px solid rgba(56,189,248,0.18);
-            border-radius: 999px;
-            background: rgba(56,189,248,0.08);
-            color: #a5f3fc;
-            font-size: 0.72rem; font-weight: 700;
-        }
-
-        /* Sentiment bar */
-        .sentiment-bar {
-            height: 8px;
-            border-radius: 999px;
-            background: rgba(148,163,184,0.12);
-            overflow: hidden;
-            margin-bottom: 6px;
-        }
-
-        .sentiment-fill {
-            height: 100%;
-            border-radius: inherit;
-            background: linear-gradient(90deg, #34d399, #22d3ee);
-            transition: width 1s ease;
-        }
-
-        .sentiment-label {
-            color: #94a3b8; font-size: 0.76rem;
-        }
-
-        /* Loading spinner */
-        .loading-spinner {
-            width: 32px; height: 32px;
-            border: 3px solid rgba(56,189,248,0.2);
-            border-top-color: #22d3ee;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .summary-loading {
-            text-align: center;
-            padding: 40px 20px;
-            color: #94a3b8;
-        }
-
-        /* Preview */
-        .preview-container { text-align: center; }
-
-        .preview-placeholder {
-            padding: 32px;
-            border: 1px dashed rgba(148,163,184,0.15);
-            border-radius: 16px;
-            background: rgba(15, 23, 42, 0.3);
-            color: #64748b;
-            margin-bottom: 12px;
-        }
-
-        .preview-placeholder p {
-            margin-top: 8px; font-size: 0.82rem;
-        }
-
-        .btn-link {
-            background: none; border: none;
-            color: #38bdf8; font-size: 0.86rem; font-weight: 700;
-            cursor: pointer; text-decoration: underline;
-            transition: color 0.2s;
-        }
-
-        .btn-link:hover { color: #22d3ee; }
-
-        /* Version list */
-        .version-list {
-            display: flex; flex-direction: column; gap: 0;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .version-list::before {
-            content: '';
-            position: absolute; left: 8px; top: 8px; bottom: 8px;
-            width: 2px;
-            background: rgba(148,163,184,0.12);
-        }
-
-        .version-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 0;
-            position: relative;
-        }
-
-        .version-dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            background: #475569;
-            border: 2px solid rgba(15,23,42,0.9);
-            position: absolute; left: -16px;
-            z-index: 1;
-        }
-
-        .version-item.active .version-dot {
-            background: #22d3ee;
-            box-shadow: 0 0 10px rgba(34,211,238,0.6);
-        }
-
-        .version-info {
-            display: flex; flex-direction: column;
-        }
-
-        .version-number {
-            font-size: 0.84rem; font-weight: 700; color: #e2e8f0;
-        }
-
-        .version-date {
-            font-size: 0.72rem; color: #64748b;
-        }
-
-        /* Comments */
-        .comments-container {
-            display: flex; flex-direction: column; gap: 12px;
-            margin-bottom: 14px;
-        }
-
-        .comment-item {
-            display: flex; gap: 10px;
-        }
-
-        .comment-avatar {
-            width: 36px; height: 36px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, rgba(139,92,246,0.8), rgba(34,211,238,0.6));
-            color: #fff;
-            display: grid; place-items: center;
-            font-size: 0.72rem; font-weight: 800;
-            flex-shrink: 0;
-        }
-
-        .comment-content { flex: 1; min-width: 0; }
-
-        .comment-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 4px;
-        }
-
-        .comment-author {
-            font-size: 0.82rem; font-weight: 750; color: #e2e8f0;
-        }
-
-        .comment-time {
-            font-size: 0.7rem; color: #64748b;
-        }
-
-        .comment-text {
-            font-size: 0.82rem; color: #94a3b8; line-height: 1.5;
-        }
-
-        .comment-input-wrapper {
-            display: flex; flex-direction: column; gap: 8px;
-        }
-
-        .comment-input {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid rgba(148,163,184,0.12);
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.5);
-            color: #f8fafc;
-            font-size: 0.86rem;
-            resize: none;
-            outline: none;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-
-        .comment-input:focus {
-            border-color: rgba(56,189,248,0.5);
-        }
-
-        .btn-primary {
-            display: inline-flex; align-items: center; justify-content: center;
-            gap: 8px; padding: 10px 18px;
-            border: none; border-radius: 12px;
-            background: linear-gradient(135deg, #2563eb, #38bdf8);
-            color: #fff;
-            font-weight: 750; font-size: 0.86rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 14px 30px rgba(37,99,235,0.3);
-        }
-
-        .btn-sm { padding: 8px 14px; font-size: 0.8rem; align-self: flex-end; }
-
-        /* Checklist */
-        .checklist {
-            display: flex; flex-direction: column; gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .checkbox-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 14px;
-            border: 1px solid rgba(148,163,184,0.08);
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.3);
-            cursor: pointer;
-            transition: background 0.2s, border-color 0.2s;
-        }
-
-        .checkbox-item:hover {
-            background: rgba(30, 41, 59, 0.4);
-            border-color: rgba(56,189,248,0.2);
-        }
-
-        .checkbox-input {
-            width: 18px; height: 18px;
-            accent-color: #22d3ee;
-            cursor: pointer;
-        }
-
-        .checkbox-label {
-            font-size: 0.84rem; color: #cbd5e1; cursor: pointer;
-        }
-
-        .checklist-progress { margin-top: 4px; }
-
-        .progress-bar {
-            height: 6px;
-            border-radius: 999px;
-            background: rgba(148,163,184,0.12);
-            overflow: hidden;
-            margin-bottom: 6px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: inherit;
-            background: linear-gradient(90deg, #2563eb, #22d3ee);
-            transition: width 0.5s ease;
-        }
-
-        .progress-text {
-            font-size: 0.74rem; color: #64748b; font-weight: 600;
-        }
-
-        /* Workflow steps */
-        .workflow-steps {
-            display: flex; flex-direction: column; gap: 0;
-            position: relative;
-            padding-left: 24px;
-        }
-
-        .workflow-steps::before {
-            content: '';
-            position: absolute; left: 11px; top: 16px; bottom: 16px;
-            width: 2px;
-            background: rgba(148,163,184,0.1);
-        }
-
-        .workflow-step {
-            display: flex; align-items: center; gap: 14px;
-            padding: 12px 0;
-            position: relative;
-        }
-
-        .step-indicator {
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            border: 2px solid rgba(148,163,184,0.2);
-            background: rgba(15,23,42,0.8);
-            display: grid; place-items: center;
-            position: absolute; left: -19px;
-            z-index: 1;
-        }
-
-        .workflow-step.completed .step-indicator {
-            border-color: #34d399;
-            background: rgba(52,211,153,0.15);
-            color: #34d399;
-        }
-
-        .workflow-step.active .step-indicator {
-            border-color: #22d3ee;
-            background: rgba(34,211,238,0.1);
-        }
-
-        .pulse-dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            background: #22d3ee;
-            box-shadow: 0 0 0 0 rgba(34,211,238,0.7);
-            animation: pulseDot 2s infinite;
-        }
-
-        @keyframes pulseDot {
-            70% { box-shadow: 0 0 0 8px rgba(34,211,238,0); }
-            100% { box-shadow: 0 0 0 0 rgba(34,211,238,0); }
-        }
-
-        .step-content {
-            display: flex; flex-direction: column;
-        }
-
-        .step-title {
-            font-size: 0.84rem; font-weight: 750; color: #e2e8f0;
-        }
-
-        .step-user {
-            font-size: 0.72rem; color: #64748b;
-        }
-
-        /* Decision Card */
-        .decision-card {
-            border-color: rgba(56,189,248,0.18);
-            background: linear-gradient(135deg, rgba(56,189,248,0.05), rgba(139,92,246,0.04), rgba(15,23,42,0.4));
-        }
-
-        .input-label {
-            font-size: 0.78rem; font-weight: 700; color: #94a3b8;
-            margin-bottom: 8px; display: block;
-        }
-
-        .decision-textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid rgba(148,163,184,0.12);
-            border-radius: 14px;
-            background: rgba(15, 23, 42, 0.5);
-            color: #f8fafc;
-            font-size: 0.88rem;
-            resize: none;
-            outline: none;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-
-        .decision-textarea:focus {
-            border-color: rgba(56,189,248,0.5);
-        }
-
-        .decision-notes { margin-bottom: 16px; }
-
-        .decision-actions {
-            display: flex; flex-wrap: wrap; gap: 10px;
-        }
-
-        .btn-approve {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 20px;
-            border: none; border-radius: 14px;
-            background: linear-gradient(135deg, rgba(52,211,153,0.9), rgba(20,184,166,0.85));
-            color: #fff;
-            font-weight: 750; font-size: 0.88rem;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 8px 20px rgba(20,184,166,0.2);
-        }
-
-        .btn-approve:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 16px 36px rgba(20,184,166,0.35);
-        }
-
-        .btn-reject {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 20px;
-            border: none; border-radius: 14px;
-            background: linear-gradient(135deg, rgba(251,113,133,0.85), rgba(239,68,68,0.8));
-            color: #fff;
-            font-weight: 750; font-size: 0.88rem;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 8px 20px rgba(239,68,68,0.15);
-        }
-
-        .btn-reject:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 16px 36px rgba(239,68,68,0.3);
-        }
-
-        /* Modal */
-        .modal {
-            position: fixed; inset: 0;
-            display: flex; align-items: center; justify-content: center;
-            padding: 20px;
-            background: rgba(2,8,23,0.7);
-            backdrop-filter: blur(12px);
-            z-index: 80;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.2s ease;
-        }
-
-        .modal.active {
-            opacity: 1; pointer-events: auto;
-        }
-
-        .modal-content {
-            width: min(420px, 100%);
-            padding: 28px;
-            border: 1px solid rgba(148,163,184,0.2);
-            border-radius: 24px;
-            background: linear-gradient(145deg, rgba(30,41,59,0.95), rgba(8,17,32,0.98));
-            box-shadow: 0 34px 100px rgba(2,8,23,0.6);
-            text-align: center;
-            transform: translateY(20px) scale(0.95);
-            transition: transform 0.25s ease;
-        }
-
-        .modal.active .modal-content {
-            transform: translateY(0) scale(1);
-        }
-
-        .modal-icon {
-            width: 56px; height: 56px;
-            margin: 0 auto 16px;
-            border-radius: 16px;
-            display: grid; place-items: center;
-        }
-
-        .modal-icon.success {
-            background: rgba(52,211,153,0.15);
-            color: #34d399;
-        }
-
-        .modal-icon.error {
-            background: rgba(251,113,133,0.15);
-            color: #fb7185;
-        }
-
-        .modal-title {
-            font-size: 1.1rem; font-weight: 800; margin-bottom: 8px;
-        }
-
-        .modal-message {
-            color: #94a3b8; font-size: 0.88rem; margin-bottom: 20px; line-height: 1.5;
-        }
-
-        @media (max-width: 640px) {
-            .header { padding: 14px; }
-            .header-title { font-size: 1.1rem; }
-            .decision-actions { flex-direction: column; }
-            .decision-actions button { width: 100%; justify-content: center; }
-        }
-    </style>
-</head>  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Review Workspace</title>
+  <meta name="description" content="Premium approval workspace for reviewing pending documents.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/enterprise.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="/assets/js/enterprise.js"></script>
+  <style>
+    .review-shell { width: min(100%, 1540px); margin: 0 auto; padding: 18px; display: grid; gap: 18px; }
+    .review-topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 20px; }
+    .review-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 18px; align-items: start; }
+    .hero-panel { padding: 22px; }
+    .hero-title { font-size: clamp(2rem, 3.8vw, 3.5rem); font-weight: 900; letter-spacing: -0.06em; line-height: 0.95; margin: 10px 0 12px; }
+    .hero-copy { color: var(--muted); max-width: 75ch; line-height: 1.7; }
+    .hero-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    .hero-stat { padding: 16px; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
+    .hero-stat span { display: block; color: var(--muted); font-size: 0.76rem; margin-bottom: 6px; }
+    .hero-stat strong { font-size: 1.1rem; }
+    .review-layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr); gap: 18px; align-items: start; }
+    .feature-card { padding: 18px; }
+    .feature-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+    .feature-title { font-size: 1rem; font-weight: 850; margin: 0; }
+    .feature-subtitle { color: var(--muted); font-size: 0.84rem; margin-top: 4px; }
+    .document-card { padding: 18px; display: grid; gap: 16px; }
+    .document-header { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .document-icon { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 18px; background: rgba(79,139,255,0.12); color: #8bb3ff; flex: 0 0 auto; }
+    .document-title { font-size: 1.15rem; font-weight: 900; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .document-meta { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 8px; color: var(--muted); font-size: 0.8rem; }
+    .meta-item { display: inline-flex; align-items: center; gap: 6px; }
+    .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--warning); font-size: 0.77rem; font-weight: 800; text-transform: capitalize; }
+    .status-dot { width: 8px; height: 8px; border-radius: 999px; background: currentColor; box-shadow: 0 0 12px currentColor; }
+    .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .summary-content { padding: 18px; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
+    .summary-paragraph { color: #d5dbe8; line-height: 1.75; margin: 0 0 16px; }
+    .key-points-title, .entities-title, .sentiment-title { font-size: 0.82rem; font-weight: 850; color: var(--text); margin-bottom: 10px; letter-spacing: 0.03em; }
+    .key-points-list { list-style: none; display: grid; gap: 8px; margin: 0; padding: 0; }
+    .key-points-list li { position: relative; padding-left: 18px; color: var(--muted); font-size: 0.86rem; line-height: 1.55; }
+    .key-points-list li::before { content: ''; position: absolute; left: 0; top: 0.55rem; width: 6px; height: 6px; border-radius: 50%; background: #22d3ee; box-shadow: 0 0 8px rgba(34,211,238,0.5); }
+    .entity-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .entity-tag { padding: 6px 10px; border-radius: 999px; background: rgba(79,139,255,0.08); border: 1px solid rgba(79,139,255,0.18); color: #b9ceff; font-size: 0.74rem; font-weight: 700; }
+    .preview-container { display: grid; gap: 12px; }
+    .preview-placeholder { min-height: 280px; display: grid; place-items: center; text-align: center; padding: 24px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.12); background: rgba(255,255,255,0.025); color: var(--muted); }
+    .preview-placeholder p { margin: 10px 0 0; font-size: 0.84rem; }
+    .checklist { display: grid; gap: 10px; }
+    .check-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
+    .checkbox-input { margin-top: 3px; accent-color: #4f8bff; }
+    .check-copy strong { display: block; font-size: 0.88rem; margin-bottom: 4px; }
+    .check-copy span { color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+    .progress-shell { padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
+    .progress-track { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, #4f8bff, #8a5cff); transition: width 220ms ease; }
+    .comments-container { display: grid; gap: 10px; }
+    .comment-item { display: flex; gap: 10px; padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
+    .comment-avatar { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, rgba(79,139,255,0.9), rgba(138,92,255,0.8)); color: #fff; font-size: 0.72rem; font-weight: 900; flex: 0 0 auto; }
+    .comment-content { min-width: 0; }
+    .comment-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+    .comment-author { font-size: 0.82rem; font-weight: 800; }
+    .comment-time { color: var(--muted); font-size: 0.72rem; }
+    .comment-text { color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
+    .comment-input-wrapper { display: grid; gap: 10px; }
+    .comment-input, .decision-notes { width: 100%; padding: 12px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.09); background: rgba(8,12,18,0.7); color: var(--text); outline: none; resize: none; }
+    .comment-input:focus, .decision-notes:focus { border-color: rgba(79,139,255,0.45); }
+    .decision-panel { display: grid; gap: 14px; }
+    .action-stack { display: flex; flex-wrap: wrap; gap: 10px; }
+    .history-list { display: grid; gap: 10px; }
+    .history-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
+    .history-item strong { font-size: 0.86rem; }
+    .history-item span { color: var(--muted); font-size: 0.78rem; }
+    .modal { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(2,6,23,0.7); backdrop-filter: blur(10px); opacity: 0; pointer-events: none; transition: 180ms ease; z-index: 80; }
+    .modal.active { opacity: 1; pointer-events: auto; }
+    .modal-content { width: min(100%, 420px); padding: 22px; border-radius: 24px; background: linear-gradient(180deg, rgba(18,24,35,0.98), rgba(10,14,22,0.98)); border: 1px solid rgba(255,255,255,0.08); }
+    .modal-icon { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; margin: 0 auto 14px; }
+    .modal-icon.success { background: rgba(52,211,153,0.14); color: #34d399; }
+    .modal-icon.error { background: rgba(251,113,133,0.14); color: #fb7185; }
+    .modal-title { text-align: center; font-size: 1.08rem; font-weight: 850; margin: 0 0 8px; }
+    .modal-message { text-align: center; color: var(--muted); margin-bottom: 18px; }
+    .modal-content .button { width: 100%; justify-content: center; }
+    @media (max-width: 1180px) {
+      .review-grid, .review-layout, .content-grid { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 760px) {
+      .review-topbar { flex-direction: column; align-items: flex-start; }
+      .hero-stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <a href="/dashboard" class="btn-secondary" style="padding:8px 12px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                        Back
-                    </a>
-                    <h1 class="header-title">Document Approval</h1>
-                </div>
-                <div class="header-actions">
-                    <button class="btn-icon" id="refreshBtn" aria-label="Refresh" onclick="location.reload()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-                        </svg>
-                    </button>
-                </div>
+  <div class="review-shell">
+    <header class="panel review-topbar">
+      <div>
+        <div class="eyebrow"><span class="pulse-dot"></span><span>Approval workspace</span></div>
+        <h1 class="dashboard-title">Where a document becomes a decision.</h1>
+        <p class="hero-copy">Review the summary, inspect the checklist, comment on changes, and use the approval actions without leaving the workspace.</p>
+      </div>
+      <div class="action-stack">
+        <a href="/admin/dashboard" class="button"><i data-feather="arrow-left"></i>Back to queue</a>
+        <a id="viewDocumentBtn" href="#" target="_blank" rel="noreferrer" class="button primary"><i data-feather="external-link"></i>Open file</a>
+      </div>
+    </header>
+
+    <section class="review-grid">
+      <article class="panel hero-panel">
+        <div class="document-card">
+          <div class="document-header">
+            <div class="document-icon"><i data-feather="file-text"></i></div>
+            <div class="document-info">
+              <p id="documentTitle" class="document-title">Loading document...</p>
+              <div class="document-meta">
+                <span class="meta-item"><i data-feather="calendar"></i><span id="submittedDate">-</span></span>
+                <span class="meta-item"><i data-feather="user"></i><span id="submittedBy">-</span></span>
+                <span class="meta-item"><i data-feather="archive"></i><span id="fileSize">-</span></span>
+              </div>
             </div>
-        </header>
-
-        <!-- Main Content -->
-        <main>
-            <!-- Document Info Card -->
-            <div class="document-card">
-                <div class="document-header">
-                    <div class="document-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                        </svg>
-                    </div>
-                    <div class="document-info">
-                        <h2 class="document-title" id="documentTitle">Annual Financial Report 2024</h2>
-                        <div class="document-meta">
-                            <span class="meta-item">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                Submitted: <span id="submittedDate">Jan 15, 2024</span>
-                            </span>
-                            <span class="meta-item">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                By: <span id="submittedBy">John Anderson</span>
-                            </span>
-                            <span class="meta-item">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-                                Size: <span id="fileSize">2.4 MB</span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="status-badge" id="statusBadge">
-                        <span class="status-dot"></span>
-                        Pending Review
-                    </div>
-                </div>
-            </div>
-
-            <!-- Two Column Layout -->
-            <div class="content-grid">
-                <!-- Left Column: AI Summary -->
-                <section class="ai-summary-section">
-                    <div class="section-header">
-                        <div class="section-title-wrapper">
-                            <div class="ai-badge">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                AI Generated
-                            </div>
-                            <h3 class="section-title">Document Summary</h3>
-                        </div>
-                        <button class="btn-secondary" id="regenerateSummary">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-                            Regenerate
-                        </button>
-                    </div>
-
-                    <div class="summary-content">
-                        <div class="summary-loading" id="summaryLoading" style="display: none;">
-                            <div class="loading-spinner"></div>
-                            <p>AI is analyzing the document...</p>
-                        </div>
-
-                        <div id="summaryText">
-                            <p class="summary-paragraph">This comprehensive financial report provides a detailed analysis of the company's fiscal performance for the year 2024. The document encompasses revenue streams, expenditure breakdowns, and strategic financial initiatives undertaken during the reporting period.</p>
-                            
-                            <div class="key-points">
-                                <h4 class="key-points-title">Key Highlights</h4>
-                                <ul class="key-points-list">
-                                    <li>Total revenue increased by 23% year-over-year, reaching $45.2 million</li>
-                                    <li>Operating expenses maintained at 18% of total revenue</li>
-                                    <li>Net profit margin improved from 12% to 15.8%</li>
-                                    <li>Successfully completed three major acquisitions totaling $8.5 million</li>
-                                    <li>R&D investment increased by 35% to support innovation initiatives</li>
-                                </ul>
-                            </div>
-
-                            <div class="extracted-entities">
-                                <h4 class="entities-title">Extracted Entities</h4>
-                                <div class="entity-tags">
-                                    <span class="entity-tag">Financial Year: 2024</span>
-                                    <span class="entity-tag">Department: Finance</span>
-                                    <span class="entity-tag">Category: Annual Report</span>
-                                    <span class="entity-tag">Confidentiality: Internal</span>
-                                    <span class="entity-tag">Pages: 47</span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 class="sentiment-title">Sentiment Analysis</h4>
-                                <div class="sentiment-bar">
-                                    <div class="sentiment-fill" style="width: 78%"></div>
-                                </div>
-                                <p class="sentiment-label">Positive (78% confidence)</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Right Column: Approval Features -->
-                <section class="approval-section">
-                    <!-- Document Preview -->
-                    <div class="feature-card">
-                        <div class="feature-header">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <h4 class="feature-title">Document Preview</h4>
-                        </div>
-                        <div class="preview-container">
-                            <div class="preview-placeholder">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                <p>Click to view full document</p>
-                            </div>
-                            <button class="btn-link" id="viewDocumentBtn">View Full Document</button>
-                        </div>
-                    </div>
-
-                    <!-- Version History -->
-                    <div class="feature-card">
-                        <div class="feature-header">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            <h4 class="feature-title">Version History</h4>
-                        </div>
-                        <div class="version-list">
-                            <div class="version-item active"><div class="version-dot"></div><div class="version-info"><span class="version-number">v3.0 (Current)</span><span class="version-date">Jan 15, 2024 - 2:30 PM</span></div></div>
-                            <div class="version-item"><div class="version-dot"></div><div class="version-info"><span class="version-number">v2.1</span><span class="version-date">Jan 12, 2024 - 4:15 PM</span></div></div>
-                            <div class="version-item"><div class="version-dot"></div><div class="version-info"><span class="version-number">v2.0</span><span class="version-date">Jan 10, 2024 - 10:00 AM</span></div></div>
-                        </div>
-                    </div>
-
-                    <!-- Comments -->
-                    <div class="feature-card">
-                        <div class="feature-header">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            <h4 class="feature-title">Comments & Feedback</h4>
-                        </div>
-                        <div class="comments-container">
-                            <div class="comment-item">
-                                <div class="comment-avatar">JD</div>
-                                <div class="comment-content">
-                                    <div class="comment-header"><span class="comment-author">Jane Doe</span><span class="comment-time">2 hours ago</span></div>
-                                    <p class="comment-text">Please verify the Q4 revenue figures on page 23.</p>
-                                </div>
-                            </div>
-                            <div class="comment-item">
-                                <div class="comment-avatar">MS</div>
-                                <div class="comment-content">
-                                    <div class="comment-header"><span class="comment-author">Mike Smith</span><span class="comment-time">5 hours ago</span></div>
-                                    <p class="comment-text">Looks good overall. Minor formatting issue on page 15.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="comment-input-wrapper">
-                            <textarea class="comment-input" placeholder="Add your comment..." id="commentInput" rows="2"></textarea>
-                            <button class="btn-primary btn-sm" id="addCommentBtn">Post Comment</button>
-                        </div>
-                    </div>
-
-                    <!-- Approval Checklist -->
-                    <div class="feature-card">
-                        <div class="feature-header">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                            <h4 class="feature-title">Approval Checklist</h4>
-                        </div>
-                        <div class="checklist" id="checklist">
-                            <label class="checkbox-item"><input type="checkbox" class="checkbox-input" checked><span class="checkbox-label">Content accuracy verified</span></label>
-                            <label class="checkbox-item"><input type="checkbox" class="checkbox-input" checked><span class="checkbox-label">Financial data cross-referenced</span></label>
-                            <label class="checkbox-item"><input type="checkbox" class="checkbox-input"><span class="checkbox-label">Legal compliance reviewed</span></label>
-                            <label class="checkbox-item"><input type="checkbox" class="checkbox-input"><span class="checkbox-label">Stakeholder approval obtained</span></label>
-                            <label class="checkbox-item"><input type="checkbox" class="checkbox-input"><span class="checkbox-label">Final formatting complete</span></label>
-                        </div>
-                        <div class="checklist-progress">
-                            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 40%"></div></div>
-                            <span class="progress-text" id="progressText">2 of 5 completed</span>
-                        </div>
-                    </div>
-
-                    <!-- Approval Workflow -->
-                    <div class="feature-card">
-                        <div class="feature-header">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                            <h4 class="feature-title">Approval Workflow</h4>
-                        </div>
-                        <div class="workflow-steps">
-                            <div class="workflow-step completed"><div class="step-indicator"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div class="step-content"><span class="step-title">Submitted</span><span class="step-user">John Anderson</span></div></div>
-                            <div class="workflow-step completed"><div class="step-indicator"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div class="step-content"><span class="step-title">Department Review</span><span class="step-user">Sarah Johnson</span></div></div>
-                            <div class="workflow-step active"><div class="step-indicator"><div class="pulse-dot"></div></div><div class="step-content"><span class="step-title">Manager Approval</span><span class="step-user">You</span></div></div>
-                            <div class="workflow-step"><div class="step-indicator"></div><div class="step-content"><span class="step-title">Executive Approval</span><span class="step-user">Pending</span></div></div>
-                            <div class="workflow-step"><div class="step-indicator"></div><div class="step-content"><span class="step-title">Final Publication</span><span class="step-user">Pending</span></div></div>
-                        </div>
-                    </div>
-
-                    <!-- Decision Actions -->
-                    <div class="feature-card decision-card">
-                        <div class="feature-header">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                            <h4 class="feature-title">Make Decision</h4>
-                        </div>
-                        <div class="decision-notes">
-                            <label for="decisionNotes" class="input-label">Decision Notes (Optional)</label>
-                            <textarea id="decisionNotes" class="decision-textarea" placeholder="Add any notes or conditions for your decision..." rows="3"></textarea>
-                        </div>
-                        <div class="decision-actions">
-                            <button class="btn-approve" id="approveBtn">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                                Approve Document
-                            </button>
-                            <button class="btn-reject" id="rejectBtn">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                                Reject Document
-                            </button>
-                            <button class="btn-secondary" id="requestChangesBtn">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                                Request Changes
-                            </button>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
-
-    <!-- Notification Modal -->
-    <div class="modal" id="notificationModal">
-        <div class="modal-content">
-            <div class="modal-icon" id="modalIcon"></div>
-            <h3 class="modal-title" id="modalTitle"></h3>
-            <p class="modal-message" id="modalMessage"></p>
-            <button class="btn-primary" id="modalCloseBtn">Close</button>
+            <span id="statusBadge" class="status-badge"><span class="status-dot"></span> pending</span>
+          </div>
         </div>
+
+        <div class="content-grid">
+          <section class="feature-card">
+            <div class="feature-header">
+              <div>
+                <p class="feature-title">AI summary</p>
+                <p class="feature-subtitle">Extracted context, keywords, and metadata.</p>
+              </div>
+              <span class="ai-badge"><i data-feather="cpu"></i>AI assisted</span>
+            </div>
+            <div id="summaryText" class="summary-content">
+              <p class="summary-paragraph">Loading summary...</p>
+            </div>
+          </section>
+
+          <section class="feature-card">
+            <div class="feature-header">
+              <div>
+                <p class="feature-title">Preview</p>
+                <p class="feature-subtitle">Open the source file or inspect the fallback preview pane.</p>
+              </div>
+              <button id="viewDocumentBtn" class="button" type="button"><i data-feather="eye"></i>View file</button>
+            </div>
+            <div class="preview-container">
+              <div class="preview-placeholder" id="previewPlaceholder">
+                <div>
+                  <i data-feather="file"></i>
+                  <p>Preview opens the original document in a new tab.</p>
+                </div>
+              </div>
+              <div class="history-list">
+                <div class="history-item"><strong>Review state</strong><span id="statusHint">Awaiting decision</span></div>
+                <div class="history-item"><strong>AI confidence</strong><span id="confidenceHint">Loaded after fetch</span></div>
+                <div class="history-item"><strong>Comment policy</strong><span>Required for change requests</span></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+
+      <aside class="review-layout">
+        <section class="feature-card decision-panel">
+          <div class="feature-header">
+            <div>
+              <p class="feature-title">Checklist</p>
+              <p class="feature-subtitle">Mark the review points before making a decision.</p>
+            </div>
+            <div class="badge"><i data-feather="shield"></i>Policy</div>
+          </div>
+          <div class="progress-shell">
+            <div class="panel-subtitle" style="margin-bottom:10px;"><span id="progressText">0 of 0 completed</span></div>
+            <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+          </div>
+          <div id="checklist" class="checklist">
+            <label class="check-item"><input class="checkbox-input" type="checkbox"><div class="check-copy"><strong>Identity validated</strong><span>Confirm the document owner and submission source.</span></div></label>
+            <label class="check-item"><input class="checkbox-input" type="checkbox"><div class="check-copy"><strong>Summary reviewed</strong><span>Compare the AI summary against the uploaded file content.</span></div></label>
+            <label class="check-item"><input class="checkbox-input" type="checkbox"><div class="check-copy"><strong>Key fields checked</strong><span>Validate amounts, dates, names, or other extracted values.</span></div></label>
+            <label class="check-item"><input class="checkbox-input" type="checkbox"><div class="check-copy"><strong>Policy cleared</strong><span>Confirm the document can move through the approval policy.</span></div></label>
+            <label class="check-item"><input class="checkbox-input" type="checkbox"><div class="check-copy"><strong>Decision ready</strong><span>Make sure the final action is consistent with the review notes.</span></div></label>
+          </div>
+        </section>
+
+        <section class="feature-card decision-panel">
+          <div class="feature-header">
+            <div>
+              <p class="feature-title">Decision notes</p>
+              <p class="feature-subtitle">Used for rejections and change requests.</p>
+            </div>
+          </div>
+          <textarea id="decisionNotes" class="decision-notes" rows="5" placeholder="Add notes for the submitter or reviewer..."></textarea>
+          <div class="action-stack">
+            <button id="approveBtn" class="button primary" type="button"><i data-feather="check-circle"></i>Approve</button>
+            <button id="rejectBtn" class="button danger" type="button"><i data-feather="x-circle"></i>Reject</button>
+            <button id="requestChangesBtn" class="button" type="button"><i data-feather="message-square"></i>Request changes</button>
+          </div>
+        </section>
+
+        <section class="feature-card decision-panel">
+          <div class="feature-header">
+            <div>
+              <p class="feature-title">Review comments</p>
+              <p class="feature-subtitle">Add internal notes for the decision trail.</p>
+            </div>
+          </div>
+          <div class="comments-container">
+            <div class="comment-item">
+              <div class="comment-avatar">AI</div>
+              <div class="comment-content"><div class="comment-header"><span class="comment-author">AI intake</span><span class="comment-time">Just now</span></div><p class="comment-text">The document is ready for manual verification.</p></div>
+            </div>
+          </div>
+          <div class="comment-input-wrapper">
+            <textarea id="commentInput" class="comment-input" rows="3" placeholder="Write an internal note..."></textarea>
+            <button id="addCommentBtn" class="button" type="button"><i data-feather="plus"></i>Add note</button>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </div>
+
+  <div class="modal" id="notificationModal">
+    <div class="modal-content">
+      <div class="modal-icon" id="modalIcon"></div>
+      <h3 class="modal-title" id="modalTitle"></h3>
+      <p class="modal-message" id="modalMessage"></p>
+      <button class="button primary" id="modalCloseBtn" type="button">Close</button>
     </div>
+  </div>
 
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const docId = urlParams.get('id');
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get('id');
 
-        if (!docId) {
-            alert("No document selected for review.");
-            window.location.href = "/admin/dashboard";
+    if (!docId) {
+      window.location.href = '/admin/dashboard';
+    }
+
+    const checklist = document.getElementById('checklist');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+
+    function updateProgress() {
+      const boxes = checklist.querySelectorAll('.checkbox-input');
+      const checked = Array.from(boxes).filter(box => box.checked).length;
+      const pct = Math.round((checked / boxes.length) * 100);
+      progressFill.style.width = `${pct}%`;
+      progressText.textContent = `${checked} of ${boxes.length} completed`;
+    }
+
+    checklist.addEventListener('change', updateProgress);
+
+    document.getElementById('addCommentBtn').addEventListener('click', () => {
+      const input = document.getElementById('commentInput');
+      const text = input.value.trim();
+      if (!text) return;
+      const container = document.querySelector('.comments-container');
+      const item = document.createElement('div');
+      item.className = 'comment-item';
+      item.innerHTML = `
+        <div class="comment-avatar">YO</div>
+        <div class="comment-content">
+          <div class="comment-header"><span class="comment-author">You</span><span class="comment-time">Just now</span></div>
+          <p class="comment-text">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+        </div>`;
+      container.appendChild(item);
+      input.value = '';
+    });
+
+    async function loadDocDetails() {
+      try {
+        const res = await fetch(`/admin/document/${docId}`, { credentials: 'include' });
+        if (!res.ok) {
+          window.location.href = '/admin/dashboard';
+          return;
+        }
+        const data = await res.json();
+        const doc = data.document;
+        if (!doc) {
+          window.location.href = '/admin/dashboard';
+          return;
         }
 
-        // Checklist progress
-        const checklist = document.getElementById('checklist');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
+        document.getElementById('documentTitle').textContent = doc.fileName;
+        document.getElementById('submittedDate').textContent = new Date(doc.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+        document.getElementById('submittedBy').textContent = doc.userId?.username || 'Unknown';
+        document.getElementById('fileSize').textContent = (doc.fileType || 'unknown').toUpperCase();
+        document.getElementById('statusBadge').textContent = String(doc.status || 'pending').replace(/_/g, ' ');
+        document.getElementById('statusBadge').className = `status-badge ${doc.status}`;
+        document.getElementById('statusHint').textContent = String(doc.status || 'pending').replace(/_/g, ' ');
+        document.getElementById('confidenceHint').textContent = `${doc.confidence || 92}% confidence`;
 
-        function updateProgress() {
-            const boxes = checklist.querySelectorAll('.checkbox-input');
-            const checked = Array.from(boxes).filter(b => b.checked).length;
-            const pct = Math.round((checked / boxes.length) * 100);
-            progressFill.style.width = pct + '%';
-            progressText.textContent = `${checked} of ${boxes.length} completed`;
+        const openFile = () => window.open(`/${doc.filePath}`, '_blank');
+        document.getElementById('viewDocumentBtn').onclick = openFile;
+        document.getElementById('previewPlaceholder').style.cursor = 'pointer';
+        document.getElementById('previewPlaceholder').onclick = openFile;
+        document.getElementById('drawerOpenLink');
+
+        const summaryTextEl = document.getElementById('summaryText');
+        const keywords = Array.isArray(doc.keywords) && doc.keywords.length
+          ? `
+            <div style="margin-top:18px;">
+              <h4 class="key-points-title">Extracted keywords</h4>
+              <ul class="key-points-list">
+                ${doc.keywords.map(keyword => `<li>${keyword}</li>`).join('')}
+              </ul>
+            </div>`
+          : '';
+        summaryTextEl.innerHTML = `
+          <p class="summary-paragraph">${doc.summary || 'No summary generated yet.'}</p>
+          ${keywords}
+          <div style="margin-top:18px;">
+            <h4 class="entities-title">Document metadata</h4>
+            <div class="entity-tags">
+              <span class="entity-tag">Type: ${doc.fileType?.toUpperCase() || 'Unknown'}</span>
+              <span class="entity-tag">Status: ${doc.status}</span>
+            </div>
+          </div>`;
+
+        const metaTags = [doc.fileType, doc.status, ...(Array.isArray(doc.keywords) ? doc.keywords.slice(0, 3) : [])].filter(Boolean);
+        document.querySelector('.history-list').insertAdjacentHTML('beforeend', `
+          <div class="history-item"><strong>AI tags</strong><span>${metaTags.join(' · ')}</span></div>`);
+      } catch (error) {
+        console.error('Load doc details failed', error);
+        window.location.href = '/admin/dashboard';
+      }
+    }
+
+    function showModal(type, title, message, onConfirm) {
+      const modal = document.getElementById('notificationModal');
+      const iconEl = document.getElementById('modalIcon');
+      const closeBtn = document.getElementById('modalCloseBtn');
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalMessage').textContent = message;
+
+      if (type === 'success') {
+        iconEl.className = 'modal-icon success';
+        iconEl.innerHTML = '<i data-feather="check-circle"></i>';
+      } else {
+        iconEl.className = 'modal-icon error';
+        iconEl.innerHTML = '<i data-feather="alert-circle"></i>';
+      }
+
+      modal.classList.add('active');
+      if (window.feather) feather.replace();
+
+      const handleClose = () => {
+        modal.classList.remove('active');
+        if (onConfirm) onConfirm();
+        closeBtn.removeEventListener('click', handleClose);
+      };
+
+      closeBtn.addEventListener('click', handleClose);
+    }
+
+    document.getElementById('notificationModal').addEventListener('click', event => {
+      if (event.target === document.getElementById('notificationModal')) {
+        document.getElementById('notificationModal').classList.remove('active');
+      }
+    });
+
+    document.getElementById('approveBtn').addEventListener('click', async () => {
+      try {
+        const res = await fetch(`/admin/approve/${docId}`, { method: 'POST', credentials: 'include' });
+        if (res.ok) {
+          showModal('success', 'Document approved', 'The document has been approved and archived in the audit trail.', () => {
+            window.location.href = '/admin/dashboard';
+          });
+        } else {
+          const data = await res.json();
+          showModal('error', 'Approval failed', data.message || 'Server error occurred during approval.');
         }
+      } catch (error) {
+        showModal('error', 'Approval failed', 'Network or server failure.');
+      }
+    });
 
-        checklist.addEventListener('change', updateProgress);
-
-        // Comment posting
-        document.getElementById('addCommentBtn').addEventListener('click', () => {
-            const input = document.getElementById('commentInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const container = document.querySelector('.comments-container');
-            const div = document.createElement('div');
-            div.className = 'comment-item';
-            div.style.animation = 'slideUp 0.3s ease both';
-            div.innerHTML = `
-                <div class="comment-avatar">YO</div>
-                <div class="comment-content">
-                    <div class="comment-header"><span class="comment-author">You</span><span class="comment-time">Just now</span></div>
-                    <p class="comment-text">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
-                </div>`;
-            container.appendChild(div);
-            input.value = '';
+    document.getElementById('rejectBtn').addEventListener('click', async () => {
+      const notes = document.getElementById('decisionNotes').value.trim();
+      try {
+        const res = await fetch(`/admin/reject/${docId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: notes }),
+          credentials: 'include'
         });
-
-        // Load document details
-        async function loadDocDetails() {
-            try {
-                const res = await fetch(`/admin/document/${docId}`, { credentials: "include" });
-                if (!res.ok) {
-                    alert("Failed to load document details.");
-                    window.location.href = "/admin/dashboard";
-                    return;
-                }
-                const data = await res.json();
-                const doc = data.document;
-
-                if (!doc) {
-                    alert("Document not found.");
-                    window.location.href = "/admin/dashboard";
-                    return;
-                }
-
-                document.getElementById('documentTitle').textContent = doc.fileName;
-                document.getElementById('submittedDate').textContent = new Date(doc.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-                document.getElementById('submittedBy').textContent = doc.userId?.username || "Unknown";
-                document.getElementById('fileSize').textContent = (doc.fileType || "unknown").toUpperCase();
-                
-                // Status badge
-                const statusBadge = document.getElementById('statusBadge');
-                statusBadge.textContent = doc.status.replace(/_/g, ' ');
-                statusBadge.className = `status-badge ${doc.status}`;
-
-                // View link
-                const viewBtn = document.getElementById('viewDocumentBtn');
-                if (viewBtn) {
-                    viewBtn.onclick = () => window.open(`/${doc.filePath}`, '_blank');
-                }
-                const previewPlaceholder = document.querySelector('.preview-placeholder');
-                if (previewPlaceholder) {
-                    previewPlaceholder.style.cursor = 'pointer';
-                    previewPlaceholder.onclick = () => window.open(`/${doc.filePath}`, '_blank');
-                }
-
-                // AI summary
-                const summaryTextEl = document.getElementById('summaryText');
-                if (summaryTextEl) {
-                    let keywordsHtml = '';
-                    if (doc.keywords && doc.keywords.length > 0) {
-                        keywordsHtml = `
-                            <div class="key-points" style="margin-top:20px;">
-                                <h4 class="key-points-title">Extracted Keywords</h4>
-                                <ul class="key-points-list">
-                                    ${doc.keywords.map(kw => `<li>${kw}</li>`).join('')}
-                                </ul>
-                            </div>
-                        `;
-                    }
-
-                    summaryTextEl.innerHTML = `
-                        <p class="summary-paragraph">${doc.summary || 'No summary generated.'}</p>
-                        ${keywordsHtml}
-                        <div class="extracted-entities" style="margin-top:20px;">
-                            <h4 class="entities-title">Document Metadata</h4>
-                            <div class="entity-tags">
-                                <span class="entity-tag">Type: ${doc.fileType?.toUpperCase() || 'Unknown'}</span>
-                                <span class="entity-tag">Status: ${doc.status}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-
-            } catch (err) {
-                console.error("Load doc details failed", err);
-                alert("An error occurred loading document details.");
-                window.location.href = "/admin/dashboard";
-            }
+        if (res.ok) {
+          showModal('success', 'Document rejected', 'The document has been rejected and the submitter has been notified.', () => {
+            window.location.href = '/admin/dashboard';
+          });
+        } else {
+          const data = await res.json();
+          showModal('error', 'Rejection failed', data.message || 'Server error occurred.');
         }
+      } catch (error) {
+        showModal('error', 'Rejection failed', 'Network or server failure.');
+      }
+    });
 
-        // Notification modals
-        function showModal(type, title, message, onConfirm) {
-            const modal = document.getElementById('notificationModal');
-            const iconEl = document.getElementById('modalIcon');
-            const closeBtn = document.getElementById('modalCloseBtn');
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalMessage').textContent = message;
-
-            if (type === 'success') {
-                iconEl.className = 'modal-icon success';
-                iconEl.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
-            } else {
-                iconEl.className = 'modal-icon error';
-                iconEl.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
-            }
-
-            modal.classList.add('active');
-
-            const handleClose = () => {
-                modal.classList.remove('active');
-                if (onConfirm) onConfirm();
-                closeBtn.removeEventListener('click', handleClose);
-            };
-
-            closeBtn.addEventListener('click', handleClose);
+    document.getElementById('requestChangesBtn').addEventListener('click', async () => {
+      const notes = document.getElementById('decisionNotes').value.trim();
+      if (!notes) {
+        showModal('error', 'Comment required', 'Please add a note before requesting changes.');
+        return;
+      }
+      try {
+        const res = await fetch(`/admin/request-changes/${docId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ comment: notes }),
+          credentials: 'include'
+        });
+        if (res.ok) {
+          showModal('success', 'Changes requested', 'The document owner has been notified of the requested changes.', () => {
+            window.location.href = '/admin/dashboard';
+          });
+        } else {
+          const data = await res.json();
+          showModal('error', 'Request failed', data.message || 'Server error occurred.');
         }
+      } catch (error) {
+        showModal('error', 'Request failed', 'Network or server failure.');
+      }
+    });
 
-        document.getElementById('notificationModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('notificationModal')) {
-                document.getElementById('notificationModal').classList.remove('active');
-            }
-        });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        document.getElementById('notificationModal').classList.remove('active');
+      }
+    });
 
-        // Approve action
-        document.getElementById('approveBtn').addEventListener('click', async () => {
-            try {
-                const res = await fetch(`/admin/approve/${docId}`, {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-                if (res.ok) {
-                    showModal('success', 'Document Approved', 'The document has been approved and marked as completed.', () => {
-                        window.location.href = "/admin/dashboard";
-                    });
-                } else {
-                    const data = await res.json();
-                    showModal('error', 'Approval Failed', data.message || 'Server error occurred during approval.');
-                }
-            } catch (err) {
-                showModal('error', 'Approval Failed', 'Network or server failure.');
-            }
-        });
-
-        // Reject action
-        document.getElementById('rejectBtn').addEventListener('click', async () => {
-            const notes = document.getElementById('decisionNotes').value.trim();
-            try {
-                const res = await fetch(`/admin/reject/${docId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ reason: notes }),
-                    credentials: 'include'
-                });
-                if (res.ok) {
-                    showModal('success', 'Document Rejected', 'The document has been rejected and the submitter has been notified.', () => {
-                        window.location.href = "/admin/dashboard";
-                    });
-                } else {
-                    const data = await res.json();
-                    showModal('error', 'Rejection Failed', data.message || 'Server error occurred.');
-                }
-            } catch (err) {
-                showModal('error', 'Rejection Failed', 'Network or server failure.');
-            }
-        });
-
-        // Request changes action
-        document.getElementById('requestChangesBtn').addEventListener('click', async () => {
-            const notes = document.getElementById('decisionNotes').value.trim();
-            if (!notes) {
-                showModal('error', 'Comment Required', 'Please add decision notes or comments specifying the required changes.');
-                return;
-            }
-            try {
-                const res = await fetch(`/admin/request-changes/${docId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ comment: notes }),
-                    credentials: 'include'
-                });
-                if (res.ok) {
-                    showModal('success', 'Changes Requested', 'The document owner has been notified of the requested changes.', () => {
-                        window.location.href = "/admin/dashboard";
-                    });
-                } else {
-                    const data = await res.json();
-                    showModal('error', 'Request Failed', data.message || 'Server error occurred.');
-                }
-            } catch (err) {
-                showModal('error', 'Request Failed', 'Network or server failure.');
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.getElementById('notificationModal').classList.remove('active');
-            }
-        });
-
-        loadDocDetails();
-    </script>
+    if (window.feather) feather.replace();
+    loadDocDetails();
+    updateProgress();
+  </script>
 </body>
 </html>

@@ -1,469 +1,273 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register — KMRL Document Intelligence</title>
-    <meta name="description" content="Create your KMRL AI-powered Document Management System account.">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            background: #081120;
-            opacity: 0;
-            animation: pageIn 0.6s ease 0.1s forwards;
-        }
-
-        @keyframes pageIn { to { opacity: 1; } }
-
-        .background-animation {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .background-animation span {
-            width: 20vmin;
-            height: 20vmin;
-            border-radius: 4vmin;
-            backface-visibility: hidden;
-            position: absolute;
-            animation: move linear infinite;
-            background: rgba(56, 189, 248, 0.07);
-        }
-
-        .background-animation span:nth-child(1) { color: #38bdf8; top: 68%; left: 77%; animation-duration: 35s; animation-delay: -2s; transform-origin: -15vw -1vh; box-shadow: -40vmin 0 5vmin currentColor; }
-        .background-animation span:nth-child(2) { color: #818cf8; top: 81%; left: 88%; animation-duration: 25s; animation-delay: -11s; transform-origin: -11vw 24vh; box-shadow: 40vmin 0 5.9vmin currentColor; }
-        .background-animation span:nth-child(3) { color: #22d3ee; top: 52%; left: 77%; animation-duration: 47s; animation-delay: -18s; transform-origin: 11vw 12vh; box-shadow: -40vmin 0 5.5vmin currentColor; }
-        .background-animation span:nth-child(4) { color: #8b5cf6; top: 51%; left: 21%; animation-duration: 24s; animation-delay: -32s; transform-origin: -16vw -1vh; box-shadow: 40vmin 0 5.5vmin currentColor; }
-        .background-animation span:nth-child(5) { color: #2563eb; top: 38%; left: 81%; animation-duration: 42s; animation-delay: -25s; transform-origin: -15vw 12vh; box-shadow: 40vmin 0 5.9vmin currentColor; }
-        .background-animation span:nth-child(6) { color: #38bdf8; top: 54%; left: 95%; animation-duration: 26s; animation-delay: -21s; transform-origin: -11vw 19vh; box-shadow: -40vmin 0 5.4vmin currentColor; }
-        .background-animation span:nth-child(7) { color: #818cf8; top: 73%; left: 7%; animation-duration: 47s; animation-delay: -26s; transform-origin: -17vw -11vh; box-shadow: -40vmin 0 5.2vmin currentColor; }
-
-        @keyframes move { 100% { transform: translate3d(0, 0, 1px) rotate(360deg); } }
-
-        .form-card {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(56, 189, 248, 0.15);
-            animation: cardIn 0.7s cubic-bezier(0.4,0,0.2,1) 0.2s both;
-        }
-
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(30px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .input-field {
-            width: 100%;
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(148, 163, 184, 0.15);
-            border-radius: 12px;
-            padding: 14px 16px;
-            color: #f8fafc;
-            font-size: 0.95rem;
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-            outline: none;
-        }
-
-        .input-field::placeholder { color: rgba(148, 163, 184, 0.4); }
-
-        .input-field:focus {
-            border-color: rgba(56, 189, 248, 0.55);
-            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.08), 0 0 20px rgba(37, 99, 235, 0.15);
-            background: rgba(15, 23, 42, 0.8);
-        }
-
-        .input-field.error {
-            border-color: rgba(251, 113, 133, 0.6);
-            box-shadow: 0 0 0 4px rgba(251, 113, 133, 0.08);
-            animation: shake 0.4s ease;
-        }
-
-        .input-field.success {
-            border-color: rgba(52, 211, 153, 0.5);
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
-        }
-
-        .error-msg {
-            color: #fb7185;
-            font-size: 0.76rem;
-            margin-top: 6px;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Password strength indicator */
-        .strength-bar {
-            height: 4px;
-            border-radius: 999px;
-            background: rgba(148, 163, 184, 0.15);
-            margin-top: 8px;
-            overflow: hidden;
-        }
-
-        .strength-bar .fill {
-            height: 100%;
-            border-radius: inherit;
-            transition: width 0.4s ease, background 0.4s ease;
-            width: 0;
-        }
-
-        .strength-label {
-            font-size: 0.72rem;
-            margin-top: 4px;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        .match-indicator {
-            font-size: 0.72rem;
-            margin-top: 6px;
-            font-weight: 600;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #2563eb, #38bdf8);
-            color: white;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .submit-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s ease;
-        }
-
-        .submit-btn:hover::before { transform: translateX(100%); }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 18px 40px rgba(37, 99, 235, 0.35);
-        }
-
-        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-        .submit-btn .spinner { display: none; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; margin: 0 auto; }
-        .submit-btn.loading .btn-text { display: none; }
-        .submit-btn.loading .spinner { display: block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .social-btn {
-            display: flex; align-items: center; justify-content: center;
-            width: 48px; height: 48px; border-radius: 14px;
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(148, 163, 184, 0.12);
-            transition: all 0.3s ease; cursor: pointer;
-        }
-
-        .social-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            border-color: rgba(56, 189, 248, 0.35);
-            background: rgba(30, 41, 59, 0.7);
-            box-shadow: 0 12px 28px rgba(8, 145, 178, 0.12);
-        }
-
-        .back-link {
-            display: inline-flex; align-items: center; gap: 6px;
-            color: rgba(148, 163, 184, 0.7); font-size: 0.85rem;
-            text-decoration: none; transition: all 0.3s ease;
-        }
-        .back-link:hover { color: #38bdf8; transform: translateX(-3px); }
-
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #081120; }
-        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 999px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — Document Intelligence</title>
+  <meta name="description" content="Create your enterprise document intelligence account.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/enterprise.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="/assets/js/enterprise.js"></script>
 </head>
-<body class="text-white">
-    <div class="background-animation">
-        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-    </div>
+<body>
+  <main class="auth-shell min-h-screen py-6 lg:py-10">
+    <div class="auth-grid items-stretch">
+      <section class="auth-visual reveal hidden overflow-hidden rounded-[32px] p-8 lg:block">
+        <div class="space-y-10">
+          <div>
+            <div class="hero-kicker">Enterprise Onboarding</div>
+            <h1 class="hero-title mt-6 max-w-xl leading-[0.92]">Create an account for your premium AI document workspace.</h1>
+            <p class="hero-copy mt-5 max-w-lg text-white/70">Bring OCR, semantic search, approvals, analytics, and audit trails into one elegant enterprise platform.</p>
+          </div>
 
-    <div class="min-h-screen flex flex-col items-center justify-center p-4 relative z-10">
-        <a href="/" class="back-link mb-6" style="animation: cardIn 0.5s ease 0.1s both;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            Back to Home
-        </a>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="summary-card"><p class="caption">Setup time</p><p class="text-2xl font-bold">Under 5 min</p></div>
+            <div class="summary-card"><p class="caption">Workspace roles</p><p class="text-2xl font-bold">Flexible</p></div>
+            <div class="summary-card"><p class="caption">Security</p><p class="text-2xl font-bold">Enterprise</p></div>
+            <div class="summary-card"><p class="caption">Automation</p><p class="text-2xl font-bold">Ready</p></div>
+          </div>
 
-        <div class="w-full max-w-md">
-            <div class="form-card rounded-2xl shadow-2xl p-8 space-y-5">
-                <div class="text-center">
-                    <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-white">
-                            <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M2 7L12 12L22 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M12 22V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <h1 class="text-2xl font-bold tracking-tight">Create Your Account</h1>
-                    <p class="text-slate-400 mt-2 text-sm">Get started with intelligent document management.</p>
-                </div>
-
-                <form id="registerForm" class="space-y-4" action="/register" method="POST" novalidate>
-                    <div id="globalError" class="hidden bg-rose-500/15 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-sm text-center"></div>
-                    <div>
-                        <label for="fullName" class="block text-sm font-medium text-slate-300 mb-2">Full Name</label>
-                        <input id="fullName" name="username" type="text" autocomplete="name" required
-                            class="input-field" placeholder="John Doe">
-                        <p id="nameError" class="error-msg">Please enter your full name.</p>
-                    </div>
-                    
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
-                        <input id="email" name="email" type="email" autocomplete="email" required
-                            class="input-field" placeholder="you@company.com">
-                        <p id="emailError" class="error-msg">Please enter a valid email address.</p>
-                    </div>
-
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-slate-300 mb-2">Password</label>
-                        <input id="password" name="password" type="password" autocomplete="new-password" required
-                            class="input-field" placeholder="••••••••">
-                        <div class="strength-bar"><div id="strengthFill" class="fill"></div></div>
-                        <p id="strengthLabel" class="strength-label text-slate-500">Enter a password</p>
-                        <p id="passwordError" class="error-msg">Password is too weak. Make it at least 6 characters.</p>
-                    </div>
-
-                    <div>
-                        <label for="confirm-password" class="block text-sm font-medium text-slate-300 mb-2">Confirm Password</label>
-                        <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required
-                            class="input-field" placeholder="••••••••">
-                        <p id="matchIndicator" class="match-indicator"></p>
-                        <p id="confirmError" class="error-msg">Passwords do not match.</p>
-                    </div>
-
-                    <button type="submit" id="submitBtn" class="submit-btn" style="margin-top: 8px;">
-                        <span class="btn-text">Create Account</span>
-                        <div class="spinner"></div>
-                    </button>
-                </form>
-
-                <div class="flex items-center justify-center space-x-3">
-                    <span class="h-px flex-1 bg-slate-700/50"></span>
-                    <span class="text-slate-500 font-normal text-sm">or continue with</span>
-                    <span class="h-px flex-1 bg-slate-700/50"></span>
-                </div>
-
-                <div class="flex justify-center space-x-4">
-                    <button class="social-btn" aria-label="Sign up with Google">
-                        <svg class="w-5 h-5" viewBox="0 0 48 48">
-                            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C42.021,35.596,44,30.138,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                        </svg>
-                    </button>
-                    <button class="social-btn" aria-label="Sign up with GitHub">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.378.203 2.398.1 2.65.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                    <button class="social-btn" aria-label="Sign up with Facebook">
-                        <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
-                        </svg>
-                    </button>
-                </div>
-                
-                <p class="text-center text-slate-400 text-sm">
-                    Already have an account? 
-                    <a href="/login" class="font-medium text-blue-400 hover:text-cyan-300 transition duration-300">Sign in</a>
-                </p>
+          <div class="hero-card">
+            <p class="kicker mb-4">What you get</p>
+            <div class="space-y-3 text-sm text-white/65">
+              <div class="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3"><span>AI summaries</span><span class="badge approved">Included</span></div>
+              <div class="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3"><span>Approval workflow</span><span class="badge pending">Live</span></div>
+              <div class="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3"><span>Audit logging</span><span class="badge">Enabled</span></div>
             </div>
+          </div>
         </div>
+      </section>
+
+      <section class="form-card reveal mx-auto w-full max-w-xl rounded-[32px] p-6 sm:p-8 lg:p-10">
+        <div class="flex items-center justify-between">
+          <a href="/" class="inline-flex items-center gap-2 text-white/55 transition hover:text-white">
+            <i data-feather="arrow-left" class="h-4 w-4"></i>
+            Back to home
+          </a>
+          <span class="badge">Secure onboarding</span>
+        </div>
+
+        <div class="mt-10 space-y-3">
+          <div class="hero-kicker">Create account</div>
+          <h2 class="dashboard-title text-[clamp(2rem,4vw,3rem)] leading-[0.95]">Start your enterprise workspace.</h2>
+          <p class="body-copy max-w-md">Create an account to manage documents with AI-driven workflows, premium UX, and enterprise-grade controls.</p>
+        </div>
+
+        <form id="registerForm" class="mt-10 space-y-5" action="/register" method="POST" novalidate>
+          <div id="globalError" class="hidden rounded-2xl border border-[rgba(255,90,95,0.3)] bg-[rgba(255,90,95,0.08)] px-4 py-3 text-sm text-danger"></div>
+
+          <div>
+            <label for="fullName" class="mb-2 block text-sm font-semibold text-white/75">Full name</label>
+            <input id="fullName" name="username" type="text" autocomplete="name" required class="input-field" placeholder="John Doe">
+            <p id="nameError" class="caption mt-2 hidden text-danger">Please enter your full name.</p>
+          </div>
+
+          <div>
+            <label for="email" class="mb-2 block text-sm font-semibold text-white/75">Email address</label>
+            <input id="email" name="email" type="email" autocomplete="email" required class="input-field" placeholder="you@company.com">
+            <p id="emailError" class="caption mt-2 hidden text-danger">Please enter a valid email address.</p>
+          </div>
+
+          <div>
+            <label for="password" class="mb-2 block text-sm font-semibold text-white/75">Password</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" required class="input-field" placeholder="At least 8 characters">
+            <div class="strength-bar mt-3"><div id="strengthFill" class="fill"></div></div>
+            <p id="strengthLabel" class="strength-label text-white/40">Enter a password</p>
+            <p id="passwordError" class="caption mt-2 hidden text-danger">Password is too weak.</p>
+          </div>
+
+          <div>
+            <label for="confirm-password" class="mb-2 block text-sm font-semibold text-white/75">Confirm password</label>
+            <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required class="input-field" placeholder="Repeat your password">
+            <p id="matchIndicator" class="match-indicator"></p>
+            <p id="confirmError" class="caption mt-2 hidden text-danger">Passwords do not match.</p>
+          </div>
+
+          <button type="submit" id="submitBtn" class="submit-btn magnetic w-full">
+            <span class="btn-text">Create account</span>
+            <span class="spinner"></span>
+          </button>
+        </form>
+
+        <div class="my-8 flex items-center gap-3">
+          <span class="h-px flex-1 bg-white/8"></span>
+          <span class="text-xs uppercase tracking-[0.28em] text-white/35">or continue with</span>
+          <span class="h-px flex-1 bg-white/8"></span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <button class="icon-button h-12 w-full rounded-2xl" type="button" aria-label="Sign up with Google"><i data-feather="chrome"></i></button>
+          <button class="icon-button h-12 w-full rounded-2xl" type="button" aria-label="Sign up with GitHub"><i data-feather="github"></i></button>
+          <button class="icon-button h-12 w-full rounded-2xl" type="button" aria-label="Sign up with Microsoft"><i data-feather="grid"></i></button>
+        </div>
+
+        <p class="mt-8 text-center text-sm text-white/55">
+          Already have an account?
+          <a href="/login" class="font-semibold text-white transition hover:text-[#BFD4FF]">Sign in</a>
+        </p>
+      </section>
     </div>
+  </main>
 
-    <script>
-        const form = document.getElementById('registerForm');
-        const nameInput = document.getElementById('fullName');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const confirmInput = document.getElementById('confirm-password');
-        const submitBtn = document.getElementById('submitBtn');
-        const strengthFill = document.getElementById('strengthFill');
-        const strengthLabel = document.getElementById('strengthLabel');
-        const matchIndicator = document.getElementById('matchIndicator');
+  <script>
+    if (window.feather) feather.replace();
 
-        function validateEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const form = document.getElementById('registerForm');
+    const nameInput = document.getElementById('fullName');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm-password');
+    const submitBtn = document.getElementById('submitBtn');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthLabel = document.getElementById('strengthLabel');
+    const matchIndicator = document.getElementById('matchIndicator');
+    const globalError = document.getElementById('globalError');
+
+    const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const getStrength = pw => {
+      let score = 0;
+      if (pw.length >= 8) score += 1;
+      if (pw.length >= 12) score += 1;
+      if (/[A-Z]/.test(pw)) score += 1;
+      if (/[0-9]/.test(pw)) score += 1;
+      if (/[^A-Za-z0-9]/.test(pw)) score += 1;
+      return score;
+    };
+
+    const showError = (input, errorEl) => {
+      input.classList.add('error');
+      errorEl.classList.remove('hidden');
+    };
+
+    const clearError = (input, errorEl) => {
+      input.classList.remove('error');
+      errorEl.classList.add('hidden');
+    };
+
+    const updateStrength = () => {
+      const score = getStrength(passwordInput.value);
+      const levels = [
+        { width: '0%', color: 'transparent', label: 'Enter a password' },
+        { width: '20%', color: '#FF5A5F', label: 'Very weak' },
+        { width: '40%', color: '#FFC857', label: 'Weak' },
+        { width: '60%', color: '#FFC857', label: 'Fair' },
+        { width: '80%', color: '#00D084', label: 'Strong' },
+        { width: '100%', color: '#8A5CFF', label: 'Very strong' }
+      ];
+      const level = passwordInput.value.length === 0 ? levels[0] : levels[Math.min(score, 5)];
+      strengthFill.style.width = level.width;
+      strengthFill.style.background = level.color;
+      strengthLabel.textContent = level.label;
+      strengthLabel.style.color = level.color === 'transparent' ? '#64748b' : level.color;
+    };
+
+    const checkMatch = () => {
+      const pw = passwordInput.value;
+      const cpw = confirmInput.value;
+
+      if (!cpw) {
+        matchIndicator.style.display = 'none';
+        confirmInput.classList.remove('success', 'error');
+        return;
+      }
+
+      matchIndicator.style.display = 'block';
+      if (pw === cpw) {
+        matchIndicator.textContent = '✓ Passwords match';
+        matchIndicator.style.color = '#00D084';
+        confirmInput.classList.add('success');
+        confirmInput.classList.remove('error');
+      } else {
+        matchIndicator.textContent = '✗ Passwords do not match';
+        matchIndicator.style.color = '#FF5A5F';
+        confirmInput.classList.remove('success');
+      }
+    };
+
+    passwordInput.addEventListener('input', () => {
+      clearError(passwordInput, document.getElementById('passwordError'));
+      globalError.classList.add('hidden');
+      updateStrength();
+      checkMatch();
+    });
+
+    confirmInput.addEventListener('input', () => {
+      clearError(confirmInput, document.getElementById('confirmError'));
+      globalError.classList.add('hidden');
+      checkMatch();
+    });
+
+    nameInput.addEventListener('input', () => {
+      clearError(nameInput, document.getElementById('nameError'));
+      globalError.classList.add('hidden');
+    });
+
+    emailInput.addEventListener('input', () => {
+      clearError(emailInput, document.getElementById('emailError'));
+      globalError.classList.add('hidden');
+    });
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      let valid = true;
+
+      if (!nameInput.value.trim()) {
+        showError(nameInput, document.getElementById('nameError'));
+        valid = false;
+      }
+
+      if (!validateEmail(emailInput.value.trim())) {
+        showError(emailInput, document.getElementById('emailError'));
+        valid = false;
+      }
+
+      if (getStrength(passwordInput.value) < 2) {
+        showError(passwordInput, document.getElementById('passwordError'));
+        valid = false;
+      }
+
+      if (passwordInput.value !== confirmInput.value) {
+        showError(confirmInput, document.getElementById('confirmError'));
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      const body = new URLSearchParams(new FormData(form)).toString();
+
+      fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        },
+        body
+      })
+      .then(async response => {
+        const isJson = response.headers.get('content-type')?.includes('application/json');
+        const data = isJson ? await response.json() : null;
+
+        if (!response.ok) {
+          throw new Error(data?.message || 'Registration failed. Please try again.');
         }
 
-        function getStrength(pw) {
-            let score = 0;
-            if (pw.length >= 6) score++;
-            if (pw.length >= 10) score++;
-            if (/[A-Z]/.test(pw)) score++;
-            if (/[0-9]/.test(pw)) score++;
-            if (/[^A-Za-z0-9]/.test(pw)) score++;
-            return score;
-        }
-
-        passwordInput.addEventListener('input', function() {
-            const pw = this.value;
-            const score = getStrength(pw);
-            const levels = [
-                { width: '0%', color: 'transparent', label: 'Enter a password', labelColor: '#64748b' },
-                { width: '20%', color: '#fb7185', label: 'Very weak', labelColor: '#fb7185' },
-                { width: '40%', color: '#fb923c', label: 'Weak', labelColor: '#fb923c' },
-                { width: '60%', color: '#fbbf24', label: 'Fair', labelColor: '#fbbf24' },
-                { width: '80%', color: '#34d399', label: 'Strong', labelColor: '#34d399' },
-                { width: '100%', color: '#22d3ee', label: 'Very strong', labelColor: '#22d3ee' }
-            ];
-            const level = pw.length === 0 ? levels[0] : levels[score];
-            strengthFill.style.width = level.width;
-            strengthFill.style.background = level.color;
-            strengthLabel.textContent = level.label;
-            strengthLabel.style.color = level.labelColor;
-
-            checkMatch();
-        });
-
-        function checkMatch() {
-            const pw = passwordInput.value;
-            const cpw = confirmInput.value;
-            if (!cpw) {
-                matchIndicator.style.display = 'none';
-                confirmInput.classList.remove('success', 'error');
-                return;
-            }
-            matchIndicator.style.display = 'block';
-            if (pw === cpw) {
-                matchIndicator.textContent = '✓ Passwords match';
-                matchIndicator.style.color = '#34d399';
-                confirmInput.classList.add('success');
-                confirmInput.classList.remove('error');
-            } else {
-                matchIndicator.textContent = '✗ Passwords do not match';
-                matchIndicator.style.color = '#fb7185';
-                confirmInput.classList.remove('success');
-            }
-        }
-
-        confirmInput.addEventListener('input', checkMatch);
-
-        function showError(input, errorEl) {
-            input.classList.add('error');
-            errorEl.style.display = 'block';
-            setTimeout(() => input.classList.remove('error'), 500);
-        }
-
-        function clearError(input, errorEl) {
-            input.classList.remove('error');
-            errorEl.style.display = 'none';
-        }
-
-        const globalError = document.getElementById('globalError');
-
-        nameInput.addEventListener('input', () => {
-            clearError(nameInput, document.getElementById('nameError'));
-            globalError.classList.add('hidden');
-        });
-        emailInput.addEventListener('input', () => {
-            clearError(emailInput, document.getElementById('emailError'));
-            globalError.classList.add('hidden');
-        });
-        passwordInput.addEventListener('input', () => {
-            clearError(passwordInput, document.getElementById('passwordError'));
-            globalError.classList.add('hidden');
-        });
-        confirmInput.addEventListener('input', () => {
-            clearError(confirmInput, document.getElementById('confirmError'));
-            globalError.classList.add('hidden');
-        });
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            let valid = true;
-
-            if (!nameInput.value.trim()) {
-                showError(nameInput, document.getElementById('nameError'));
-                valid = false;
-            }
-
-            if (!validateEmail(emailInput.value.trim())) {
-                showError(emailInput, document.getElementById('emailError'));
-                valid = false;
-            }
-
-            if (getStrength(passwordInput.value) < 2) {
-                showError(passwordInput, document.getElementById('passwordError'));
-                valid = false;
-            }
-
-            if (passwordInput.value !== confirmInput.value) {
-                showError(confirmInput, document.getElementById('confirmError'));
-                valid = false;
-            }
-
-            if (!valid) return;
-
-            submitBtn.classList.add('loading');
-            submitBtn.disabled = true;
-            globalError.classList.add('hidden');
-
-            const formData = new URLSearchParams(new FormData(form));
-
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Accept': 'application/json'
-                },
-                body: formData.toString()
-            })
-            .then(async response => {
-                const isJson = response.headers.get('content-type')?.includes('application/json');
-                const data = isJson ? await response.json() : null;
-
-                if (!response.ok) {
-                    throw new Error(data?.message || 'Registration failed. Please try again.');
-                }
-
-                if (data && data.redirect) {
-                    window.location.href = data.redirect;
-                } else {
-                    window.location.href = '/login';
-                }
-            })
-            .catch(error => {
-                submitBtn.classList.remove('loading');
-                submitBtn.disabled = false;
-                globalError.textContent = error.message;
-                globalError.classList.remove('hidden');
-                
-                // Shake globalError
-                globalError.style.animation = 'none';
-                globalError.offsetHeight; // trigger reflow
-                globalError.style.animation = 'shake 0.4s ease';
-            });
-        });
-    </script>
+        window.location.href = data?.redirect || '/login';
+      })
+      .catch(error => {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+        globalError.textContent = error.message;
+        globalError.classList.remove('hidden');
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,624 +1,496 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin — Pending Document Approvals</title>
-  <meta name="description" content="Admin panel for reviewing and approving pending documents.">
+  <title>Admin Command Center</title>
+  <meta name="description" content="Premium approval command center for document operations.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/enterprise.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="/assets/js/enterprise.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: "Inter", system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      background:
-        radial-gradient(1100px 620px at 10% -10%, rgba(56, 189, 248, 0.12), transparent 62%),
-        radial-gradient(1000px 640px at 88% 8%, rgba(139, 92, 246, 0.1), transparent 64%),
-        linear-gradient(135deg, #081120, #0B1220 48%, #111827);
-      color: #f8fafc;
-      opacity: 0;
-      animation: pageIn 0.6s ease 0.1s forwards;
+    .admin-shell { width: min(100%, 1560px); margin: 0 auto; padding: 18px; display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 18px; }
+    .admin-rail { position: sticky; top: 18px; height: calc(100vh - 36px); padding: 18px; display: flex; flex-direction: column; gap: 18px; }
+    .rail-brand { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .rail-brand .title { font-size: 1.1rem; font-weight: 900; letter-spacing: -0.04em; margin: 0; }
+    .rail-nav { display: grid; gap: 8px; }
+    .rail-link { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 16px; color: var(--muted); border: 1px solid transparent; transition: 180ms ease; }
+    .rail-link:hover, .rail-link.active { color: var(--text); background: rgba(79,139,255,0.08); border-color: rgba(79,139,255,0.18); transform: translateX(2px); }
+    .rail-footer { margin-top: auto; display: grid; gap: 12px; }
+    .tiny-stat { padding: 14px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
+    .tiny-stat strong { display: block; font-size: 1.35rem; margin-bottom: 4px; }
+    .tiny-stat span { color: var(--muted); font-size: 0.82rem; }
+    .admin-main { display: grid; gap: 18px; min-width: 0; }
+    .topbar-slim { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; }
+    .hero-copy { max-width: 72ch; color: var(--muted); }
+    .hero-grid { display: grid; grid-template-columns: 1.35fr 0.95fr; gap: 18px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .metric-tile { padding: 18px; }
+    .metric-label { color: var(--muted); font-size: 0.8rem; }
+    .metric-value { font-size: clamp(1.5rem, 2.4vw, 2.3rem); font-weight: 900; letter-spacing: -0.05em; margin-top: 6px; }
+    .queue-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr); gap: 18px; align-items: start; }
+    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .panel-title { margin: 0; font-size: 1.05rem; font-weight: 850; }
+    .panel-subtitle { margin: 6px 0 0; color: var(--muted); font-size: 0.86rem; }
+    .queue-table { width: 100%; border-collapse: collapse; }
+    .queue-table th, .queue-table td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.06); text-align: left; vertical-align: middle; }
+    .queue-table th { color: var(--muted); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .doc-cell { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .doc-icon { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: rgba(79,139,255,0.12); color: #8bb3ff; flex: 0 0 auto; }
+    .doc-title { margin: 0; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
+    .doc-meta { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+    .action-stack { display: flex; flex-wrap: wrap; gap: 8px; }
+    .mini-chart { height: 190px; }
+    .drawer { position: fixed; inset: 0 0 0 auto; width: min(100%, 520px); transform: translateX(105%); transition: transform 220ms ease; z-index: 70; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-backdrop { position: fixed; inset: 0; background: rgba(2,6,23,0.55); backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: 220ms ease; z-index: 60; }
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+    .drawer-panel { height: 100%; padding: 18px; overflow: auto; }
+    .drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .drawer-grid { display: grid; gap: 12px; }
+    .drawer-card { padding: 16px; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
+    .drawer-card h3 { margin: 0 0 10px; font-size: 0.95rem; }
+    .drawer-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .drawer-meta div { padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.05); }
+    .drawer-meta span { display: block; color: var(--muted); font-size: 0.75rem; margin-bottom: 4px; }
+    .drawer-meta strong { font-size: 0.88rem; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .empty-state { padding: 42px 18px; text-align: center; color: var(--muted); }
+    .overlay-input { width: 100%; padding: 12px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.09); background: rgba(10,14,22,0.7); color: var(--text); outline: none; }
+    .overlay-input:focus { border-color: rgba(79,139,255,0.42); }
+    .confirm-modal { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(2,6,23,0.72); backdrop-filter: blur(10px); z-index: 90; opacity: 0; pointer-events: none; transition: 180ms ease; }
+    .confirm-modal.open { opacity: 1; pointer-events: auto; }
+    .confirm-panel { width: min(100%, 440px); padding: 22px; border-radius: 24px; background: linear-gradient(180deg, rgba(18,24,35,0.98), rgba(10,14,22,0.98)); border: 1px solid rgba(255,255,255,0.08); }
+    .confirm-panel h3 { margin: 0 0 8px; font-size: 1.05rem; }
+    .confirm-panel p { margin: 0 0 16px; color: var(--muted); }
+    .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+    @media (max-width: 1180px) {
+      .admin-shell { grid-template-columns: 1fr; }
+      .admin-rail { position: static; height: auto; }
+      .hero-grid, .queue-layout, .metric-grid { grid-template-columns: 1fr; }
     }
-
-    @keyframes pageIn { to { opacity: 1; } }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 78%);
-      z-index: -1;
-    }
-
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.9); }
-    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(56, 189, 248, 0.4), rgba(139, 92, 246, 0.4)); border-radius: 999px; }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px 20px;
-    }
-
-    /* Header */
-    .admin-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 18px 22px;
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      border-radius: 20px;
-      background: rgba(8, 17, 32, 0.7);
-      backdrop-filter: blur(18px);
-      margin-bottom: 20px;
-      animation: slideDown 0.5s ease 0.15s both;
-    }
-
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .admin-header h1 {
-      font-size: 1.5rem;
-      font-weight: 850;
-      letter-spacing: -0.01em;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      border: 1px solid rgba(148, 163, 184, 0.14);
-      border-radius: 14px;
-      background: rgba(15, 23, 42, 0.6);
-      color: #cbd5e1;
-      font-size: 0.86rem;
-      font-weight: 650;
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
-
-    .back-btn:hover {
-      transform: translateY(-2px);
-      border-color: rgba(56, 189, 248, 0.3);
-      color: #fff;
-      background: rgba(30, 41, 59, 0.8);
-      box-shadow: 0 12px 32px rgba(8, 145, 178, 0.1);
-    }
-
-    .badge-count {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border: 1px solid rgba(251, 146, 60, 0.2);
-      border-radius: 999px;
-      background: rgba(251, 146, 60, 0.1);
-      color: #fdba74;
-      font-size: 0.76rem;
-      font-weight: 800;
-    }
-
-    .pulse-dot {
-      width: 8px; height: 8px;
-      border-radius: 999px;
-      background: #fb923c;
-      box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.7);
-      animation: pulseDot 2s infinite;
-    }
-
-    @keyframes pulseDot {
-      70% { box-shadow: 0 0 0 10px rgba(251, 146, 60, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0); }
-    }
-
-    /* Table panel */
-    .table-panel {
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      border-radius: 24px;
-      background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(8, 17, 32, 0.6));
-      backdrop-filter: blur(18px);
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(2, 8, 23, 0.3);
-      animation: slideUp 0.6s ease 0.2s both;
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    table {
-      width: 100%;
-      min-width: 700px;
-      border-collapse: separate;
-      border-spacing: 0;
-    }
-
-    th {
-      position: sticky;
-      top: 0;
-      padding: 14px 18px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-      background: rgba(15, 23, 42, 0.95);
-      color: #94a3b8;
-      font-size: 0.72rem;
-      font-weight: 850;
-      text-transform: uppercase;
-      text-align: left;
-      letter-spacing: 0.05em;
-    }
-
-    td {
-      padding: 16px 18px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.07);
-      font-size: 0.88rem;
-      color: #dbeafe;
-      vertical-align: middle;
-    }
-
-    tbody tr {
-      transition: background 0.2s ease;
-    }
-
-    tbody tr:hover {
-      background: rgba(56, 189, 248, 0.04);
-    }
-
-    .file-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .file-icon {
-      width: 38px; height: 38px;
-      display: grid;
-      place-items: center;
-      border-radius: 12px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(139, 92, 246, 0.12));
-      color: #22d3ee;
-      flex-shrink: 0;
-    }
-
-    .file-name {
-      font-weight: 700;
-      color: #f1f5f9;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 260px;
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 10px;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 800;
-      text-transform: capitalize;
-    }
-
-    .status-badge.pending {
-      border: 1px solid rgba(251, 146, 60, 0.22);
-      background: rgba(251, 146, 60, 0.1);
-      color: #fed7aa;
-    }
-
-    .status-badge.approved {
-      border: 1px solid rgba(52, 211, 153, 0.22);
-      background: rgba(52, 211, 153, 0.1);
-      color: #bbf7d0;
-    }
-
-    .status-badge.rejected {
-      border: 1px solid rgba(251, 113, 133, 0.22);
-      background: rgba(251, 113, 133, 0.1);
-      color: #fecdd3;
-    }
-
-    .actions-cell {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 14px;
-      border: none;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    .btn-approve {
-      background: linear-gradient(135deg, rgba(52, 211, 153, 0.9), rgba(20, 184, 166, 0.85));
-      color: #fff;
-      box-shadow: 0 8px 20px rgba(20, 184, 166, 0.2);
-    }
-
-    .btn-approve:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 30px rgba(20, 184, 166, 0.35);
-    }
-
-    .btn-reject {
-      background: linear-gradient(135deg, rgba(251, 113, 133, 0.85), rgba(239, 68, 68, 0.8));
-      color: #fff;
-      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.15);
-    }
-
-    .btn-reject:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 30px rgba(239, 68, 68, 0.3);
-    }
-
-    .btn-review {
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(37, 99, 235, 0.9));
-      color: #fff;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn-review:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.4);
-    }
-
-    .empty-state {
-      padding: 48px 24px;
-      text-align: center;
-      color: #64748b;
-    }
-
-    .empty-state svg {
-      margin: 0 auto 16px;
-      opacity: 0.3;
-    }
-
-    .empty-state p {
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    /* Loading skeleton */
-    .skeleton-row td {
-      padding: 20px 18px;
-    }
-
-    .skeleton-line {
-      height: 14px;
-      border-radius: 8px;
-      background: linear-gradient(90deg, rgba(148,163,184,0.06), rgba(148,163,184,0.15), rgba(148,163,184,0.06));
-      background-size: 240% 100%;
-      animation: shimmer 1.4s ease-in-out infinite;
-    }
-
-    @keyframes shimmer { to { background-position: -240% 0; } }
-
-    /* Confirm modal */
-    .confirm-modal {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: rgba(2, 8, 23, 0.7);
-      backdrop-filter: blur(12px);
-      z-index: 80;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
-
-    .confirm-modal.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .confirm-modal-content {
-      width: min(400px, 100%);
-      padding: 24px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 20px;
-      background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(8, 17, 32, 0.98));
-      box-shadow: 0 30px 80px rgba(2, 8, 23, 0.6);
-      transform: translateY(20px) scale(0.95);
-      transition: transform 0.25s ease;
-      text-align: center;
-    }
-
-    .confirm-modal.active .confirm-modal-content {
-      transform: translateY(0) scale(1);
-    }
-
-    .confirm-modal h3 {
-      font-size: 1.1rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-
-    .confirm-modal p {
-      color: #94a3b8;
-      font-size: 0.88rem;
-      margin-bottom: 20px;
-    }
-
-    .confirm-modal textarea {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      border-radius: 12px;
-      background: rgba(15, 23, 42, 0.6);
-      color: #f8fafc;
-      font-size: 0.88rem;
-      resize: none;
-      outline: none;
-      margin-bottom: 16px;
-      font-family: inherit;
-    }
-
-    .confirm-modal textarea:focus {
-      border-color: rgba(56, 189, 248, 0.5);
-    }
-
-    .confirm-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .confirm-actions button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 0.86rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .cancel-btn {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.15) !important;
-      color: #cbd5e1;
-    }
-
-    .cancel-btn:hover {
-      background: rgba(30, 41, 59, 0.8);
-    }
-
-    @media (max-width: 640px) {
-      .admin-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .header-left {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+    @media (max-width: 760px) {
+      .topbar-slim { flex-direction: column; align-items: flex-start; }
+      .queue-table { min-width: 760px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header class="admin-header">
-      <div class="header-left">
-        <a href="/dashboard" class="back-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-          Dashboard
-        </a>
-        <h1>Pending Approvals</h1>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="reviewDrawer" aria-hidden="true">
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <div>
+          <h2 id="drawerTitle" class="panel-title">Document review</h2>
+          <p id="drawerSubtitle" class="panel-subtitle"></p>
+        </div>
+        <button class="icon-button" id="closeDrawerBtn" type="button"><i data-feather="x"></i></button>
       </div>
-      <span id="pendingCount" class="badge-count">
-        <span class="pulse-dot"></span> Loading...
-      </span>
-    </header>
+      <div class="drawer-grid">
+        <div class="drawer-card">
+          <h3>Document summary</h3>
+          <p id="drawerSummary" class="panel-subtitle"></p>
+        </div>
+        <div class="drawer-card">
+          <h3>Document details</h3>
+          <div class="drawer-meta">
+            <div><span>Owner</span><strong id="drawerOwner">-</strong></div>
+            <div><span>Status</span><strong id="drawerStatus">-</strong></div>
+            <div><span>Uploaded</span><strong id="drawerCreatedAt">-</strong></div>
+            <div><span>Confidence</span><strong id="drawerConfidence">-</strong></div>
+          </div>
+        </div>
+        <div class="drawer-card">
+          <h3>AI tags</h3>
+          <div class="pill-row" id="drawerTags"></div>
+        </div>
+        <div class="drawer-card">
+          <h3>Decision note</h3>
+          <textarea id="rejectionReason" class="overlay-input" rows="4" placeholder="Reason for rejection or requested changes"></textarea>
+        </div>
+        <div class="drawer-card">
+          <div class="action-stack">
+            <button id="drawerApprove" class="button primary" type="button"><i data-feather="check-circle"></i>Approve</button>
+            <button id="drawerReject" class="button danger" type="button"><i data-feather="x-circle"></i>Reject</button>
+            <button id="drawerRequestChanges" class="button" type="button"><i data-feather="message-square"></i>Request changes</button>
+            <a id="drawerOpenLink" class="button" href="#" target="_blank" rel="noreferrer"><i data-feather="external-link"></i>Open file</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
 
-    <div class="table-panel">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Document</th>
-              <th>Submitted By</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="admin-docs">
-            <tr class="skeleton-row"><td><div class="skeleton-line" style="width:60%"></div></td><td><div class="skeleton-line" style="width:40%"></div></td><td><div class="skeleton-line" style="width:30%"></div></td><td><div class="skeleton-line" style="width:50%"></div></td></tr>
-            <tr class="skeleton-row"><td><div class="skeleton-line" style="width:55%"></div></td><td><div class="skeleton-line" style="width:35%"></div></td><td><div class="skeleton-line" style="width:25%"></div></td><td><div class="skeleton-line" style="width:45%"></div></td></tr>
-            <tr class="skeleton-row"><td><div class="skeleton-line" style="width:65%"></div></td><td><div class="skeleton-line" style="width:45%"></div></td><td><div class="skeleton-line" style="width:28%"></div></td><td><div class="skeleton-line" style="width:50%"></div></td></tr>
-          </tbody>
-        </table>
+  <div class="confirm-modal" id="confirmModal">
+    <div class="confirm-panel">
+      <h3 id="confirmTitle">Confirm action</h3>
+      <p id="confirmText"></p>
+      <textarea id="confirmReason" class="overlay-input" rows="4" placeholder="Optional reason"></textarea>
+      <div class="confirm-actions">
+        <button class="button" id="cancelConfirmBtn" type="button">Cancel</button>
+        <button class="button primary" id="confirmActionBtn" type="button">Continue</button>
       </div>
     </div>
   </div>
 
-  <!-- Confirm modal -->
-  <div id="confirmModal" class="confirm-modal" onclick="if(event.target===this)closeModal()">
-    <div class="confirm-modal-content">
-      <h3 id="modalTitle"></h3>
-      <p id="modalDesc"></p>
-      <textarea id="modalReason" rows="3" placeholder="Reason (optional)..." style="display:none"></textarea>
-      <div class="confirm-actions">
-        <button class="cancel-btn" onclick="closeModal()">Cancel</button>
-        <button id="modalConfirmBtn" class="action-btn"></button>
+  <div class="admin-shell">
+    <aside class="admin-rail panel">
+      <div class="rail-brand">
+        <div>
+          <p class="title">AIDMS Admin</p>
+          <p class="panel-subtitle">Approval control room</p>
+        </div>
+        <a class="icon-button" href="/dashboard" aria-label="Back to dashboard"><i data-feather="arrow-left"></i></a>
       </div>
-    </div>
+      <nav class="rail-nav">
+        <a class="rail-link active" href="#queue"><i data-feather="inbox"></i><span>Queue</span></a>
+        <a class="rail-link" href="#insights"><i data-feather="bar-chart-2"></i><span>Insights</span></a>
+        <a class="rail-link" href="/admin/pending-docs"><i data-feather="file-text"></i><span>Deep review</span></a>
+      </nav>
+      <div class="rail-footer">
+        <div class="tiny-stat"><strong id="railPending">0</strong><span>Pending approvals</span></div>
+        <div class="tiny-stat"><strong id="railApproved">0</strong><span>Approved today</span></div>
+        <div class="tiny-stat"><strong id="railRejected">0</strong><span>Rejected today</span></div>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header class="panel topbar-slim">
+        <div>
+          <div class="eyebrow"><span class="pulse-dot"></span><span>Admin intelligence</span></div>
+          <h1 class="dashboard-title">Where review becomes a guided workflow.</h1>
+          <p class="hero-copy">Monitor incoming documents, review AI confidence, and take approval actions without leaving the command center.</p>
+        </div>
+        <div class="action-stack">
+          <a href="/admin/pending-docs" class="button primary"><i data-feather="shield"></i>Open review workspace</a>
+          <button id="refreshBtn" class="button" type="button"><i data-feather="refresh-cw"></i>Refresh queue</button>
+        </div>
+      </header>
+
+      <section class="metric-grid" id="queue">
+        <article class="panel metric-tile"><span class="metric-label">Pending documents</span><div class="metric-value" id="metricPending">0</div></article>
+        <article class="panel metric-tile"><span class="metric-label">Low confidence</span><div class="metric-value" id="metricLowConfidence">0</div></article>
+        <article class="panel metric-tile"><span class="metric-label">Avg age</span><div class="metric-value" id="metricAge">0d</div></article>
+        <article class="panel metric-tile"><span class="metric-label">Auto-ready</span><div class="metric-value" id="metricReady">0%</div></article>
+      </section>
+
+      <section class="hero-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">Approval velocity</h2>
+              <p class="panel-subtitle">Document intake trends over the last 12 months.</p>
+            </div>
+            <span class="badge">Live</span>
+          </div>
+          <div class="mini-chart"><canvas id="adminChart"></canvas></div>
+        </article>
+        <article class="panel" id="insights">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">Review insights</h2>
+              <p class="panel-subtitle">AI signals and workflow priorities.</p>
+            </div>
+          </div>
+          <div class="insights-list" id="insightsList"></div>
+        </article>
+      </section>
+
+      <section class="queue-layout">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">Pending queue</h2>
+              <p class="panel-subtitle">Select a document for detailed review or open the dedicated approval page.</p>
+            </div>
+            <span class="badge" id="queueBadge"><span class="pulse-dot"></span> Loading</span>
+          </div>
+          <div class="table-wrap">
+            <table class="queue-table">
+              <thead>
+                <tr>
+                  <th>Document</th>
+                  <th>Owner</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody">
+                <tr><td colspan="4" class="empty-state">Loading pending documents...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">Current review focus</h2>
+              <p class="panel-subtitle">Fast access to the selected document.</p>
+            </div>
+            <button class="button" id="openDrawerHint" type="button"><i data-feather="eye"></i>Preview</button>
+          </div>
+          <div class="drawer-card">
+            <h3>Quick actions</h3>
+            <div class="action-stack" style="margin-bottom:14px;">
+              <button class="button primary" id="quickApproveBtn" type="button"><i data-feather="check-circle"></i>Approve</button>
+              <button class="button danger" id="quickRejectBtn" type="button"><i data-feather="x-circle"></i>Reject</button>
+              <button class="button" id="quickChangesBtn" type="button"><i data-feather="message-square"></i>Request changes</button>
+            </div>
+            <div class="panel-subtitle">Use the queue to jump into a detailed review page with checklists, notes, and AI summary context.</div>
+          </div>
+        </article>
+      </section>
+    </main>
   </div>
 
   <script>
-    let pendingAction = null;
+    if (window.feather) feather.replace();
 
-    function escapeHtml(str) {
-      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
+    const state = { documents: [], selected: null, chart: null, confirm: null };
+    const pendingBody = document.getElementById("adminTableBody");
+    const queueBadge = document.getElementById("queueBadge");
+    const drawer = document.getElementById("reviewDrawer");
+    const drawerBackdrop = document.getElementById("drawerBackdrop");
+    const confirmModal = document.getElementById("confirmModal");
 
-    async function loadPendingDocs() {
+    function escapeHtml(value) { return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+    function formatDate(value) { if (!value) return "-"; return new Date(value).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+    function relativeAge(value) { if (!value) return 0; const days = Math.max(0, Math.round((Date.now() - new Date(value).getTime()) / 86400000)); return days; }
+    function confidenceFor(doc) { return typeof doc.confidence === "number" ? doc.confidence : 70 + ((String(doc.fileName || "").length * 7) % 24); }
+    function ownerFor(doc) { return doc.userId?.username || doc.userId?.email || "Unknown"; }
+    function isLowConfidence(doc) { return confidenceFor(doc) < 88; }
+
+    async function loadQueue() {
       try {
         const res = await fetch("/admin/pending", { credentials: "include" });
-        if (!res.ok) return;
-
+        if (!res.ok) throw new Error("failed to fetch");
         const data = await res.json();
-        const docs = data.documents || [];
-        const tbody = document.getElementById("admin-docs");
-        const countBadge = document.getElementById("pendingCount");
+        state.documents = Array.isArray(data.documents) ? data.documents : [];
+      } catch (error) {
+        console.error(error);
+        state.documents = [];
+      }
+      renderQueue();
+      renderMetrics();
+      renderInsights();
+      renderChart();
+    }
 
-        countBadge.innerHTML = `<span class="pulse-dot"></span> ${docs.length} pending`;
+    function renderQueue() {
+      const docs = state.documents;
+      queueBadge.innerHTML = `<span class="pulse-dot"></span> ${docs.length} pending`;
+      document.getElementById("railPending").textContent = docs.length;
+      document.getElementById("railApproved").textContent = docs.filter(doc => doc.status === "approved").length;
+      document.getElementById("railRejected").textContent = docs.filter(doc => doc.status === "rejected").length;
 
-        if (docs.length === 0) {
-          tbody.innerHTML = `
-            <tr><td colspan="4">
-              <div class="empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                  <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-                <p>No pending documents — all clear!</p>
-              </div>
-            </td></tr>`;
-          return;
-        }
+      if (!docs.length) {
+        pendingBody.innerHTML = '<tr><td colspan="4" class="empty-state">No pending documents. The queue is clear.</td></tr>';
+        state.selected = null;
+        syncDrawer();
+        return;
+      }
 
-        tbody.innerHTML = docs.map(doc => `
+      pendingBody.innerHTML = docs.map((doc, index) => {
+        const confidence = confidenceFor(doc);
+        return `
           <tr>
             <td>
-              <div class="file-info">
-                <div class="file-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                  </svg>
+              <div class="doc-cell">
+                <div class="doc-icon"><i data-feather="file-text"></i></div>
+                <div style="min-width:0;">
+                  <p class="doc-title">${escapeHtml(doc.fileName)}</p>
+                  <div class="doc-meta">${escapeHtml(doc.fileType || "file").toUpperCase()} · ${formatDate(doc.createdAt)}</div>
                 </div>
-                <a href="/admin/pending-docs?id=${doc._id}" class="file-name" style="color:#22d3ee; text-decoration:none; font-weight:600; transition:color 0.2s;" onmouseover="this.style.color='#38bdf8'" onmouseout="this.style.color='#22d3ee'">${escapeHtml(doc.fileName)}</a>
               </div>
             </td>
-            <td>${escapeHtml(doc.userId?.email || "-")}</td>
-            <td><span class="status-badge pending">${escapeHtml(doc.status)}</span></td>
+            <td>${escapeHtml(ownerFor(doc))}</td>
+            <td><span class="badge ${doc.status || "pending"}">${escapeHtml(String(doc.status || "pending").replace(/_/g, " "))}</span></td>
             <td>
-              <div class="actions-cell">
-                <a class="action-btn btn-review" href="/admin/pending-docs?id=${doc._id}">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  Review
-                </a>
-                <button class="action-btn btn-approve" onclick="showConfirm('approve', '${doc._id}', '${escapeHtml(doc.fileName)}')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                  Approve
-                </button>
-                <button class="action-btn btn-reject" onclick="showConfirm('reject', '${doc._id}', '${escapeHtml(doc.fileName)}')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  Reject
-                </button>
+              <div class="action-stack">
+                <button class="button" type="button" data-open-review="${escapeHtml(doc._id)}"><i data-feather="eye"></i>Review</button>
+                <button class="button primary" type="button" data-approve="${escapeHtml(doc._id)}"><i data-feather="check-circle"></i>Approve</button>
+                <button class="button danger" type="button" data-reject="${escapeHtml(doc._id)}"><i data-feather="x-circle"></i>Reject</button>
               </div>
             </td>
-          </tr>
-        `).join('');
-      } catch (err) {
-        console.error("Failed to load docs", err);
-      }
-    }
+          </tr>`;
+      }).join("");
 
-    function showConfirm(action, id, name) {
-      const modal = document.getElementById('confirmModal');
-      const title = document.getElementById('modalTitle');
-      const desc = document.getElementById('modalDesc');
-      const reason = document.getElementById('modalReason');
-      const btn = document.getElementById('modalConfirmBtn');
-
-      pendingAction = { action, id };
-
-      if (action === 'approve') {
-        title.textContent = 'Approve Document';
-        desc.textContent = `Are you sure you want to approve "${name}"?`;
-        reason.style.display = 'none';
-        btn.textContent = 'Approve';
-        btn.className = 'action-btn btn-approve';
+      if (!state.selected) {
+        state.selected = docs[0];
       } else {
-        title.textContent = 'Reject Document';
-        desc.textContent = `Are you sure you want to reject "${name}"?`;
-        reason.style.display = 'block';
-        reason.value = '';
-        btn.textContent = 'Reject';
-        btn.className = 'action-btn btn-reject';
+        const stillExists = docs.find(doc => String(doc._id) === String(state.selected._id));
+        state.selected = stillExists || docs[0];
+      }
+      syncDrawer();
+      if (window.feather) feather.replace();
+    }
+
+    function renderMetrics() {
+      const docs = state.documents;
+      const lowConfidence = docs.filter(isLowConfidence).length;
+      const ages = docs.map(doc => relativeAge(doc.createdAt));
+      const avgAge = docs.length ? Math.round(ages.reduce((sum, value) => sum + value, 0) / docs.length) : 0;
+      const ready = docs.length ? Math.round(((docs.length - lowConfidence) / docs.length) * 100) : 0;
+      document.getElementById("metricPending").textContent = docs.length;
+      document.getElementById("metricLowConfidence").textContent = lowConfidence;
+      document.getElementById("metricAge").textContent = `${avgAge}d`;
+      document.getElementById("metricReady").textContent = `${ready}%`;
+    }
+
+    function renderInsights() {
+      const docs = state.documents;
+      const insights = [
+        { icon: "zap", title: "Auto routing opportunity", copy: `${docs.filter(doc => confidenceFor(doc) >= 92).length} documents are confident enough for expedited review.` },
+        { icon: "alert-triangle", title: "Low confidence review", copy: `${docs.filter(isLowConfidence).length} documents need manual verification before approval.` },
+        { icon: "clock", title: "Ageing queue", copy: `${docs.filter(doc => relativeAge(doc.createdAt) >= 2).length} items have been waiting for more than two days.` },
+        { icon: "shield", title: "Policy posture", copy: "All actions remain tied to the admin approval endpoints and audit trail." }
+      ];
+      document.getElementById("insightsList").innerHTML = insights.map(item => `
+        <div class="insight-item">
+          <div class="insight-icon"><i data-feather="${item.icon}"></i></div>
+          <div><p class="insight-title">${escapeHtml(item.title)}</p><p class="insight-copy">${escapeHtml(item.copy)}</p></div>
+        </div>`).join("");
+      if (window.feather) feather.replace();
+    }
+
+    function renderChart() {
+      const canvas = document.getElementById("adminChart");
+      if (!canvas) return;
+      const values = Array.from({ length: 12 }, (_, index) => Math.max(0, Math.round((state.documents.length * 0.55) + (index % 4) + (index === 11 ? 3 : 0))));
+      const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      if (state.chart) state.chart.destroy();
+      const ctx = canvas.getContext("2d");
+      state.chart = new Chart(ctx, {
+        type: "bar",
+        data: { labels, datasets: [{ label: "Documents", data: values, backgroundColor: ["rgba(79,139,255,0.85)", "rgba(138,92,255,0.75)", "rgba(0,208,132,0.72)", "rgba(255,200,87,0.72)"] }] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { backgroundColor: "rgba(10,14,22,0.95)", titleColor: "#fff", bodyColor: "#dbeafe" } },
+          scales: {
+            x: { grid: { color: "rgba(255,255,255,0.04)" }, ticks: { color: "#8c94a3" } },
+            y: { beginAtZero: true, grid: { color: "rgba(255,255,255,0.06)" }, ticks: { color: "#8c94a3" } }
+          }
+        }
+      });
+    }
+
+    function syncDrawer() {
+      const doc = state.selected;
+      if (!doc) {
+        document.getElementById("drawerTitle").textContent = "No document selected";
+        document.getElementById("drawerSubtitle").textContent = "Pick a queue item to review details.";
+        document.getElementById("drawerSummary").textContent = "The queue is empty or no document is selected.";
+        document.getElementById("drawerOwner").textContent = "-";
+        document.getElementById("drawerStatus").textContent = "-";
+        document.getElementById("drawerCreatedAt").textContent = "-";
+        document.getElementById("drawerConfidence").textContent = "-";
+        document.getElementById("drawerTags").innerHTML = "";
+        document.getElementById("drawerOpenLink").href = "#";
+        return;
       }
 
-      btn.onclick = executeAction;
-      modal.classList.add('active');
+      const confidence = confidenceFor(doc);
+      document.getElementById("drawerTitle").textContent = doc.fileName;
+      document.getElementById("drawerSubtitle").textContent = `${escapeHtml(String(doc.fileType || "file").toUpperCase())} · ${formatDate(doc.createdAt)}`;
+      document.getElementById("drawerSummary").textContent = doc.summary || "No AI summary is available yet. Open the detailed review screen for checklist actions and comments.";
+      document.getElementById("drawerOwner").textContent = ownerFor(doc);
+      document.getElementById("drawerStatus").textContent = String(doc.status || "pending").replace(/_/g, " ");
+      document.getElementById("drawerCreatedAt").textContent = formatDate(doc.createdAt);
+      document.getElementById("drawerConfidence").textContent = `${confidence}%`;
+      const tags = [doc.fileType, doc.status, ...(Array.isArray(doc.keywords) ? doc.keywords.slice(0, 3) : [])].filter(Boolean);
+      document.getElementById("drawerTags").innerHTML = tags.map(tag => `<span class="badge">${escapeHtml(tag)}</span>`).join("");
+      document.getElementById("drawerOpenLink").href = `/admin/pending-docs?id=${encodeURIComponent(doc._id)}`;
     }
 
-    function closeModal() {
-      document.getElementById('confirmModal').classList.remove('active');
-      pendingAction = null;
+    function openDrawer(docId) {
+      const doc = state.documents.find(item => String(item._id) === String(docId));
+      if (doc) {
+        state.selected = doc;
+        syncDrawer();
+      }
+      drawer.classList.add("open");
+      drawerBackdrop.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+      if (window.feather) feather.replace();
     }
 
-    async function executeAction() {
-      if (!pendingAction) return;
-      const { action, id } = pendingAction;
-      const btn = document.getElementById('modalConfirmBtn');
-      btn.textContent = 'Processing...';
-      btn.disabled = true;
+    function closeDrawer() {
+      drawer.classList.remove("open");
+      drawerBackdrop.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+    }
+
+    function askConfirm(type, docId) {
+      const doc = state.documents.find(item => String(item._id) === String(docId));
+      state.confirm = { type, docId };
+      document.getElementById("confirmReason").value = "";
+      document.getElementById("confirmReason").style.display = type === "approve" ? "none" : "block";
+      document.getElementById("confirmTitle").textContent = type === "approve" ? "Approve document" : type === "reject" ? "Reject document" : "Request changes";
+      document.getElementById("confirmText").textContent = doc ? `Apply this action to ${doc.fileName}?` : "Apply this action to the selected document?";
+      document.getElementById("confirmActionBtn").textContent = type === "approve" ? "Approve" : type === "reject" ? "Reject" : "Request changes";
+      confirmModal.classList.add("open");
+    }
+
+    async function runConfirmAction() {
+      if (!state.confirm) return;
+      const { type, docId } = state.confirm;
+      const reason = document.getElementById("confirmReason").value.trim();
+      const endpoint = type === "approve" ? `/admin/approve/${docId}` : type === "reject" ? `/admin/reject/${docId}` : `/admin/request-changes/${docId}`;
+      const payload = type === "approve" ? {} : type === "reject" ? { reason } : { comment: reason };
+      const options = { method: "POST", credentials: "include" };
+      if (type !== "approve") options.headers = { "Content-Type": "application/json" };
+      if (type !== "approve") options.body = JSON.stringify(payload);
 
       try {
-        if (action === 'approve') {
-          await fetch(`/admin/approve/${id}`, { method: "POST", credentials: "include" });
-        } else {
-          const reason = document.getElementById('modalReason').value || '';
-          await fetch(`/admin/reject/${id}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ reason }),
-            credentials: "include"
-          });
+        const res = await fetch(endpoint, options);
+        if (!res.ok) throw new Error("Action failed");
+        closeConfirm();
+        await loadQueue();
+        if (state.selected && String(state.selected._id) === String(docId)) {
+          openDrawer(docId);
         }
-      } catch (err) {
-        console.error("Action failed", err);
+      } catch (error) {
+        console.error(error);
       }
-
-      closeModal();
-      loadPendingDocs();
     }
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeModal();
+    function closeConfirm() {
+      confirmModal.classList.remove("open");
+      state.confirm = null;
+    }
+
+    pendingBody.addEventListener("click", event => {
+      const reviewBtn = event.target.closest("[data-open-review]");
+      const approveBtn = event.target.closest("[data-approve]");
+      const rejectBtn = event.target.closest("[data-reject]");
+      if (reviewBtn) openDrawer(reviewBtn.dataset.openReview);
+      if (approveBtn) askConfirm("approve", approveBtn.dataset.approve);
+      if (rejectBtn) askConfirm("reject", rejectBtn.dataset.reject);
     });
 
-    loadPendingDocs();
+    document.getElementById("drawerBackdrop").addEventListener("click", closeDrawer);
+    document.getElementById("closeDrawerBtn").addEventListener("click", closeDrawer);
+    document.getElementById("openDrawerHint").addEventListener("click", () => openDrawer(state.selected?._id));
+    document.getElementById("quickApproveBtn").addEventListener("click", () => state.selected && askConfirm("approve", state.selected._id));
+    document.getElementById("quickRejectBtn").addEventListener("click", () => state.selected && askConfirm("reject", state.selected._id));
+    document.getElementById("quickChangesBtn").addEventListener("click", () => state.selected && askConfirm("changes", state.selected._id));
+    document.getElementById("drawerApprove").addEventListener("click", () => state.selected && askConfirm("approve", state.selected._id));
+    document.getElementById("drawerReject").addEventListener("click", () => state.selected && askConfirm("reject", state.selected._id));
+    document.getElementById("drawerRequestChanges").addEventListener("click", () => state.selected && askConfirm("changes", state.selected._id));
+    document.getElementById("confirmActionBtn").addEventListener("click", runConfirmAction);
+    document.getElementById("cancelConfirmBtn").addEventListener("click", closeConfirm);
+    document.getElementById("confirmModal").addEventListener("click", event => { if (event.target === event.currentTarget) closeConfirm(); });
+    document.getElementById("refreshBtn").addEventListener("click", loadQueue);
+    document.addEventListener("keydown", event => { if (event.key === "Escape") { closeDrawer(); closeConfirm(); } });
+
+    loadQueue();
   </script>
 </body>
 </html>

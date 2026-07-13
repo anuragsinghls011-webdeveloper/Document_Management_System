@@ -1,1873 +1,108 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Powered Intelligent Document Management System</title>
+  <meta name="description" content="Premium enterprise AI-powered document management workspace.">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/enterprise.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+  <script defer src="/assets/js/enterprise.js"></script>
   <style>
     :root {
-      color-scheme: dark;
-      --bg: #081120;
-      --bg-2: #0B1220;
-      --bg-3: #111827;
-      --surface: rgba(23, 32, 51, 0.74);
-      --surface-strong: rgba(30, 41, 59, 0.88);
-      --surface-soft: rgba(15, 23, 42, 0.7);
-      --border: rgba(148, 163, 184, 0.14);
-      --border-strong: rgba(148, 163, 184, 0.24);
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --muted-2: #64748b;
-      --blue: #38bdf8;
-      --blue-strong: #2563eb;
-      --violet: #8b5cf6;
-      --cyan: #22d3ee;
-      --emerald: #34d399;
-      --orange: #fb923c;
-      --pink: #ec4899;
-      --danger: #fb7185;
-      --shadow: 0 24px 80px rgba(2, 8, 23, 0.5);
-      --glass: saturate(140%) blur(18px);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      min-height: 100vh;
-      margin: 0;
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      letter-spacing: 0;
-      background:
-        radial-gradient(1100px 620px at 10% -10%, rgba(56, 189, 248, 0.16), transparent 62%),
-        radial-gradient(1000px 640px at 88% 8%, rgba(139, 92, 246, 0.13), transparent 64%),
-        linear-gradient(135deg, var(--bg), var(--bg-2) 48%, var(--bg-3));
-      color: var(--text);
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 78%);
-      z-index: -1;
-    }
-
-    body.focus-theme {
-      --surface: rgba(17, 24, 39, 0.78);
-      --surface-strong: rgba(15, 23, 42, 0.94);
-      --border: rgba(125, 211, 252, 0.18);
-    }
-
-    ::selection {
-      background: rgba(34, 211, 238, 0.26);
-      color: var(--text);
-    }
-
-    ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, rgba(56, 189, 248, 0.45), rgba(139, 92, 246, 0.45));
-      border: 2px solid rgba(15, 23, 42, 0.9);
-      border-radius: 999px;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .app-shell {
-      display: grid;
-      grid-template-columns: 288px minmax(0, 1fr);
-      gap: 16px;
-      min-height: 100vh;
-      padding: 16px;
-      transition: grid-template-columns 0.28s ease;
-    }
-
-    .app-shell.sidebar-collapsed {
-      grid-template-columns: 92px minmax(0, 1fr);
-    }
-
-    .sidebar {
-      position: sticky;
-      top: 16px;
-      height: calc(100vh - 32px);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      background:
-        linear-gradient(180deg, rgba(23, 32, 51, 0.9), rgba(8, 17, 32, 0.82)),
-        rgba(15, 23, 42, 0.82);
-      box-shadow: var(--shadow);
-      backdrop-filter: var(--glass);
-      z-index: 30;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 18px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .brand-lockup {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .ai-logo {
-      position: relative;
-      display: grid;
-      width: 46px;
-      height: 46px;
-      flex: 0 0 auto;
-      place-items: center;
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(34, 211, 238, 0.95), rgba(37, 99, 235, 0.95) 48%, rgba(139, 92, 246, 0.95));
-      box-shadow: 0 18px 46px rgba(37, 99, 235, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.24);
-    }
-
-    .ai-logo::after {
-      content: "";
-      position: absolute;
-      inset: -5px;
-      border: 1px solid rgba(34, 211, 238, 0.36);
-      border-radius: 20px;
-      opacity: 0;
-      animation: logoPulse 2.8s ease-in-out infinite;
-    }
-
-    @keyframes logoPulse {
-      0%, 100% {
-        transform: scale(0.96);
-        opacity: 0;
-      }
-      42% {
-        transform: scale(1.06);
-        opacity: 0.9;
-      }
-    }
-
-    .brand-title {
-      margin: 0;
-      font-size: 0.98rem;
-      font-weight: 800;
-      letter-spacing: 0;
-      line-height: 1.1;
-    }
-
-    .brand-subtitle {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 0.75rem;
-      white-space: nowrap;
-    }
-
-    .icon-button {
-      position: relative;
-      display: inline-grid;
-      width: 40px;
-      height: 40px;
-      place-items: center;
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      border-radius: 14px;
-      background: rgba(15, 23, 42, 0.48);
-      color: #cbd5e1;
-      transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .icon-button:hover {
-      transform: translateY(-2px);
-      border-color: rgba(56, 189, 248, 0.38);
-      color: white;
-      background: rgba(30, 41, 59, 0.8);
-      box-shadow: 0 18px 40px rgba(8, 145, 178, 0.13);
-    }
-
-    .nav {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      gap: 6px;
-      padding: 14px 12px;
-      overflow-y: auto;
-    }
-
-    .nav-link {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-height: 46px;
-      padding: 0 14px;
-      border: 1px solid transparent;
-      border-radius: 16px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      font-weight: 650;
-      text-decoration: none;
-      transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
-    }
-
-    .nav-link i,
-    .nav-link svg {
-      width: 18px;
-      height: 18px;
-      flex: 0 0 auto;
-    }
-
-    .nav-link:hover {
-      color: white;
-      border-color: rgba(56, 189, 248, 0.22);
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(139, 92, 246, 0.08));
-      transform: translateX(3px);
-      box-shadow: 0 12px 32px rgba(8, 145, 178, 0.08);
-    }
-
-    .nav-link.active {
-      color: white;
-      border-color: rgba(34, 211, 238, 0.34);
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.24), rgba(34, 211, 238, 0.11), rgba(139, 92, 246, 0.18));
-      box-shadow: inset 3px 0 0 rgba(34, 211, 238, 0.82), 0 20px 52px rgba(37, 99, 235, 0.13);
-    }
-
-    .sidebar.collapsed .brand-copy,
-    .sidebar.collapsed .nav-label,
-    .sidebar.collapsed .user-meta,
-    .sidebar.collapsed .assist-label,
-    .sidebar.collapsed .role-badge,
-    .sidebar.collapsed .assistant-action span {
-      display: none;
-    }
-
-    .sidebar.collapsed .brand {
-      justify-content: center;
-      padding-inline: 12px;
-    }
-
-    .sidebar.collapsed .brand-lockup {
-      justify-content: center;
-    }
-
-    .sidebar.collapsed .nav-link {
-      justify-content: center;
-      padding-inline: 0;
-    }
-
-    .sidebar.collapsed .nav-link::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      left: calc(100% + 10px);
-      top: 50%;
-      transform: translateY(-50%) translateX(-4px);
-      width: max-content;
-      max-width: 180px;
-      padding: 8px 10px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: rgba(15, 23, 42, 0.94);
-      color: white;
-      font-size: 0.78rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      box-shadow: 0 12px 32px rgba(2, 8, 23, 0.42);
-    }
-
-    .sidebar.collapsed .nav-link:hover::after {
-      opacity: 1;
-      transform: translateY(-50%) translateX(0);
-    }
-
-    .sidebar-footer {
-      display: grid;
-      gap: 10px;
-      padding: 12px;
-      border-top: 1px solid var(--border);
-    }
-
-    .profile-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-      padding: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.13);
-      border-radius: 18px;
-      background: rgba(15, 23, 42, 0.48);
-    }
-
-    .avatar {
-      position: relative;
-      display: grid;
-      width: 40px;
-      height: 40px;
-      flex: 0 0 auto;
-      place-items: center;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(34, 211, 238, 0.72));
-      color: white;
-      font-weight: 800;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
-    }
-
-    .avatar.online::after {
-      content: "";
-      position: absolute;
-      right: -1px;
-      bottom: -1px;
-      width: 11px;
-      height: 11px;
-      border: 2px solid #0f172a;
-      border-radius: 999px;
-      background: var(--emerald);
-      box-shadow: 0 0 12px rgba(52, 211, 153, 0.7);
-    }
-
-    .user-meta {
-      min-width: 0;
-    }
-
-    .user-name {
-      margin: 0;
-      overflow: hidden;
-      color: white;
-      font-size: 0.86rem;
-      font-weight: 750;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .user-role {
-      margin: 2px 0 0;
-      color: var(--muted);
-      font-size: 0.72rem;
-    }
-
-    .role-badge {
-      margin-left: auto;
-      padding: 4px 8px;
-      border: 1px solid rgba(52, 211, 153, 0.24);
-      border-radius: 999px;
-      background: rgba(52, 211, 153, 0.09);
-      color: #a7f3d0;
-      font-size: 0.67rem;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .assistant-action {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      min-height: 42px;
-      border: 1px solid rgba(56, 189, 248, 0.22);
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.11), rgba(139, 92, 246, 0.12));
-      color: white;
-      font-size: 0.83rem;
-      font-weight: 750;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-
-    .assistant-action:hover {
-      transform: translateY(-2px);
-      border-color: rgba(34, 211, 238, 0.44);
-      box-shadow: 0 18px 42px rgba(37, 99, 235, 0.16);
-    }
-
-    .main-shell {
-      min-width: 0;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-height: 76px;
-      padding: 14px;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      background: rgba(8, 17, 32, 0.74);
-      box-shadow: 0 18px 54px rgba(2, 8, 23, 0.28);
-      backdrop-filter: var(--glass);
-      z-index: 20;
-    }
-
-    .mobile-menu {
-      display: none;
-    }
-
-    .ai-search {
-      position: relative;
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .ai-search i,
-    .ai-search svg {
-      position: absolute;
-      top: 50%;
-      left: 16px;
-      width: 18px;
-      height: 18px;
-      transform: translateY(-50%);
-      color: var(--cyan);
-      pointer-events: none;
-    }
-
-    .ai-search input {
-      width: 100%;
-      height: 48px;
-      padding: 0 84px 0 46px;
-      border: 1px solid rgba(148, 163, 184, 0.16);
-      border-radius: 16px;
-      outline: none;
-      background: rgba(15, 23, 42, 0.72);
-      color: white;
-      font-size: 0.92rem;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .ai-search input:focus {
-      border-color: rgba(34, 211, 238, 0.55);
-      background: rgba(15, 23, 42, 0.9);
-      box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.08), 0 0 34px rgba(37, 99, 235, 0.22);
-    }
-
-    .shortcut {
-      position: absolute;
-      top: 50%;
-      right: 12px;
-      transform: translateY(-50%);
-      padding: 4px 8px;
-      border: 1px solid rgba(148, 163, 184, 0.16);
-      border-radius: 9px;
-      background: rgba(15, 23, 42, 0.85);
-      color: var(--muted);
-      font-size: 0.72rem;
-      font-weight: 800;
-    }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      min-height: 42px;
-      padding: 0 14px;
-      border: 1px solid rgba(148, 163, 184, 0.14);
-      border-radius: 14px;
-      background: rgba(15, 23, 42, 0.68);
-      color: #e2e8f0;
-      font-size: 0.86rem;
-      font-weight: 750;
-      text-decoration: none;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-    }
-
-    button,
-    a {
-      cursor: pointer;
-    }
-
-    .button:hover {
-      transform: translateY(-2px);
-      border-color: rgba(56, 189, 248, 0.35);
-      background: rgba(30, 41, 59, 0.9);
-      box-shadow: 0 18px 44px rgba(2, 8, 23, 0.24);
-    }
-
-    .button.primary {
-      border-color: rgba(34, 211, 238, 0.34);
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(34, 211, 238, 0.72));
-      color: white;
-      box-shadow: 0 18px 44px rgba(37, 99, 235, 0.24);
-    }
-
-    .notification-dot {
-      position: absolute;
-      top: 9px;
-      right: 9px;
-      width: 9px;
-      height: 9px;
-      border: 2px solid #0f172a;
-      border-radius: 999px;
-      background: var(--orange);
-      box-shadow: 0 0 14px rgba(251, 146, 60, 0.75);
-    }
-
-    .content {
-      padding: 18px 0 0;
-    }
-
-    .page-content {
-      animation: reveal 0.46s ease both;
-    }
-
-    .page-content.page-entering {
-      animation: reveal 0.4s cubic-bezier(0.4,0,0.2,1) both;
-    }
-
-    .page-content.page-exiting {
-      animation: revealOut 0.2s ease both;
-    }
-
-    @keyframes reveal {
-      from {
-        opacity: 0;
-        transform: translateY(14px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes revealOut {
-      from {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateY(-8px);
-      }
-    }
-
-    /* Scroll to top button */
-    .scroll-top-btn {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 46px;
-      height: 46px;
-      border-radius: 16px;
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      background: rgba(15, 23, 42, 0.9);
-      backdrop-filter: blur(12px);
-      color: var(--cyan);
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      z-index: 50;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-      pointer-events: none;
-    }
-
-    .scroll-top-btn.visible {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    .scroll-top-btn:hover {
-      box-shadow: 0 12px 30px rgba(34, 211, 238, 0.18);
-      transform: translateY(-3px);
-    }
-
-    /* Logout button */
-    .logout-action {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      min-height: 42px;
-      border: 1px solid rgba(251, 113, 133, 0.22);
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(251, 113, 133, 0.1), rgba(239, 68, 68, 0.08));
-      color: #fda4af;
-      font-size: 0.83rem;
-      font-weight: 750;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-    }
-
-    .logout-action:hover {
-      transform: translateY(-2px);
-      border-color: rgba(251, 113, 133, 0.44);
-      background: linear-gradient(135deg, rgba(251, 113, 133, 0.18), rgba(239, 68, 68, 0.15));
-      box-shadow: 0 18px 42px rgba(239, 68, 68, 0.12);
-    }
-
-    /* Mobile sidebar backdrop */
-    .sidebar-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(2, 8, 23, 0);
-      backdrop-filter: blur(0px);
-      z-index: 29;
-      pointer-events: none;
-      transition: background 0.3s ease, backdrop-filter 0.3s ease;
-    }
-
-    .sidebar-backdrop.active {
-      background: rgba(2, 8, 23, 0.5);
-      backdrop-filter: blur(8px);
-      pointer-events: auto;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.8fr);
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
-    .hero-panel,
+      --shell-radius: 30px;
+      --shell-border: rgba(255, 255, 255, 0.08);
+      --glass-bg: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    }
+    .dashboard-title { font-size: clamp(2rem, 3.2vw, 3.2rem); }
+    .hero-shell { padding-top: 12px; }
+    .dashboard-shell { width: min(100%, 1600px); margin: 0 auto; }
+    .sidebar-shell { padding: 14px; }
+    .sidebar-section { display: grid; gap: 8px; }
+    .section-card { padding: 18px; }
+    .status-rail { display: flex; align-items: center; gap: 8px; }
+    .status-rail .rail { flex: 1; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.06); overflow: hidden; }
+    .status-rail .rail > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #4F8BFF, #8A5CFF); }
+    .workflow-grid { display: grid; gap: 14px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .workflow-step { min-height: 140px; padding: 18px; }
+    .doc-shell { overflow: hidden; }
+    .doc-row-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .topbar { min-height: 82px; }
+    .panel-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); margin: 12px 0; }
+    .muted-label { color: #B6BCC8; font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .hero-gradient { background: linear-gradient(135deg, rgba(79,139,255,0.12), rgba(138,92,255,0.12)); }
+    .table-cell-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .page-content { scroll-margin-top: 104px; }
+    .panel,
     .glass-card,
-    .panel {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      background:
-        linear-gradient(145deg, rgba(30, 41, 59, 0.84), rgba(8, 17, 32, 0.74)),
-        var(--surface);
-      box-shadow: 0 22px 70px rgba(2, 8, 23, 0.3);
-      backdrop-filter: var(--glass);
+    .summary-panel,
+    .modal-content,
+    .drawer-panel {
+      border-radius: var(--shell-radius);
+      border-color: var(--shell-border);
+      background: var(--glass-bg);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
     }
-
     .hero-panel {
-      min-height: 294px;
-      padding: clamp(22px, 3vw, 34px);
-      isolation: isolate;
-    }
-
-    .hero-panel::before {
-      content: "";
-      position: absolute;
-      inset: 0;
+      padding: clamp(24px, 3vw, 40px);
+      min-height: 420px;
       background:
-        linear-gradient(120deg, rgba(34, 211, 238, 0.18), transparent 34%),
-        linear-gradient(300deg, rgba(236, 72, 153, 0.12), transparent 36%);
-      z-index: -2;
+        radial-gradient(860px 460px at 18% 12%, rgba(79,139,255,0.18), transparent 56%),
+        radial-gradient(620px 360px at 86% 18%, rgba(138,92,255,0.16), transparent 52%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      overflow: hidden;
     }
-
     .hero-panel::after {
       content: "";
       position: absolute;
-      inset: auto 24px 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.6), transparent);
-      opacity: 0.7;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 18px;
-      padding: 8px 11px;
-      border: 1px solid rgba(34, 211, 238, 0.2);
-      border-radius: 999px;
-      background: rgba(8, 47, 73, 0.22);
-      color: #a5f3fc;
-      font-size: 0.78rem;
-      font-weight: 750;
-    }
-
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--emerald);
-      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.72);
-      animation: pulseDot 2.2s infinite;
-    }
-
-    @keyframes pulseDot {
-      70% {
-        box-shadow: 0 0 0 10px rgba(52, 211, 153, 0);
-      }
-      100% {
-        box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
-      }
-    }
-
-    .hero-title {
-      max-width: 780px;
-      margin: 0;
-      font-size: clamp(2.1rem, 4vw, 4rem);
-      line-height: 0.98;
-      font-weight: 850;
-      letter-spacing: 0;
-    }
-
-    .gradient-text {
-      background: linear-gradient(90deg, #f8fafc, #a5f3fc 34%, #c4b5fd 68%, #fbcfe8);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .hero-copy {
-      max-width: 650px;
-      margin: 18px 0 0;
-      color: #cbd5e1;
-      font-size: 1rem;
-      line-height: 1.75;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 26px;
-    }
-
-    .summary-panel {
-      display: grid;
-      gap: 12px;
-      padding: 16px;
-    }
-
-    .summary-chip {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 16px;
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      border-radius: 18px;
-      background: rgba(15, 23, 42, 0.58);
-    }
-
-    .summary-chip span {
-      color: var(--muted);
-      font-size: 0.79rem;
-      font-weight: 700;
-    }
-
-    .summary-chip strong {
-      display: block;
-      margin-top: 5px;
-      color: white;
-      font-size: 1.08rem;
-      font-weight: 850;
-    }
-
-    .chip-icon {
-      display: grid;
-      width: 42px;
-      height: 42px;
-      place-items: center;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(139, 92, 246, 0.14));
-      color: var(--cyan);
-    }
-
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-
-    .metric-card {
-      min-height: 176px;
-      padding: 16px;
-      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
-    }
-
-    .metric-card:hover {
-      transform: perspective(800px) translateY(-5px) rotateX(1deg);
-      border-color: rgba(34, 211, 238, 0.32);
-      box-shadow: 0 26px 70px rgba(8, 145, 178, 0.12);
-    }
-
-    .metric-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .metric-icon {
-      display: grid;
-      width: 42px;
-      height: 42px;
-      place-items: center;
-      border-radius: 14px;
-      color: white;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.88), rgba(37, 99, 235, 0.88));
-      box-shadow: 0 14px 32px rgba(37, 99, 235, 0.24);
-    }
-
-    .metric-icon.violet {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.92), rgba(37, 99, 235, 0.86));
-      box-shadow: 0 14px 32px rgba(139, 92, 246, 0.22);
-    }
-
-    .metric-icon.emerald {
-      background: linear-gradient(135deg, rgba(52, 211, 153, 0.9), rgba(20, 184, 166, 0.84));
-      box-shadow: 0 14px 32px rgba(20, 184, 166, 0.18);
-    }
-
-    .metric-icon.orange {
-      background: linear-gradient(135deg, rgba(251, 146, 60, 0.9), rgba(236, 72, 153, 0.76));
-      box-shadow: 0 14px 32px rgba(251, 146, 60, 0.18);
-    }
-
-    .trend {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 5px 8px;
-      border-radius: 999px;
-      background: rgba(52, 211, 153, 0.1);
-      color: #86efac;
-      font-size: 0.72rem;
-      font-weight: 850;
-    }
-
-    .trend.warn {
-      background: rgba(251, 146, 60, 0.11);
-      color: #fdba74;
-    }
-
-    .metric-label {
-      margin: 20px 0 0;
-      color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 750;
-    }
-
-    .metric-value {
-      margin: 6px 0 0;
-      color: white;
-      font-size: 2rem;
-      line-height: 1;
-      font-weight: 850;
-    }
-
-    .sparkline {
-      width: 100%;
-      height: 38px;
-      margin-top: 14px;
-      overflow: visible;
-    }
-
-    .sparkline path {
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-width: 3;
-      filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.35));
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .panel {
-      padding: 18px;
-    }
-
-    .span-8 {
-      grid-column: span 8;
-    }
-
-    .span-7 {
-      grid-column: span 7;
-    }
-
-    .span-6 {
-      grid-column: span 6;
-    }
-
-    .span-5 {
-      grid-column: span 5;
-    }
-
-    .span-4 {
-      grid-column: span 4;
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-
-    .panel-title {
-      margin: 0;
-      color: white;
-      font-size: 1rem;
-      font-weight: 820;
-    }
-
-    .panel-subtitle {
-      margin: 5px 0 0;
-      color: var(--muted);
-      font-size: 0.82rem;
-      line-height: 1.5;
-    }
-
-    .panel-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 10px;
-      border: 1px solid rgba(34, 211, 238, 0.2);
-      border-radius: 999px;
-      background: rgba(8, 47, 73, 0.24);
-      color: #a5f3fc;
-      font-size: 0.72rem;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .chart-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 170px;
-      gap: 18px;
-      align-items: stretch;
-    }
-
-    .chart-wrap {
-      min-height: 310px;
-    }
-
-    .heatmap {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-      align-content: end;
-      padding: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      border-radius: 18px;
-      background: rgba(15, 23, 42, 0.42);
-    }
-
-    .heat-cell {
-      aspect-ratio: 1;
-      border-radius: 7px;
-      background: rgba(56, 189, 248, var(--heat, 0.12));
-      box-shadow: 0 0 18px rgba(34, 211, 238, calc(var(--heat, 0.12) * 0.28));
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-
-    .heat-cell:hover {
-      transform: scale(1.14);
-      background: rgba(52, 211, 153, 0.58);
-    }
-
-    .timeline {
-      display: grid;
-      gap: 12px;
-      max-height: 450px;
-      overflow-y: auto;
-      padding-right: 2px;
-    }
-
-    .timeline-item {
-      position: relative;
-      display: grid;
-      grid-template-columns: 40px minmax(0, 1fr);
-      gap: 12px;
-      padding: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      border-radius: 18px;
-      background: rgba(15, 23, 42, 0.46);
-      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-    }
-
-    .timeline-item:hover {
-      transform: translateX(3px);
-      border-color: rgba(56, 189, 248, 0.22);
-      background: rgba(30, 41, 59, 0.58);
-    }
-
-    .timeline-avatar {
-      display: grid;
-      width: 40px;
-      height: 40px;
-      place-items: center;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.78), rgba(139, 92, 246, 0.8));
-      color: white;
-      font-size: 0.78rem;
-      font-weight: 850;
-    }
-
-    .timeline-title {
-      margin: 0;
-      color: #f8fafc;
-      font-size: 0.86rem;
-      font-weight: 750;
-      line-height: 1.35;
-    }
-
-    .timeline-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 0.72rem;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      width: fit-content;
-      padding: 5px 8px;
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.64);
-      color: #cbd5e1;
-      font-size: 0.72rem;
-      font-weight: 800;
-      text-transform: capitalize;
-      white-space: nowrap;
-    }
-
-    .badge.approved {
-      border-color: rgba(52, 211, 153, 0.22);
-      background: rgba(52, 211, 153, 0.1);
-      color: #bbf7d0;
-    }
-
-    .badge.pending,
-    .badge.review,
-    .badge.processing {
-      border-color: rgba(251, 146, 60, 0.22);
-      background: rgba(251, 146, 60, 0.1);
-      color: #fed7aa;
-    }
-
-    .badge.rejected,
-    .badge.changes_requested {
-      border-color: rgba(251, 113, 133, 0.22);
-      background: rgba(251, 113, 133, 0.1);
-      color: #fecdd3;
-    }
-
-    .badge.archived {
-      color: #cbd5e1;
-    }
-
-    .insights-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .insight-item {
-      display: grid;
-      grid-template-columns: 38px minmax(0, 1fr);
-      gap: 12px;
-      padding: 13px;
-      border: 1px solid rgba(148, 163, 184, 0.11);
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(139, 92, 246, 0.07));
-    }
-
-    .insight-icon {
-      display: grid;
-      width: 38px;
-      height: 38px;
-      place-items: center;
-      border-radius: 13px;
-      background: rgba(34, 211, 238, 0.11);
-      color: var(--cyan);
-    }
-
-    .insight-title {
-      margin: 0;
-      color: white;
-      font-size: 0.84rem;
-      font-weight: 800;
-    }
-
-    .insight-copy {
-      margin: 5px 0 0;
-      color: var(--muted);
-      font-size: 0.77rem;
-      line-height: 1.5;
-    }
-
-    .workflow-map {
-      position: relative;
-      min-height: 318px;
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      border-radius: 20px;
-      background:
-        linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px),
-        rgba(15, 23, 42, 0.38);
-      background-size: 28px 28px;
-      overflow: hidden;
-    }
-
-    .workflow-lines {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0.8;
-    }
-
-    .workflow-lines path {
-      fill: none;
-      stroke: rgba(34, 211, 238, 0.45);
-      stroke-width: 2;
-      stroke-dasharray: 8 10;
-      animation: dashFlow 12s linear infinite;
-      filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.34));
-    }
-
-    @keyframes dashFlow {
-      to {
-        stroke-dashoffset: -160;
-      }
-    }
-
-    .node {
-      position: absolute;
-      width: 148px;
-      padding: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.16);
-      border-radius: 18px;
-      background: rgba(15, 23, 42, 0.9);
-      box-shadow: 0 16px 40px rgba(2, 8, 23, 0.28);
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .node:hover {
-      transform: translateY(-4px);
-      border-color: rgba(34, 211, 238, 0.38);
-    }
-
-    .node small {
-      display: block;
-      color: var(--muted);
-      font-size: 0.67rem;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .node strong {
-      display: block;
-      margin-top: 4px;
-      color: white;
-      font-size: 0.86rem;
-      line-height: 1.25;
-    }
-
-    .node .node-dot {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: var(--cyan);
-      box-shadow: 0 0 14px rgba(34, 211, 238, 0.82);
-    }
-
-    .node.input {
-      left: 7%;
-      top: 16%;
-    }
-
-    .node.ai {
-      left: 40%;
-      top: 10%;
-    }
-
-    .node.review {
-      left: 38%;
-      top: 60%;
-    }
-
-    .node.approval {
-      right: 8%;
-      top: 31%;
-    }
-
-    .table-tools {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .filter-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .input,
-    .select {
-      min-height: 42px;
-      border: 1px solid rgba(148, 163, 184, 0.14);
-      border-radius: 14px;
-      outline: none;
-      background: rgba(15, 23, 42, 0.62);
-      color: #e2e8f0;
-      font-size: 0.85rem;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .input {
-      width: min(320px, 100%);
-      padding: 0 13px;
-    }
-
-    .select {
-      padding: 0 12px;
-    }
-
-    .input:focus,
-    .select:focus {
-      border-color: rgba(34, 211, 238, 0.5);
-      box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.08);
-      background: rgba(15, 23, 42, 0.88);
-    }
-
-    .table-wrap {
-      max-width: 100%;
-      overflow: auto;
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      border-radius: 20px;
-      background: rgba(15, 23, 42, 0.36);
-    }
-
-    .data-table {
-      width: 100%;
-      min-width: 900px;
-      border-collapse: separate;
-      border-spacing: 0;
-      text-align: left;
-    }
-
-    .data-table th {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      padding: 13px 14px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-      background: rgba(15, 23, 42, 0.96);
-      color: #94a3b8;
-      font-size: 0.72rem;
-      font-weight: 850;
-      text-transform: uppercase;
-    }
-
-    .sort-button {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      color: inherit;
-      font: inherit;
-    }
-
-    .data-table td {
-      padding: 14px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
-      color: #dbeafe;
-      font-size: 0.84rem;
-      vertical-align: middle;
-    }
-
-    .data-table tbody tr {
-      transition: background 0.2s ease, transform 0.2s ease;
-    }
-
-    .data-table tbody tr:hover {
-      background: rgba(56, 189, 248, 0.055);
-    }
-
-    .doc-name {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .file-glyph {
-      display: grid;
-      width: 36px;
-      height: 36px;
-      flex: 0 0 auto;
-      place-items: center;
-      border-radius: 12px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.16), rgba(139, 92, 246, 0.14));
-      color: var(--cyan);
-    }
-
-    .doc-title {
-      display: block;
-      max-width: 260px;
-      overflow: hidden;
-      color: white;
-      font-weight: 800;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .doc-sub {
-      display: block;
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 0.72rem;
-    }
-
-    .confidence {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 120px;
-    }
-
-    .confidence-bar {
-      width: 72px;
-      height: 6px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.14);
-    }
-
-    .confidence-bar span {
-      display: block;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--emerald), var(--cyan));
-      box-shadow: 0 0 14px rgba(34, 211, 238, 0.4);
-    }
-
-    .row-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .pagination {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    .empty-state,
-    .skeleton-state {
-      padding: 28px;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    .skeleton-line {
-      display: block;
-      width: 100%;
-      height: 14px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(148, 163, 184, 0.08), rgba(148, 163, 184, 0.2), rgba(148, 163, 184, 0.08));
-      background-size: 240% 100%;
-      animation: skeleton 1.4s ease-in-out infinite;
-    }
-
-    @keyframes skeleton {
-      to {
-        background-position: -240% 0;
-      }
-    }
-
-    .page-heading {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 16px;
-      padding: 22px;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      background: rgba(8, 17, 32, 0.62);
-      backdrop-filter: var(--glass);
-    }
-
-    .page-heading h1 {
-      margin: 0;
-      color: white;
-      font-size: clamp(1.5rem, 2.5vw, 2.2rem);
-      font-weight: 850;
-      letter-spacing: 0;
-    }
-
-    .page-heading p {
-      max-width: 720px;
-      margin: 7px 0 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .kanban {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(260px, 1fr));
-      gap: 14px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-    }
-
-    .kanban-column {
-      min-height: 520px;
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      border-radius: 20px;
-      background: rgba(15, 23, 42, 0.48);
-    }
-
-    .kanban-head {
-      position: sticky;
-      top: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-      background: rgba(15, 23, 42, 0.88);
-      border-radius: 20px 20px 0 0;
-    }
-
-    .kanban-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: white;
-      font-size: 0.78rem;
-      font-weight: 850;
-      text-transform: uppercase;
-    }
-
-    .status-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: var(--cyan);
-      box-shadow: 0 0 14px rgba(34, 211, 238, 0.7);
-    }
-
-    .kanban-dropzone {
-      display: grid;
-      align-content: start;
-      gap: 10px;
-      min-height: 450px;
-      padding: 12px;
-      transition: background 0.2s ease;
-    }
-
-    .kanban-dropzone.is-over {
-      background: rgba(34, 211, 238, 0.06);
-    }
-
-    .kanban-card {
-      cursor: grab;
-      padding: 13px;
-      border: 1px solid rgba(148, 163, 184, 0.13);
-      border-radius: 16px;
-      background: rgba(8, 17, 32, 0.78);
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .kanban-card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(34, 211, 238, 0.32);
-      box-shadow: 0 18px 44px rgba(2, 8, 23, 0.24);
-    }
-
-    .kanban-card:active {
-      cursor: grabbing;
-    }
-
-    .kanban-card.dragging {
-      opacity: 0.55;
-      transform: rotate(1deg) scale(0.98);
-    }
-
-    .progress-track {
-      height: 6px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.14);
-    }
-
-    .progress-track span {
-      display: block;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--blue), var(--emerald));
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: rgba(2, 8, 23, 0.74);
-      backdrop-filter: blur(18px);
-      z-index: 80;
-      animation: fadeIn 0.2s ease both;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-
-    .modal-content {
-      width: min(680px, 100%);
-      max-height: 90vh;
-      overflow: auto;
-      border: 1px solid var(--border-strong);
-      border-radius: 24px;
-      background: linear-gradient(145deg, rgba(30, 41, 59, 0.94), rgba(8, 17, 32, 0.96));
-      box-shadow: 0 34px 100px rgba(2, 8, 23, 0.6);
-      animation: modalIn 0.24s ease both;
-    }
-
-    @keyframes modalIn {
-      from {
-        transform: translateY(16px) scale(0.98);
-      }
-      to {
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .modal-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 18px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .modal-title {
-      margin: 0;
-      color: white;
-      font-size: 1rem;
-      font-weight: 850;
-    }
-
-    .modal-body {
-      padding: 18px;
-    }
-
-    .dropzone {
-      display: grid;
-      min-height: 220px;
-      place-items: center;
-      padding: 24px;
-      border: 1px dashed rgba(56, 189, 248, 0.38);
-      border-radius: 20px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(139, 92, 246, 0.08));
-      color: #cbd5e1;
-      text-align: center;
-      transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
-      cursor: pointer;
-    }
-
-    .dropzone:hover,
-    .dropzone.dropzone-active {
-      transform: translateY(-2px);
-      border-color: rgba(34, 211, 238, 0.72);
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.13), rgba(139, 92, 246, 0.11));
-    }
-
-    .search-modal-input {
-      width: 100%;
-      height: 58px;
-      padding: 0 18px;
-      border: 1px solid rgba(34, 211, 238, 0.28);
-      border-radius: 18px;
-      outline: none;
-      background: rgba(15, 23, 42, 0.75);
-      color: white;
-      font-size: 1rem;
-      box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.06);
-    }
-
-    .suggestions {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .suggestion-button {
-      display: grid;
-      grid-template-columns: 38px minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      padding: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      border-radius: 16px;
-      background: rgba(15, 23, 42, 0.5);
-      color: #e2e8f0;
-      text-align: left;
-      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-    }
-
-    .suggestion-button:hover,
-    .suggestion-button:focus {
-      transform: translateY(-2px);
-      border-color: rgba(34, 211, 238, 0.32);
-      background: rgba(30, 41, 59, 0.7);
-      outline: none;
-    }
-
-    .drawer {
-      position: fixed;
-      inset: 0;
-      z-index: 75;
+      inset: auto -10% -40% auto;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(79,139,255,0.18), transparent 65%);
+      filter: blur(12px);
       pointer-events: none;
     }
-
-    .drawer::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(2, 8, 23, 0);
-      transition: background 0.2s ease;
+    .hero-title {
+      font-size: clamp(2.7rem, 5vw, 5.2rem);
+      letter-spacing: -0.075em;
+      line-height: 0.9;
+      max-width: 12ch;
+      margin: 14px 0 16px;
+      text-wrap: balance;
     }
-
-    .drawer.open {
-      pointer-events: auto;
-    }
-
-    .drawer.open::before {
-      background: rgba(2, 8, 23, 0.48);
-      backdrop-filter: blur(8px);
-    }
-
-    .drawer-panel {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      bottom: 16px;
-      width: min(460px, calc(100vw - 32px));
-      overflow: auto;
-      padding: 18px;
-      border: 1px solid var(--border-strong);
-      border-radius: 24px;
-      background: linear-gradient(145deg, rgba(30, 41, 59, 0.96), rgba(8, 17, 32, 0.98));
-      box-shadow: 0 30px 100px rgba(2, 8, 23, 0.64);
-      transform: translateX(calc(100% + 32px));
-      transition: transform 0.24s ease;
-    }
-
-    .drawer.open .drawer-panel {
-      transform: translateX(0);
-    }
-
-    .activity-popover {
-      position: fixed;
-      top: 94px;
-      right: 120px;
-      width: min(380px, calc(100vw - 32px));
-      padding: 14px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      background: rgba(15, 23, 42, 0.96);
-      box-shadow: 0 24px 80px rgba(2, 8, 23, 0.54);
-      backdrop-filter: var(--glass);
-      z-index: 70;
-    }
-
-    .mini-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .mini-tile {
-      padding: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.11);
-      border-radius: 18px;
-      background: rgba(15, 23, 42, 0.5);
-    }
-
-    .mini-tile strong {
-      display: block;
-      color: white;
-      font-size: 1.2rem;
-    }
-
-    .mini-tile span {
+    .hero-copy {
+      max-width: 70ch;
+      font-size: 1.02rem;
+      line-height: 1.75;
       color: var(--muted);
-      font-size: 0.76rem;
     }
-
-    @media (max-width: 1440px) {
-      .metrics-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
+    .hero-copy strong { color: var(--text); }
+    .hero-actions { margin-top: 24px; }
     @media (max-width: 1180px) {
-      .hero-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .dashboard-grid {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
-      }
-
-      .span-8,
-      .span-7,
-      .span-6,
-      .span-5,
-      .span-4 {
-        grid-column: span 6;
-      }
-
-      .chart-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .heatmap {
-        grid-template-columns: repeat(14, 1fr);
-      }
+      .workflow-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-
-    @media (max-width: 980px) {
-      .app-shell,
-      .app-shell.sidebar-collapsed {
-        grid-template-columns: 1fr;
-        padding: 12px;
-      }
-
-      .sidebar {
-        position: fixed;
-        left: 12px;
-        top: 12px;
-        bottom: 12px;
-        width: min(312px, calc(100vw - 24px));
-        height: auto;
-        transform: translateX(calc(-100% - 24px));
-        transition: transform 0.25s ease;
-      }
-
-      .sidebar.open {
-        transform: translateX(0);
-      }
-
-      .mobile-menu {
-        display: inline-grid;
-      }
-
-      .topbar {
-        top: 12px;
-        border-radius: 20px;
-      }
-
-      .top-actions .button span {
-        display: none;
-      }
-    }
-
     @media (max-width: 760px) {
-      .metrics-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        flex-wrap: wrap;
-      }
-
-      .ai-search {
-        flex-basis: 100%;
-        order: 3;
-      }
-
-      .hero-title {
-        font-size: 2.25rem;
-      }
-
-      .summary-panel {
-        padding: 12px;
-      }
-
-      .page-heading {
-        flex-direction: column;
-      }
-
-      .mini-grid {
-        grid-template-columns: 1fr;
-      }
+      .workflow-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-
 <body>
-  <!-- Mobile sidebar backdrop -->
   <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
 
-  <!-- Scroll to top -->
   <button id="scrollTopBtn" class="scroll-top-btn" type="button" aria-label="Scroll to top">
     <i data-feather="chevron-up"></i>
   </button>
 
-  <div id="appShell" class="app-shell">
-    <aside id="sidebar" class="sidebar">
+  <div id="appShell" class="dashboard-shell app-shell">
+    <aside id="sidebar" class="sidebar sidebar-shell">
       <div class="brand">
         <div class="brand-lockup">
           <div class="ai-logo" aria-hidden="true"><i data-feather="cpu"></i></div>
@@ -1882,33 +117,15 @@
       </div>
 
       <nav id="sidebar-nav" class="nav" aria-label="Main navigation">
-        <a href="#dashboard" class="nav-link active" data-target="dashboard" data-tooltip="Dashboard" title="Dashboard">
-          <i data-feather="grid"></i><span class="nav-label">Dashboard</span>
-        </a>
-        <a href="#documents" class="nav-link" data-target="documents" data-tooltip="Documents" title="Documents">
-          <i data-feather="file-text"></i><span class="nav-label">Documents</span>
-        </a>
-        <a href="#workflows" class="nav-link" data-target="workflows" data-tooltip="Workflows" title="Workflows">
-          <i data-feather="git-branch"></i><span class="nav-label">Workflows</span>
-        </a>
-        <a href="#ai-insights" class="nav-link" data-target="ai-insights" data-tooltip="AI Insights" title="AI Insights">
-          <i data-feather="cpu"></i><span class="nav-label">AI Insights</span>
-        </a>
-        <a href="#smart-search" class="nav-link" data-target="smart-search" data-tooltip="Smart Search" title="Smart Search">
-          <i data-feather="search"></i><span class="nav-label">Smart Search</span>
-        </a>
-        <a href="#approvals" class="nav-link" data-target="approvals" data-tooltip="Approvals" title="Approvals">
-          <i data-feather="check-circle"></i><span class="nav-label">Approvals</span>
-        </a>
-        <a href="#analytics" class="nav-link" data-target="analytics" data-tooltip="Analytics" title="Analytics">
-          <i data-feather="bar-chart-2"></i><span class="nav-label">Analytics</span>
-        </a>
-        <a href="#team" class="nav-link" data-target="team" data-tooltip="Team" title="Team">
-          <i data-feather="users"></i><span class="nav-label">Team</span>
-        </a>
-        <a href="#settings" class="nav-link" data-target="settings" data-tooltip="Settings" title="Settings">
-          <i data-feather="settings"></i><span class="nav-label">Settings</span>
-        </a>
+        <a href="#dashboard" class="nav-link active" data-target="dashboard" data-tooltip="Dashboard"><i data-feather="grid"></i><span class="nav-label">Dashboard</span></a>
+        <a href="#documents" class="nav-link" data-target="documents" data-tooltip="Documents"><i data-feather="file-text"></i><span class="nav-label">Documents</span></a>
+        <a href="#workflows" class="nav-link" data-target="workflows" data-tooltip="Workflows"><i data-feather="git-branch"></i><span class="nav-label">Workflows</span></a>
+        <a href="#ai-insights" class="nav-link" data-target="ai-insights" data-tooltip="AI Insights"><i data-feather="cpu"></i><span class="nav-label">AI Insights</span></a>
+        <a href="#smart-search" class="nav-link" data-target="smart-search" data-tooltip="Smart Search"><i data-feather="search"></i><span class="nav-label">Smart Search</span></a>
+        <a href="#approvals" class="nav-link" data-target="approvals" data-tooltip="Approvals"><i data-feather="check-circle"></i><span class="nav-label">Approvals</span></a>
+        <a href="#analytics" class="nav-link" data-target="analytics" data-tooltip="Analytics"><i data-feather="bar-chart-2"></i><span class="nav-label">Analytics</span></a>
+        <a href="#team" class="nav-link" data-target="team" data-tooltip="Team"><i data-feather="users"></i><span class="nav-label">Team</span></a>
+        <a href="#settings" class="nav-link" data-target="settings" data-tooltip="Settings"><i data-feather="settings"></i><span class="nav-label">Settings</span></a>
       </nav>
 
       <div class="sidebar-footer">
@@ -1920,20 +137,16 @@
           </div>
           <span class="role-badge">Online</span>
         </div>
-        <button id="assistantQuickAction" class="assistant-action" type="button">
-          <i data-feather="zap"></i><span class="assist-label">Ask document AI</span>
-        </button>
-        <a href="/" id="logoutBtn" class="logout-action" onclick="document.cookie='token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'; return true;">
-          <i data-feather="log-out"></i><span class="assist-label">Log out</span>
-        </a>
+        <button id="assistantQuickAction" class="assistant-action" type="button"><i data-feather="zap"></i><span class="assist-label">Ask document AI</span></button>
+        <form action="/logout" method="POST" class="m-0">
+          <button id="logoutBtn" class="logout-action w-full" type="submit"><i data-feather="log-out"></i><span class="assist-label">Log out</span></button>
+        </form>
       </div>
     </aside>
 
     <div class="main-shell">
       <header class="topbar">
-        <button id="mobileMenu" class="icon-button mobile-menu" type="button" aria-label="Open menu">
-          <i data-feather="menu"></i>
-        </button>
+        <button id="mobileMenu" class="icon-button mobile-menu" type="button" aria-label="Open menu"><i data-feather="menu"></i></button>
 
         <div class="ai-search">
           <i data-feather="search"></i>
@@ -1942,18 +155,10 @@
         </div>
 
         <div class="top-actions">
-          <button id="quickUploadBtn" class="button primary" type="button">
-            <i data-feather="upload-cloud"></i><span>Upload</span>
-          </button>
-          <button id="activityFeedBtn" class="icon-button" type="button" aria-label="Activity feed">
-            <i data-feather="activity"></i>
-          </button>
-          <button id="notificationBtn" class="icon-button" type="button" aria-label="Notifications">
-            <i data-feather="bell"></i><span class="notification-dot"></span>
-          </button>
-          <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle theme">
-            <i data-feather="moon"></i>
-          </button>
+          <button id="quickUploadBtn" class="button primary" type="button"><i data-feather="upload-cloud"></i><span>Upload</span></button>
+          <button id="activityFeedBtn" class="icon-button" type="button" aria-label="Activity feed"><i data-feather="activity"></i></button>
+          <button id="notificationBtn" class="icon-button" type="button" aria-label="Notifications"><i data-feather="bell"></i><span class="notification-dot"></span></button>
+          <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle theme"><i data-feather="moon"></i></button>
           <button id="avatarBtn" class="avatar" type="button" aria-label="User profile">U</button>
         </div>
       </header>
@@ -1973,9 +178,9 @@
         <section id="dashboard" class="page-content">
           <div class="hero-grid">
             <article class="hero-panel">
-              <div class="eyebrow"><span class="pulse-dot"></span><span id="aiStatus">AI routing engine online</span></div>
-              <h1 class="hero-title"><span id="greeting">Good Evening, User</span><br><span class="gradient-text">Your documents are moving intelligently.</span></h1>
-              <p class="hero-copy">Your AI assistant processed <strong id="heroProcessed">0</strong> documents today, detected workflow priority, and surfaced the next approval actions across the workspace.</p>
+              <div class="eyebrow"><span class="pulse-dot"></span><span id="aiStatus">The document intelligence market is live</span></div>
+              <h1 class="hero-title"><span id="greeting">Good Evening, User</span><br><span class="gradient-text">Where documents become intelligence.</span></h1>
+              <p class="hero-copy">The workspace processed <strong id="heroProcessed">0</strong> documents today, surfaced the highest-priority approvals, and routed the next actions across your operational flow.</p>
               <div class="hero-actions">
                 <button id="heroUploadBtn" class="button primary" type="button"><i data-feather="upload-cloud"></i>Quick upload</button>
                 <button id="heroSearchBtn" class="button" type="button"><i data-feather="command"></i>Open AI command</button>
@@ -1984,6 +189,13 @@
             </article>
 
             <aside class="panel summary-panel">
+              <div class="panel-header" style="margin-bottom: 14px;">
+                <div>
+                  <h2 class="panel-title">Built in, not bolted on</h2>
+                  <p class="panel-subtitle">Every control ships with the workspace.</p>
+                </div>
+                <span class="panel-pill"><i data-feather="layers"></i>Included</span>
+              </div>
               <div class="summary-chip">
                 <div>
                   <span>Workflow Summary</span>
@@ -2008,66 +220,51 @@
             </aside>
           </div>
 
+          <div class="hero-grid" style="margin-top: 18px;">
+            <article class="panel section-card">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Three steps from upload to approval</h2>
+                  <p class="panel-subtitle">A compact view of the workspace pipeline.</p>
+                </div>
+              </div>
+              <div class="workflow-grid">
+                <div class="workflow-step glass-card">
+                  <div class="eyebrow"><span class="pulse-dot"></span><span>01 Intake</span></div>
+                  <h3 class="panel-title" style="margin-top: 10px; font-size: 1rem;">Upload and classify</h3>
+                  <p class="panel-subtitle">Drop files in once. OCR, tags, and confidence arrive automatically.</p>
+                </div>
+                <div class="workflow-step glass-card">
+                  <div class="eyebrow"><span class="pulse-dot"></span><span>02 Review</span></div>
+                  <h3 class="panel-title" style="margin-top: 10px; font-size: 1rem;">Validate and comment</h3>
+                  <p class="panel-subtitle">Use the queue, preview drawer, and notes to make a fast decision.</p>
+                </div>
+                <div class="workflow-step glass-card">
+                  <div class="eyebrow"><span class="pulse-dot"></span><span>03 Route</span></div>
+                  <h3 class="panel-title" style="margin-top: 10px; font-size: 1rem;">Approve or escalate</h3>
+                  <p class="panel-subtitle">Send documents forward with a single action and a full audit trail.</p>
+                </div>
+                <div class="workflow-step glass-card">
+                  <div class="eyebrow"><span class="pulse-dot"></span><span>04 Learn</span></div>
+                  <h3 class="panel-title" style="margin-top: 10px; font-size: 1rem;">Improve the model</h3>
+                  <p class="panel-subtitle">The workspace adapts from your actions and improves future routing.</p>
+                </div>
+              </div>
+            </article>
+          </div>
+
           <div class="metrics-grid">
             <article class="glass-card metric-card">
-              <div class="metric-top">
-                <div class="metric-icon"><i data-feather="file-text"></i></div>
-                <span class="trend"><i data-feather="trending-up"></i>12%</span>
-              </div>
+              <div class="metric-top"><div class="metric-icon"><i data-feather="file-text"></i></div><span class="trend"><i data-feather="trending-up"></i>12%</span></div>
               <p class="metric-label">Total Documents</p>
               <p class="metric-value" id="totalDocs">0</p>
               <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#38bdf8" d="M2 30 C18 18, 26 22, 40 14 S70 12, 82 20 S102 26, 118 8"></path></svg>
             </article>
-
-            <article class="glass-card metric-card">
-              <div class="metric-top">
-                <div class="metric-icon violet"><i data-feather="cpu"></i></div>
-                <span class="trend"><i data-feather="zap"></i>Live</span>
-              </div>
-              <p class="metric-label">AI Processed</p>
-              <p class="metric-value" id="aiProcessed">0</p>
-              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#8b5cf6" d="M2 28 C18 30, 24 12, 40 18 S62 34, 76 16 S96 4, 118 12"></path></svg>
-            </article>
-
-            <article class="glass-card metric-card">
-              <div class="metric-top">
-                <div class="metric-icon orange"><i data-feather="clock"></i></div>
-                <span class="trend warn"><i data-feather="alert-triangle"></i>Queue</span>
-              </div>
-              <p class="metric-label">Pending Approvals</p>
-              <p class="metric-value" id="pendingApproval">0</p>
-              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#fb923c" d="M2 26 C14 14, 28 18, 40 24 S60 32, 72 20 S94 14, 118 18"></path></svg>
-            </article>
-
-            <article class="glass-card metric-card">
-              <div class="metric-top">
-                <div class="metric-icon emerald"><i data-feather="git-branch"></i></div>
-                <span class="trend"><i data-feather="activity"></i>4 lanes</span>
-              </div>
-              <p class="metric-label">Active Workflows</p>
-              <p class="metric-value" id="activeWorkflows">0</p>
-              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#34d399" d="M2 31 C20 28, 28 8, 44 10 S70 32, 88 17 S104 20, 118 7"></path></svg>
-            </article>
-
-            <article class="glass-card metric-card">
-              <div class="metric-top">
-                <div class="metric-icon"><i data-feather="archive"></i></div>
-                <span class="trend"><i data-feather="database"></i>Safe</span>
-              </div>
-              <p class="metric-label">Archived Files</p>
-              <p class="metric-value" id="archivedDocs">0</p>
-              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#22d3ee" d="M2 24 C20 24, 25 28, 38 20 S62 18, 76 14 S96 18, 118 10"></path></svg>
-            </article>
-
-            <article class="glass-card metric-card">
-              <div class="metric-top">
-                <div class="metric-icon violet"><i data-feather="target"></i></div>
-                <span class="trend"><i data-feather="check"></i>High</span>
-              </div>
-              <p class="metric-label">AI Accuracy Rate</p>
-              <p class="metric-value"><span id="accuracyRate">0</span>%</p>
-              <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#ec4899" d="M2 31 C18 27, 29 24, 42 17 S70 14, 82 10 S102 8, 118 5"></path></svg>
-            </article>
+            <article class="glass-card metric-card"><div class="metric-top"><div class="metric-icon violet"><i data-feather="cpu"></i></div><span class="trend"><i data-feather="zap"></i>Live</span></div><p class="metric-label">AI Processed</p><p class="metric-value" id="aiProcessed">0</p><svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#8b5cf6" d="M2 28 C18 30, 24 12, 40 18 S62 34, 76 16 S96 4, 118 12"></path></svg></article>
+            <article class="glass-card metric-card"><div class="metric-top"><div class="metric-icon orange"><i data-feather="clock"></i></div><span class="trend warn"><i data-feather="alert-triangle"></i>Queue</span></div><p class="metric-label">Pending Approvals</p><p class="metric-value" id="pendingApproval">0</p><svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#fb923c" d="M2 26 C14 14, 28 18, 40 24 S60 32, 72 20 S94 14, 118 18"></path></svg></article>
+            <article class="glass-card metric-card"><div class="metric-top"><div class="metric-icon emerald"><i data-feather="git-branch"></i></div><span class="trend"><i data-feather="activity"></i>4 lanes</span></div><p class="metric-label">Active Workflows</p><p class="metric-value" id="activeWorkflows">0</p><svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#34d399" d="M2 31 C20 28, 28 8, 44 10 S70 32, 88 17 S104 20, 118 7"></path></svg></article>
+            <article class="glass-card metric-card"><div class="metric-top"><div class="metric-icon"><i data-feather="archive"></i></div><span class="trend"><i data-feather="database"></i>Safe</span></div><p class="metric-label">Archived Files</p><p class="metric-value" id="archivedDocs">0</p><svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#22d3ee" d="M2 24 C20 24, 25 28, 38 20 S62 18, 76 14 S96 18, 118 10"></path></svg></article>
+            <article class="glass-card metric-card"><div class="metric-top"><div class="metric-icon violet"><i data-feather="target"></i></div><span class="trend"><i data-feather="check"></i>High</span></div><p class="metric-label">AI Accuracy Rate</p><p class="metric-value"><span id="accuracyRate">0</span>%</p><svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true"><path stroke="#ec4899" d="M2 31 C18 27, 29 24, 42 17 S70 14, 82 10 S102 8, 118 5"></path></svg></article>
           </div>
 
           <div class="dashboard-grid">
@@ -2101,9 +298,7 @@
                 </div>
                 <span class="panel-pill"><span class="pulse-dot"></span> Now</span>
               </div>
-              <div id="activityList" class="timeline">
-                <div class="skeleton-state"><span class="skeleton-line"></span></div>
-              </div>
+              <div id="activityList" class="timeline"><div class="skeleton-state"><span class="skeleton-line"></span></div></div>
             </aside>
 
             <article class="panel span-4">
@@ -2126,12 +321,7 @@
                 <span class="panel-pill"><i data-feather="git-branch"></i> Node view</span>
               </div>
               <div class="workflow-map">
-                <svg class="workflow-lines" viewBox="0 0 640 320" preserveAspectRatio="none" aria-hidden="true">
-                  <path d="M92 88 C190 70 210 44 296 54"></path>
-                  <path d="M370 88 C450 100 492 122 548 142"></path>
-                  <path d="M306 106 C250 160 244 230 306 244"></path>
-                  <path d="M386 242 C450 226 500 206 548 174"></path>
-                </svg>
+                <svg class="workflow-lines" viewBox="0 0 640 320" preserveAspectRatio="none" aria-hidden="true"><path d="M92 88 C190 70 210 44 296 54"></path><path d="M370 88 C450 100 492 122 548 142"></path><path d="M306 106 C250 160 244 230 306 244"></path><path d="M386 242 C450 226 500 206 548 174"></path></svg>
                 <div class="node input"><span class="node-dot"></span><small>Intake</small><strong>Smart upload</strong></div>
                 <div class="node ai"><span class="node-dot"></span><small>AI</small><strong>Classify and extract</strong></div>
                 <div class="node review"><span class="node-dot"></span><small>Review</small><strong>Human validation</strong></div>
@@ -2163,7 +353,7 @@
                 </div>
                 <button class="button" type="button" data-nav-target="documents"><i data-feather="file-text"></i>Open documents</button>
               </div>
-              <div class="table-wrap">
+              <div class="table-wrap doc-shell">
                 <table class="data-table">
                   <thead>
                     <tr>
@@ -2177,9 +367,7 @@
                       <th>Actions</th>
                     </tr>
                   </thead>
-                  <tbody id="dashboard-documents-body">
-                    <tr><td colspan="8" class="skeleton-state"><span class="skeleton-line"></span></td></tr>
-                  </tbody>
+                  <tbody id="dashboard-documents-body"><tr><td colspan="8" class="skeleton-state"><span class="skeleton-line"></span></td></tr></tbody>
                 </table>
               </div>
             </article>
@@ -2188,10 +376,7 @@
 
         <section id="documents" class="page-content hidden">
           <div class="page-heading">
-            <div>
-              <h1>Documents</h1>
-              <p>AI-tagged document operations with filtering, sorting, preview drawer, and upload flow.</p>
-            </div>
+            <div><h1>Documents</h1><p>AI-tagged document operations with filtering, sorting, preview drawer, and upload flow.</p></div>
             <button id="upload-btn" class="button primary" type="button"><i data-feather="upload-cloud"></i>Upload document</button>
           </div>
 
@@ -2199,28 +384,13 @@
             <div class="table-tools">
               <div class="filter-grid">
                 <input id="docSearchInput" class="input" type="search" placeholder="Search document name or tag">
-                <select id="statusFilter" class="select">
-                  <option value="all">All statuses</option>
-                  <option value="approved">Approved</option>
-                  <option value="pending">Pending</option>
-                  <option value="processing">Processing</option>
-                  <option value="review">In review</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="archived">Archived</option>
-                </select>
-                <select id="typeFilter" class="select">
-                  <option value="all">All types</option>
-                  <option value="PDF">PDF</option>
-                  <option value="DOCX">DOCX</option>
-                  <option value="XLSX">XLSX</option>
-                  <option value="PNG">PNG</option>
-                  <option value="JPG">JPG</option>
-                </select>
+                <select id="statusFilter" class="select"><option value="all">All statuses</option><option value="approved">Approved</option><option value="pending">Pending</option><option value="processing">Processing</option><option value="review">In review</option><option value="rejected">Rejected</option><option value="archived">Archived</option></select>
+                <select id="typeFilter" class="select"><option value="all">All types</option><option value="PDF">PDF</option><option value="DOCX">DOCX</option><option value="XLSX">XLSX</option><option value="PNG">PNG</option><option value="JPG">JPG</option></select>
                 <input id="dateFilter" class="select" type="date">
               </div>
               <button id="resetFiltersBtn" class="button" type="button"><i data-feather="refresh-cw"></i>Reset</button>
             </div>
-            <div class="table-wrap">
+            <div class="table-wrap doc-shell">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -2234,9 +404,7 @@
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody id="documents-table-body">
-                  <tr><td colspan="8" class="skeleton-state"><span class="skeleton-line"></span></td></tr>
-                </tbody>
+                <tbody id="documents-table-body"><tr><td colspan="8" class="skeleton-state"><span class="skeleton-line"></span></td></tr></tbody>
               </table>
             </div>
             <div id="documentsPagination" class="pagination"></div>
@@ -2245,37 +413,23 @@
 
         <section id="workflows" class="page-content hidden">
           <div class="page-heading">
-            <div>
-              <h1>Workflows</h1>
-              <p>Move documents across the approval lifecycle with AI confidence, priority, and routing status visible in every card.</p>
-            </div>
+            <div><h1>Workflows</h1><p>Move documents across the approval lifecycle with AI confidence, priority, and routing status visible in every card.</p></div>
             <button class="button primary" type="button"><i data-feather="plus"></i>New workflow</button>
           </div>
-
-          <article class="panel">
-            <div id="kanbanBoard" class="kanban"></div>
-          </article>
+          <article class="panel"><div id="kanbanBoard" class="kanban"></div></article>
         </section>
 
         <section id="ai-insights" class="page-content hidden">
           <div class="page-heading">
-            <div>
-              <h1>AI Insights</h1>
-              <p>Smart alerts, anomalies, bottlenecks, and automation opportunities for the document workspace.</p>
-            </div>
+            <div><h1>AI Insights</h1><p>Smart alerts, anomalies, bottlenecks, and automation opportunities for the document workspace.</p></div>
             <button class="button" type="button" id="refreshInsightsBtn"><i data-feather="refresh-cw"></i>Refresh</button>
           </div>
-          <article class="panel">
-            <div id="insightsPageList" class="insights-list"></div>
-          </article>
+          <article class="panel"><div id="insightsPageList" class="insights-list"></div></article>
         </section>
 
         <section id="smart-search" class="page-content hidden">
           <div class="page-heading">
-            <div>
-              <h1>Smart Search</h1>
-              <p>Natural language retrieval for pending approvals, finance files, contracts, and OCR text.</p>
-            </div>
+            <div><h1>Smart Search</h1><p>Natural language retrieval for pending approvals, finance files, contracts, and OCR text.</p></div>
             <button id="smartSearchOpenBtn" class="button primary" type="button"><i data-feather="command"></i>Open command</button>
           </div>
           <article class="panel">
@@ -2301,32 +455,19 @@
 
         <section id="approvals" class="page-content hidden">
           <div class="page-heading">
-            <div>
-              <h1>Approvals</h1>
-              <p>Priority queue for reviewer handoffs, AI checks, and policy-controlled approvals.</p>
-            </div>
+            <div><h1>Approvals</h1><p>Priority queue for reviewer handoffs, AI checks, and policy-controlled approvals.</p></div>
             <a class="button primary" href="/admin/pending-docs"><i data-feather="shield"></i>Admin queue</a>
           </div>
-          <article class="panel">
-            <div id="approvalQueue" class="timeline"></div>
-          </article>
+          <article class="panel"><div id="approvalQueue" class="timeline"></div></article>
         </section>
 
         <section id="analytics" class="page-content hidden">
           <div class="page-heading">
-            <div>
-              <h1>Analytics</h1>
-              <p>Operational visibility for document volume, review speed, SLA health, and AI automation lift.</p>
-            </div>
+            <div><h1>Analytics</h1><p>Operational visibility for document volume, review speed, SLA health, and AI automation lift.</p></div>
           </div>
           <div class="dashboard-grid">
             <article class="panel span-8">
-              <div class="panel-header">
-                <div>
-                  <h2 class="panel-title">Document Trends</h2>
-                  <p class="panel-subtitle">Same live activity data in expanded analytics mode.</p>
-                </div>
-              </div>
+              <div class="panel-header"><div><h2 class="panel-title">Document Trends</h2><p class="panel-subtitle">Same live activity data in expanded analytics mode.</p></div></div>
               <div class="chart-wrap"><canvas id="analyticsChart"></canvas></div>
             </article>
             <article class="panel span-4">
@@ -2341,38 +482,21 @@
 
         <section id="team" class="page-content hidden">
           <div class="page-heading">
-            <div>
-              <h1>Team</h1>
-              <p>Reviewer workload, ownership, and collaboration signals for document operations.</p>
-            </div>
+            <div><h1>Team</h1><p>Reviewer workload, ownership, and collaboration signals for document operations.</p></div>
             <button class="button" type="button"><i data-feather="users"></i>Invite member</button>
           </div>
-          <article class="panel">
-            <div class="mini-grid">
-              <div class="mini-tile"><strong>8</strong><span>Reviewers</span></div>
-              <div class="mini-tile"><strong>3</strong><span>Active admins</span></div>
-              <div class="mini-tile"><strong>92%</strong><span>Load balance</span></div>
-            </div>
-          </article>
+          <article class="panel"><div class="mini-grid"><div class="mini-tile"><strong>8</strong><span>Reviewers</span></div><div class="mini-tile"><strong>3</strong><span>Active admins</span></div><div class="mini-tile"><strong>92%</strong><span>Load balance</span></div></div></article>
         </section>
 
         <section id="settings" class="page-content hidden">
           <div class="page-heading">
-            <div>
-              <h1>Settings</h1>
-              <p>Workspace intelligence, security, notification, and integration controls.</p>
-            </div>
+            <div><h1>Settings</h1><p>Workspace intelligence, security, notification, and integration controls.</p></div>
           </div>
           <article class="panel">
             <div class="insights-list">
-              <div class="insight-item">
-                <div class="insight-icon"><i data-feather="lock"></i></div>
-                <div><p class="insight-title">Policy guardrails</p><p class="insight-copy">Approval routing is aligned with document category and user role.</p></div>
-              </div>
-              <div class="insight-item">
-                <div class="insight-icon"><i data-feather="sliders"></i></div>
-                <div><p class="insight-title">AI confidence threshold</p><p class="insight-copy">Documents below 86% confidence are routed to manual review.</p></div>
-              </div>
+              <div class="insight-item"><div class="insight-icon"><i data-feather="lock"></i></div><div><p class="insight-title">Policy guardrails</p><p class="insight-copy">Approval routing is aligned with document category and user role.</p></div></div>
+              <div class="insight-item"><div class="insight-icon"><i data-feather="sliders"></i></div><div><p class="insight-title">AI confidence threshold</p><p class="insight-copy">Documents below 86% confidence are routed to manual review.</p></div></div>
+              <div class="insight-item"><div class="insight-icon"><i data-feather="shield"></i></div><div><p class="insight-title">Security posture</p><p class="insight-copy">Session management, encryption, and audit trails are active for the workspace.</p></div></div>
             </div>
           </article>
         </section>
@@ -2387,9 +511,7 @@
           <h2 id="uploadTitle" class="modal-title">Upload New Document</h2>
           <p class="panel-subtitle">AI classification starts as soon as the file lands.</p>
         </div>
-        <button id="close-upload-modal-btn" class="icon-button" type="button" aria-label="Close upload">
-          <i data-feather="x"></i>
-        </button>
+        <button id="close-upload-modal-btn" class="icon-button" type="button" aria-label="Close upload"><i data-feather="x"></i></button>
       </div>
       <div class="modal-body">
         <div id="dropzone" class="dropzone">
@@ -2412,9 +534,7 @@
           <h2 id="aiSearchTitle" class="modal-title">AI Command Search</h2>
           <p class="panel-subtitle">Try: "Find all pending finance invoices from March."</p>
         </div>
-        <button id="closeSearchModal" class="icon-button" type="button" aria-label="Close AI search">
-          <i data-feather="x"></i>
-        </button>
+        <button id="closeSearchModal" class="icon-button" type="button" aria-label="Close AI search"><i data-feather="x"></i></button>
       </div>
       <div class="modal-body">
         <input id="aiSearchInput" class="search-modal-input" type="text" autocomplete="off" placeholder="Ask a natural language document question">
@@ -2430,16 +550,14 @@
           <h2 id="previewTitle" class="panel-title">Document Preview</h2>
           <p id="previewMeta" class="panel-subtitle"></p>
         </div>
-        <button id="closePreviewDrawer" class="icon-button" type="button" aria-label="Close preview">
-          <i data-feather="x"></i>
-        </button>
+        <button id="closePreviewDrawer" class="icon-button" type="button" aria-label="Close preview"><i data-feather="x"></i></button>
       </div>
       <div id="previewContent" class="insights-list"></div>
     </div>
   </aside>
 
   <script>
-    feather.replace();
+    if (window.feather) feather.replace();
 
     const appShell = document.getElementById("appShell");
     const sidebar = document.getElementById("sidebar");
@@ -2450,11 +568,7 @@
     const searchInput = document.getElementById("searchInput");
     const themeToggle = document.getElementById("theme-toggle");
     const uploadModal = document.getElementById("upload-modal");
-    const uploadButtons = [
-      document.getElementById("quickUploadBtn"),
-      document.getElementById("heroUploadBtn"),
-      document.getElementById("upload-btn")
-    ].filter(Boolean);
+    const uploadButtons = [document.getElementById("quickUploadBtn"), document.getElementById("heroUploadBtn"), document.getElementById("upload-btn")].filter(Boolean);
     const closeUploadModalBtn = document.getElementById("close-upload-modal-btn");
     const dropzone = document.getElementById("dropzone");
     const fileInput = document.getElementById("file-input");
@@ -2471,19 +585,10 @@
     const activityPopover = document.getElementById("activityPopover");
     const activityFeedBtn = document.getElementById("activityFeedBtn");
     const notificationBtn = document.getElementById("notificationBtn");
+    const scrollTopBtn = document.getElementById("scrollTopBtn");
+    const sidebarBackdrop = document.getElementById("sidebarBackdrop");
 
-    const state = {
-      documents: [],
-      visibleDocuments: [],
-      stats: { total: 0, today: 0, pending: 0, archived: 0, monthly: Array(12).fill(0) },
-      activities: [],
-      page: 1,
-      pageSize: 7,
-      sortKey: "createdAt",
-      sortDirection: "desc",
-      searchResults: []
-    };
-
+    const state = { documents: [], visibleDocuments: [], stats: { total: 0, today: 0, pending: 0, archived: 0, monthly: Array(12).fill(0) }, activities: [], page: 1, pageSize: 7, sortKey: "createdAt", sortDirection: "desc" };
     const workflowItems = [
       { id: "doc-1", title: "Q3_Financial_Report.pdf", type: "PDF", status: "pending", priority: "High", aiConfidence: 98, assignee: "AS" },
       { id: "doc-2", title: "Metro_Safety_Audit_v2.docx", type: "DOCX", status: "processing", priority: "Medium", aiConfidence: 87, assignee: "JD" },
@@ -2497,32 +602,12 @@
     let debounceTimer;
 
     function escapeHtml(value) {
-      return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+      return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
-
-    function formatStatus(status) {
-      return String(status || "pending").replace(/_/g, " ");
-    }
-
-    function getDocumentId(doc) {
-      return doc._id || doc.id || doc.fileName;
-    }
-
-    function hashString(value) {
-      return String(value || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    }
-
-    function getConfidence(doc) {
-      if (typeof doc.confidence === "number") return doc.confidence;
-      const base = 82 + (hashString(doc.fileName) % 17);
-      return Math.min(99, base);
-    }
-
+    function formatStatus(status) { return String(status || "pending").replace(/_/g, " "); }
+    function getDocumentId(doc) { return doc._id || doc.id || doc.fileName; }
+    function hashString(value) { return String(value || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0); }
+    function getConfidence(doc) { if (typeof doc.confidence === "number") return doc.confidence; return Math.min(99, 82 + (hashString(doc.fileName) % 17)); }
     function getCategory(doc) {
       const keywords = Array.isArray(doc.keywords) ? doc.keywords.filter(Boolean) : [];
       if (keywords.length) return keywords[0];
@@ -2537,169 +622,59 @@
       if (type === "docx") return "Document";
       return "General";
     }
-
-    function formatDate(value) {
-      if (!value) return "-";
-      return new Date(value).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-    }
-
-    function relativeTime(value) {
-      if (!value) return "Just now";
-      const diff = Date.now() - new Date(value).getTime();
-      const minutes = Math.max(1, Math.round(diff / 60000));
-      if (minutes < 60) return `${minutes}m ago`;
-      const hours = Math.round(minutes / 60);
-      if (hours < 24) return `${hours}h ago`;
-      return `${Math.round(hours / 24)}d ago`;
-    }
-
-    function setGreeting() {
-      const hour = new Date().getHours();
-      const label = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
-      document.getElementById("greeting").textContent = `${label}, User`;
-    }
-
-    function toggleModal(modal, show) {
-      modal.classList.toggle("hidden", !show);
-      if (show) feather.replace();
-    }
+    function formatDate(value) { if (!value) return "-"; return new Date(value).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+    function relativeTime(value) { if (!value) return "Just now"; const diff = Date.now() - new Date(value).getTime(); const minutes = Math.max(1, Math.round(diff / 60000)); if (minutes < 60) return `${minutes}m ago`; const hours = Math.round(minutes / 60); if (hours < 24) return `${hours}h ago`; return `${Math.round(hours / 24)}d ago`; }
+    function setGreeting() { const hour = new Date().getHours(); const label = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening"; document.getElementById("greeting").textContent = `${label}, User`; }
+    function toggleModal(modal, show) { modal.classList.toggle("hidden", !show); }
 
     function navigate(targetId) {
-      document.querySelectorAll(".nav-link").forEach(link => {
-        link.classList.toggle("active", link.dataset.target === targetId);
-      });
-
-      // Smooth cross-fade transition
+      document.querySelectorAll(".nav-link").forEach(link => link.classList.toggle("active", link.dataset.target === targetId));
       const currentPage = document.querySelector(".page-content:not(.hidden)");
       const target = document.getElementById(targetId);
-
       if (currentPage && currentPage !== target) {
         currentPage.classList.add("page-exiting");
         setTimeout(() => {
           pageContents.forEach(page => { page.classList.add("hidden"); page.classList.remove("page-exiting", "page-entering"); });
-          if (target) {
-            target.classList.remove("hidden");
-            target.classList.add("page-entering");
-          }
-          requestAnimationFrame(() => {
-            if (activityChart) activityChart.resize();
-            if (analyticsChart) analyticsChart.resize();
-          });
-          feather.replace();
-        }, 200);
+          if (target) { target.classList.remove("hidden"); target.classList.add("page-entering"); }
+          if (activityChart) activityChart.resize();
+          if (analyticsChart) analyticsChart.resize();
+          if (window.feather) feather.replace();
+        }, 170);
       } else {
         pageContents.forEach(page => page.classList.add("hidden"));
         if (target) { target.classList.remove("hidden"); target.classList.add("page-entering"); }
-        feather.replace();
+        if (window.feather) feather.replace();
       }
-
-      if (window.innerWidth < 981) {
-        sidebar.classList.remove("open");
-        document.getElementById("sidebarBackdrop").classList.remove("active");
-      }
+      if (window.innerWidth < 981) { sidebar.classList.remove("open"); sidebarBackdrop.classList.remove("active"); }
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    sidebarToggle.addEventListener("click", () => {
-      sidebar.classList.toggle("collapsed");
-      appShell.classList.toggle("sidebar-collapsed");
-    });
-
-    mobileMenu.addEventListener("click", () => {
-      sidebar.classList.add("open");
-      document.getElementById("sidebarBackdrop").classList.add("active");
-    });
-
-    document.getElementById("sidebarBackdrop").addEventListener("click", () => {
-      sidebar.classList.remove("open");
-      document.getElementById("sidebarBackdrop").classList.remove("active");
-    });
-
-    document.addEventListener("click", event => {
-      if (window.innerWidth < 981 && sidebar.classList.contains("open")) {
-        const clickedInsideSidebar = sidebar.contains(event.target);
-        const clickedMenu = mobileMenu.contains(event.target);
-        if (!clickedInsideSidebar && !clickedMenu) {
-          sidebar.classList.remove("open");
-          document.getElementById("sidebarBackdrop").classList.remove("active");
-        }
-      }
-    });
-
-    // Scroll to top button
-    const scrollTopBtn = document.getElementById("scrollTopBtn");
-    window.addEventListener("scroll", () => {
-      scrollTopBtn.classList.toggle("visible", window.scrollY > 400);
-    }, { passive: true });
-
-    scrollTopBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
-    sidebarNav.addEventListener("click", event => {
-      const link = event.target.closest(".nav-link");
-      if (!link) return;
-      event.preventDefault();
-      navigate(link.dataset.target);
-    });
-
-    document.addEventListener("click", event => {
-      const navButton = event.target.closest("[data-nav-target]");
-      if (navButton) navigate(navButton.dataset.navTarget);
-    });
-
-    themeToggle.addEventListener("click", () => {
-      document.body.classList.toggle("focus-theme");
-      themeToggle.innerHTML = document.body.classList.contains("focus-theme")
-        ? '<i data-feather="sun"></i>'
-        : '<i data-feather="moon"></i>';
-      feather.replace();
-    });
-
-    uploadButtons.forEach(button => {
-      button.addEventListener("click", () => toggleModal(uploadModal, true));
-    });
-
+    sidebarToggle.addEventListener("click", () => { sidebar.classList.toggle("collapsed"); appShell.classList.toggle("sidebar-collapsed"); });
+    mobileMenu.addEventListener("click", () => { sidebar.classList.add("open"); sidebarBackdrop.classList.add("active"); });
+    sidebarBackdrop.addEventListener("click", () => { sidebar.classList.remove("open"); sidebarBackdrop.classList.remove("active"); });
+    sidebarNav.addEventListener("click", event => { const link = event.target.closest(".nav-link"); if (!link) return; event.preventDefault(); navigate(link.dataset.target); });
+    document.addEventListener("click", event => { const navButton = event.target.closest("[data-nav-target]"); if (navButton) navigate(navButton.dataset.navTarget); });
+    themeToggle.addEventListener("click", () => { document.body.classList.toggle("focus-theme"); themeToggle.innerHTML = document.body.classList.contains("focus-theme") ? '<i data-feather="sun"></i>' : '<i data-feather="moon"></i>'; if (window.feather) feather.replace(); });
+    uploadButtons.forEach(button => button.addEventListener("click", () => toggleModal(uploadModal, true)));
     closeUploadModalBtn.addEventListener("click", () => toggleModal(uploadModal, false));
-    uploadModal.addEventListener("click", event => {
-      if (event.target === uploadModal) toggleModal(uploadModal, false);
-    });
-
+    uploadModal.addEventListener("click", event => { if (event.target === uploadModal) toggleModal(uploadModal, false); });
     dropzone.addEventListener("click", () => fileInput.click());
-    dropzone.addEventListener("dragover", event => {
-      event.preventDefault();
-      dropzone.classList.add("dropzone-active");
-    });
+    dropzone.addEventListener("dragover", event => { event.preventDefault(); dropzone.classList.add("dropzone-active"); });
     dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dropzone-active"));
-    dropzone.addEventListener("drop", event => {
-      event.preventDefault();
-      dropzone.classList.remove("dropzone-active");
-      uploadFiles(event.dataTransfer.files);
-    });
+    dropzone.addEventListener("drop", event => { event.preventDefault(); dropzone.classList.remove("dropzone-active"); uploadFiles(event.dataTransfer.files); });
     fileInput.addEventListener("change", () => uploadFiles(fileInput.files));
 
     async function uploadFiles(files) {
       if (!files || !files.length) return;
-
       const formData = new FormData();
       Array.from(files).forEach(file => formData.append("documents", file));
       uploadProgressContainer.innerHTML = '<div class="insight-item"><div class="insight-icon"><i data-feather="upload-cloud"></i></div><div><p class="insight-title">Uploading documents</p><p class="insight-copy">AI intake will refresh automatically after upload.</p></div></div>';
-      feather.replace();
-
+      if (window.feather) feather.replace();
       try {
-        const res = await fetch("/documents/upload", {
-          method: "POST",
-          body: formData,
-          credentials: "include"
-        });
-
-        if (!res.ok) {
-          uploadProgressContainer.innerHTML = `<p class="panel-subtitle">Upload failed: ${escapeHtml(await res.text())}</p>`;
-          return;
-        }
-
+        const res = await fetch("/documents/upload", { method: "POST", body: formData, credentials: "include" });
+        if (!res.ok) { uploadProgressContainer.innerHTML = `<p class="panel-subtitle">Upload failed: ${escapeHtml(await res.text())}</p>`; return; }
         uploadProgressContainer.innerHTML = '<div class="insight-item"><div class="insight-icon"><i data-feather="check-circle"></i></div><div><p class="insight-title">Upload complete</p><p class="insight-copy">Dashboard intelligence has been refreshed.</p></div></div>';
-        feather.replace();
+        if (window.feather) feather.replace();
         setTimeout(() => toggleModal(uploadModal, false), 650);
         fileInput.value = "";
         await Promise.all([loadDocuments(), loadDashboardStats(), loadRecentActivity()]);
@@ -2710,38 +685,15 @@
     }
 
     function animateNumber(id, target, options = {}) {
-      const element = document.getElementById(id);
-      if (!element) return;
-      const duration = options.duration || 850;
-      const decimals = options.decimals || 0;
-      const start = Number(element.textContent) || 0;
-      const startTime = performance.now();
-
-      function tick(now) {
-        const progress = Math.min((now - startTime) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const value = start + (target - start) * eased;
-        element.textContent = decimals ? value.toFixed(decimals) : Math.round(value);
-        if (progress < 1) requestAnimationFrame(tick);
-      }
-
+      const element = document.getElementById(id); if (!element) return;
+      const duration = options.duration || 850; const decimals = options.decimals || 0; const start = Number(String(element.textContent).replace(/[^0-9.]/g, "")) || 0; const startTime = performance.now();
+      function tick(now) { const progress = Math.min((now - startTime) / duration, 1); const eased = 1 - Math.pow(1 - progress, 3); const value = start + (target - start) * eased; element.textContent = decimals ? value.toFixed(decimals) : Math.round(value); if (progress < 1) requestAnimationFrame(tick); }
       requestAnimationFrame(tick);
     }
 
     async function loadDashboardStats() {
-      try {
-        const res = await fetch("/documents/stats", { credentials: "include" });
-        if (res.ok) {
-          state.stats = await res.json();
-        }
-      } catch (err) {
-        console.error("Stats error", err);
-      }
-
-      updateMetrics();
-      renderCharts(state.stats.monthly || Array(12).fill(0));
-      renderHeatmap();
-      renderInsights();
+      try { const res = await fetch("/documents/stats", { credentials: "include" }); if (res.ok) state.stats = await res.json(); } catch (err) { console.error("Stats error", err); }
+      updateMetrics(); renderCharts(state.stats.monthly || Array(12).fill(0)); renderHeatmap(); renderInsights();
     }
 
     function updateMetrics() {
@@ -2752,340 +704,69 @@
       const processed = Math.max(total - pending, today);
       const activeWorkflows = workflowItems.filter(item => item.status !== "approved").length;
       const accuracy = total ? Math.min(99.3, 94.8 + Math.min(total, 12) * 0.18) : 96.8;
-
-      animateNumber("totalDocs", total);
-      animateNumber("aiProcessed", processed);
-      animateNumber("pendingApproval", pending);
-      animateNumber("activeWorkflows", activeWorkflows);
-      animateNumber("archivedDocs", archived);
-      animateNumber("accuracyRate", accuracy, { decimals: 1 });
-
+      animateNumber("totalDocs", total); animateNumber("aiProcessed", processed); animateNumber("pendingApproval", pending); animateNumber("activeWorkflows", activeWorkflows); animateNumber("archivedDocs", archived); animateNumber("accuracyRate", accuracy, { decimals: 1 });
       document.getElementById("heroProcessed").textContent = processed;
       document.getElementById("heroQueue").textContent = `${pending} approvals queued`;
       document.getElementById("heroConfidence").textContent = `${accuracy.toFixed(1)}%`;
       document.getElementById("analyticsDocs").textContent = total;
       document.getElementById("analyticsPending").textContent = pending;
       document.getElementById("analyticsArchived").textContent = archived;
+      document.getElementById("slaTile").textContent = `${Math.max(90, 98 - Math.min(pending, 6))}%`;
+      document.getElementById("cycleTile").textContent = `${Math.max(1.2, (2.4 - Math.min(pending, 5) * 0.1)).toFixed(1)}h`;
+      document.getElementById("autoTile").textContent = `${Math.max(58, Math.min(92, 74 + Math.min(total, 10)))}%`;
     }
 
     function renderCharts(monthly) {
       const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       const routed = monthly.map((value, index) => Math.max(0, Math.round(value * 0.72 + (index % 3))));
-
+      const renderLineChart = (canvasId, primary, secondary, setter, existing) => {
+        const canvas = document.getElementById(canvasId); if (!canvas) return; if (existing) existing.destroy(); const ctx = canvas.getContext("2d"); const gradient = ctx.createLinearGradient(0, 0, 0, 320); gradient.addColorStop(0, "rgba(56, 189, 248, 0.28)"); gradient.addColorStop(1, "rgba(56, 189, 248, 0)"); const violetGradient = ctx.createLinearGradient(0, 0, 0, 320); violetGradient.addColorStop(0, "rgba(139, 92, 246, 0.22)"); violetGradient.addColorStop(1, "rgba(139, 92, 246, 0)"); const chart = new Chart(ctx, { type: "line", data: { labels, datasets: [ { label: "Documents", data: primary, borderColor: "#38bdf8", backgroundColor: gradient, fill: true, tension: 0.42, pointRadius: 4, pointHoverRadius: 7, pointBackgroundColor: "#081120", pointBorderColor: "#22d3ee", pointBorderWidth: 2 }, { label: "AI routed", data: secondary, borderColor: "#8b5cf6", backgroundColor: violetGradient, fill: true, tension: 0.42, pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: "#081120", pointBorderColor: "#c4b5fd", pointBorderWidth: 2 } ] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 900, easing: "easeOutQuart" }, interaction: { intersect: false, mode: "index" }, plugins: { legend: { labels: { color: "#cbd5e1", boxWidth: 10, usePointStyle: true } }, tooltip: { backgroundColor: "rgba(15, 23, 42, 0.94)", borderColor: "rgba(148, 163, 184, 0.18)", borderWidth: 1, padding: 12, titleColor: "#f8fafc", bodyColor: "#cbd5e1" } }, scales: { x: { grid: { color: "rgba(148, 163, 184, 0.06)" }, ticks: { color: "#94a3b8" } }, y: { beginAtZero: true, grid: { color: "rgba(148, 163, 184, 0.08)" }, ticks: { color: "#94a3b8", precision: 0 } } } } }); setter(chart); };
       renderLineChart("activityChart", monthly, routed, chart => activityChart = chart, activityChart);
       renderLineChart("analyticsChart", monthly, routed, chart => analyticsChart = chart, analyticsChart);
-
-      function renderLineChart(canvasId, primary, secondary, setter, existing) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        if (existing) existing.destroy();
-        const ctx = canvas.getContext("2d");
-        const gradient = ctx.createLinearGradient(0, 0, 0, 320);
-        gradient.addColorStop(0, "rgba(56, 189, 248, 0.28)");
-        gradient.addColorStop(1, "rgba(56, 189, 248, 0)");
-        const violetGradient = ctx.createLinearGradient(0, 0, 0, 320);
-        violetGradient.addColorStop(0, "rgba(139, 92, 246, 0.22)");
-        violetGradient.addColorStop(1, "rgba(139, 92, 246, 0)");
-
-        const chart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels,
-            datasets: [
-              {
-                label: "Documents",
-                data: primary,
-                borderColor: "#38bdf8",
-                backgroundColor: gradient,
-                fill: true,
-                tension: 0.42,
-                pointRadius: 4,
-                pointHoverRadius: 7,
-                pointBackgroundColor: "#081120",
-                pointBorderColor: "#22d3ee",
-                pointBorderWidth: 2
-              },
-              {
-                label: "AI routed",
-                data: secondary,
-                borderColor: "#8b5cf6",
-                backgroundColor: violetGradient,
-                fill: true,
-                tension: 0.42,
-                pointRadius: 3,
-                pointHoverRadius: 6,
-                pointBackgroundColor: "#081120",
-                pointBorderColor: "#c4b5fd",
-                pointBorderWidth: 2
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: { duration: 900, easing: "easeOutQuart" },
-            interaction: { intersect: false, mode: "index" },
-            plugins: {
-              legend: {
-                labels: { color: "#cbd5e1", boxWidth: 10, usePointStyle: true }
-              },
-              tooltip: {
-                backgroundColor: "rgba(15, 23, 42, 0.94)",
-                borderColor: "rgba(148, 163, 184, 0.18)",
-                borderWidth: 1,
-                padding: 12,
-                titleColor: "#f8fafc",
-                bodyColor: "#cbd5e1"
-              }
-            },
-            scales: {
-              x: {
-                grid: { color: "rgba(148, 163, 184, 0.06)" },
-                ticks: { color: "#94a3b8" }
-              },
-              y: {
-                beginAtZero: true,
-                grid: { color: "rgba(148, 163, 184, 0.08)" },
-                ticks: { color: "#94a3b8", precision: 0 }
-              }
-            }
-          }
-        });
-        setter(chart);
-      }
     }
 
-    function renderHeatmap() {
-      const grid = document.getElementById("heatmapGrid");
-      if (!grid) return;
-      const seed = state.documents.length + (state.stats.pending || 0);
-      grid.innerHTML = Array.from({ length: 35 }, (_, index) => {
-        const intensity = 0.11 + (((index * 13 + seed * 7) % 70) / 100);
-        return `<span class="heat-cell" style="--heat: ${intensity.toFixed(2)}" title="${Math.round(intensity * 100)} activity score"></span>`;
-      }).join("");
-    }
+    function renderHeatmap() { const grid = document.getElementById("heatmapGrid"); if (!grid) return; const seed = state.documents.length + (state.stats.pending || 0); grid.innerHTML = Array.from({ length: 35 }, (_, index) => { const intensity = 0.11 + (((index * 13 + seed * 7) % 70) / 100); return `<span class="heat-cell" style="--heat: ${intensity.toFixed(2)}" title="${Math.round(intensity * 100)} activity score"></span>`; }).join(""); }
 
     async function loadDocuments() {
-      try {
-        const res = await fetch("/documents/my", { credentials: "include" });
-        if (!res.ok) return;
-        state.documents = await res.json();
-      } catch (err) {
-        console.error("Documents error", err);
-      }
-      state.visibleDocuments = [...state.documents];
-      state.page = 1;
-      sortVisibleDocuments();
-      renderDocuments();
-      renderDashboardDocuments();
-      renderApprovalQueue();
-      updateMetrics();
-      renderInsights();
-      renderHeatmap();
-      if (!state.activities.length) renderRecentActivity();
-      renderAISuggestions(aiSearchInput.value);
+      try { const res = await fetch("/documents/my", { credentials: "include" }); if (!res.ok) return; state.documents = await res.json(); } catch (err) { console.error("Documents error", err); }
+      state.visibleDocuments = [...state.documents]; state.page = 1; sortVisibleDocuments(); renderDocuments(); renderDashboardDocuments(); renderApprovalQueue(); updateMetrics(); renderInsights(); renderHeatmap(); if (!state.activities.length) renderRecentActivity(); renderAISuggestions(aiSearchInput.value);
     }
 
-    function sortVisibleDocuments() {
-      const direction = state.sortDirection === "asc" ? 1 : -1;
-      state.visibleDocuments.sort((a, b) => {
-        const key = state.sortKey;
-        const aValue = key === "confidence" ? getConfidence(a) : (a[key] || "");
-        const bValue = key === "confidence" ? getConfidence(b) : (b[key] || "");
-        if (key === "createdAt") return (new Date(aValue).getTime() - new Date(bValue).getTime()) * direction;
-        return String(aValue).localeCompare(String(bValue)) * direction;
-      });
-    }
+    function sortVisibleDocuments() { const direction = state.sortDirection === "asc" ? 1 : -1; state.visibleDocuments.sort((a, b) => { const key = state.sortKey; const aValue = key === "confidence" ? getConfidence(a) : (a[key] || ""); const bValue = key === "confidence" ? getConfidence(b) : (b[key] || ""); if (key === "createdAt") return (new Date(aValue).getTime() - new Date(bValue).getTime()) * direction; return String(aValue).localeCompare(String(bValue)) * direction; }); }
 
-    function renderDocuments() {
-      const start = (state.page - 1) * state.pageSize;
-      const docs = state.visibleDocuments.slice(start, start + state.pageSize);
-      documentsTableBody.innerHTML = renderDocumentRows(docs, true);
-      renderPagination();
-      feather.replace();
-    }
-
-    function renderDashboardDocuments() {
-      dashboardDocumentsBody.innerHTML = renderDocumentRows(state.documents.slice(0, 5), false);
-      feather.replace();
-    }
-
+    function renderDocuments() { const start = (state.page - 1) * state.pageSize; const docs = state.visibleDocuments.slice(start, start + state.pageSize); documentsTableBody.innerHTML = renderDocumentRows(docs, true); renderPagination(); if (window.feather) feather.replace(); }
+    function renderDashboardDocuments() { dashboardDocumentsBody.innerHTML = renderDocumentRows(state.documents.slice(0, 5), false); if (window.feather) feather.replace(); }
     function renderDocumentRows(docs, includeEmpty) {
-      if (!docs.length) {
-        return `<tr><td colspan="8" class="empty-state">${includeEmpty ? "No documents match this view." : "Upload documents to activate the intelligence layer."}</td></tr>`;
-      }
-
-      return docs.map(doc => {
-        const id = escapeHtml(getDocumentId(doc));
-        const confidence = getConfidence(doc);
-        const status = formatStatus(doc.status);
-        const statusClass = escapeHtml(doc.status || "pending");
-        const type = escapeHtml(String(doc.fileType || "FILE").toUpperCase());
-        const category = escapeHtml(getCategory(doc));
-        const fileName = escapeHtml(doc.fileName);
-        const path = escapeHtml(doc.filePath || "");
-
-        return `
-          <tr>
-            <td>
-              <div class="doc-name">
-                <span class="file-glyph"><i data-feather="file-text"></i></span>
-                <span>
-                  <button class="doc-title" type="button" data-preview="${id}">${fileName}</button>
-                  <span class="doc-sub">${type} &middot; AI tagged</span>
-                </span>
-              </div>
-            </td>
-            <td><span class="badge"><i data-feather="tag"></i>${category}</span></td>
-            <td> You </td>
-            <td><span class="badge ${statusClass}">${status}</span></td>
-            <td><span class="badge ${statusClass}">${status === "approved" ? "Approved" : status === "rejected" ? "Rejected" : "Needs review"}</span></td>
-            <td>${formatDate(doc.updatedAt || doc.createdAt)}</td>
-            <td>
-              <div class="confidence">
-                <span>${confidence}%</span>
-                <span class="confidence-bar"><span style="width: ${confidence}%;"></span></span>
-              </div>
-            </td>
-            <td>
-              <div class="row-actions">
-                <button class="icon-button" type="button" data-preview="${id}" title="Preview"><i data-feather="eye"></i></button>
-                <a class="icon-button" href="/${path}" target="_blank" rel="noreferrer" title="Open"><i data-feather="external-link"></i></a>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join("");
+      if (!docs.length) return `<tr><td colspan="8" class="empty-state">${includeEmpty ? "No documents match this view." : "Upload documents to activate the intelligence layer."}</td></tr>`;
+      return docs.map(doc => { const id = escapeHtml(getDocumentId(doc)); const confidence = getConfidence(doc); const status = formatStatus(doc.status); const statusClass = escapeHtml(doc.status || "pending"); const type = escapeHtml(String(doc.fileType || "FILE").toUpperCase()); const category = escapeHtml(getCategory(doc)); const fileName = escapeHtml(doc.fileName); const path = escapeHtml(doc.filePath || ""); return `<tr><td><div class="doc-name"><span class="file-glyph"><i data-feather="file-text"></i></span><span><button class="doc-title" type="button" data-preview="${id}">${fileName}</button><span class="doc-sub">${type} &middot; AI tagged</span></span></div></td><td><span class="badge"><i data-feather="tag"></i>${category}</span></td><td>You</td><td><span class="badge ${statusClass}">${status}</span></td><td><span class="badge ${statusClass}">${status === "approved" ? "Approved" : status === "rejected" ? "Rejected" : "Needs review"}</span></td><td>${formatDate(doc.updatedAt || doc.createdAt)}</td><td><div class="confidence"><span>${confidence}%</span><span class="confidence-bar"><span style="width:${confidence}%;"></span></span></div></td><td><div class="doc-row-actions"><button class="icon-button" type="button" data-preview="${id}" title="Preview"><i data-feather="eye"></i></button><a class="icon-button" href="/${path}" target="_blank" rel="noreferrer" title="Open"><i data-feather="external-link"></i></a></div></td></tr>`; }).join("");
     }
 
-    function renderPagination() {
-      const totalPages = Math.max(1, Math.ceil(state.visibleDocuments.length / state.pageSize));
-      documentsPagination.innerHTML = `
-        <button class="button" type="button" data-page="prev" ${state.page === 1 ? "disabled" : ""}><i data-feather="chevron-left"></i>Prev</button>
-        <span class="panel-subtitle">Page ${state.page} of ${totalPages}</span>
-        <button class="button" type="button" data-page="next" ${state.page === totalPages ? "disabled" : ""}>Next<i data-feather="chevron-right"></i></button>
-      `;
-    }
+    function renderPagination() { const totalPages = Math.max(1, Math.ceil(state.visibleDocuments.length / state.pageSize)); documentsPagination.innerHTML = `<button class="button" type="button" data-page="prev" ${state.page === 1 ? "disabled" : ""}><i data-feather="chevron-left"></i>Prev</button><span class="panel-subtitle">Page ${state.page} of ${totalPages}</span><button class="button" type="button" data-page="next" ${state.page === totalPages ? "disabled" : ""}>Next<i data-feather="chevron-right"></i></button>`; if (window.feather) feather.replace(); }
+    documentsPagination.addEventListener("click", event => { const button = event.target.closest("[data-page]"); if (!button) return; const totalPages = Math.max(1, Math.ceil(state.visibleDocuments.length / state.pageSize)); if (button.dataset.page === "prev") state.page = Math.max(1, state.page - 1); if (button.dataset.page === "next") state.page = Math.min(totalPages, state.page + 1); renderDocuments(); });
 
-    documentsPagination.addEventListener("click", event => {
-      const button = event.target.closest("[data-page]");
-      if (!button) return;
-      const totalPages = Math.max(1, Math.ceil(state.visibleDocuments.length / state.pageSize));
-      if (button.dataset.page === "prev") state.page = Math.max(1, state.page - 1);
-      if (button.dataset.page === "next") state.page = Math.min(totalPages, state.page + 1);
-      renderDocuments();
-    });
-
-    document.addEventListener("click", event => {
-      const previewButton = event.target.closest("[data-preview]");
-      if (previewButton) {
-        const doc = state.documents.find(item => String(getDocumentId(item)) === String(previewButton.dataset.preview));
-        if (doc) openPreview(doc);
-      }
-
-      const sortButton = event.target.closest("[data-sort]");
-      if (sortButton) {
-        const key = sortButton.dataset.sort;
-        if (state.sortKey === key) {
-          state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
-        } else {
-          state.sortKey = key;
-          state.sortDirection = key === "fileName" ? "asc" : "desc";
-        }
-        sortVisibleDocuments();
-        renderDocuments();
-      }
-    });
-
-    closePreviewDrawer.addEventListener("click", closePreview);
-    previewDrawer.addEventListener("click", event => {
-      if (event.target === previewDrawer) closePreview();
-    });
+    document.addEventListener("click", event => { const previewButton = event.target.closest("[data-preview]"); if (previewButton) { const doc = state.documents.find(item => String(getDocumentId(item)) === String(previewButton.dataset.preview)); if (doc) openPreview(doc); } const sortButton = event.target.closest("[data-sort]"); if (sortButton) { const key = sortButton.dataset.sort; if (state.sortKey === key) state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc"; else { state.sortKey = key; state.sortDirection = key === "fileName" ? "asc" : "desc"; } sortVisibleDocuments(); renderDocuments(); } });
+    closePreviewDrawer.addEventListener("click", closePreview); previewDrawer.addEventListener("click", event => { if (event.target === previewDrawer) closePreview(); });
 
     function openPreview(doc) {
       const confidence = getConfidence(doc);
       document.getElementById("previewTitle").textContent = doc.fileName || "Document";
       document.getElementById("previewMeta").textContent = `${String(doc.fileType || "file").toUpperCase()} - ${formatDate(doc.createdAt)} - ${confidence}% AI confidence`;
-      document.getElementById("previewContent").innerHTML = `
-        <div class="insight-item">
-          <div class="insight-icon"><i data-feather="tag"></i></div>
-          <div><p class="insight-title">AI Category</p><p class="insight-copy">${escapeHtml(getCategory(doc))}</p></div>
-        </div>
-        <div class="insight-item">
-          <div class="insight-icon"><i data-feather="activity"></i></div>
-          <div><p class="insight-title">Workflow Status</p><p class="insight-copy">${escapeHtml(formatStatus(doc.status))}</p></div>
-        </div>
-        <div class="insight-item">
-          <div class="insight-icon"><i data-feather="message-square"></i></div>
-          <div><p class="insight-title">AI Summary</p><p class="insight-copy">${escapeHtml(doc.summary || "No summary available yet. OCR and AI enrichment can populate this area after processing.")}</p></div>
-        </div>
-        <div class="insight-item">
-          <div class="insight-icon"><i data-feather="download"></i></div>
-          <div><p class="insight-title">Document Link</p><p class="insight-copy"><a href="/${escapeHtml(doc.filePath || "")}" target="_blank" rel="noreferrer" style="color: var(--cyan);">Open original file</a></p></div>
-        </div>
-      `;
-      previewDrawer.classList.add("open");
-      previewDrawer.setAttribute("aria-hidden", "false");
-      feather.replace();
+      document.getElementById("previewContent").innerHTML = `<div class="insight-item"><div class="insight-icon"><i data-feather="tag"></i></div><div><p class="insight-title">AI Category</p><p class="insight-copy">${escapeHtml(getCategory(doc))}</p></div></div><div class="insight-item"><div class="insight-icon"><i data-feather="activity"></i></div><div><p class="insight-title">Workflow Status</p><p class="insight-copy">${escapeHtml(formatStatus(doc.status))}</p></div></div><div class="insight-item"><div class="insight-icon"><i data-feather="message-square"></i></div><div><p class="insight-title">AI Summary</p><p class="insight-copy">${escapeHtml(doc.summary || "No summary available yet. OCR and AI enrichment can populate this area after processing.")}</p></div></div><div class="insight-item"><div class="insight-icon"><i data-feather="download"></i></div><div><p class="insight-title">Document Link</p><p class="insight-copy"><a href="/${escapeHtml(doc.filePath || "")}" target="_blank" rel="noreferrer" style="color: var(--cyan);">Open original file</a></p></div></div>`;
+      previewDrawer.classList.add("open"); previewDrawer.setAttribute("aria-hidden", "false"); if (window.feather) feather.replace();
     }
+    function closePreview() { previewDrawer.classList.remove("open"); previewDrawer.setAttribute("aria-hidden", "true"); }
 
-    function closePreview() {
-      previewDrawer.classList.remove("open");
-      previewDrawer.setAttribute("aria-hidden", "true");
-    }
-
-    const docSearchInput = document.getElementById("docSearchInput");
-    const statusFilter = document.getElementById("statusFilter");
-    const typeFilter = document.getElementById("typeFilter");
-    const dateFilter = document.getElementById("dateFilter");
-    const resetFiltersBtn = document.getElementById("resetFiltersBtn");
-
-    [docSearchInput, statusFilter, typeFilter, dateFilter].forEach(input => {
-      input.addEventListener(input.tagName === "SELECT" ? "change" : "input", triggerSearch);
-    });
-
-    resetFiltersBtn.addEventListener("click", () => {
-      docSearchInput.value = "";
-      statusFilter.value = "all";
-      typeFilter.value = "all";
-      dateFilter.value = "";
-      state.visibleDocuments = [...state.documents];
-      state.page = 1;
-      sortVisibleDocuments();
-      renderDocuments();
-    });
+    const docSearchInput = document.getElementById("docSearchInput"); const statusFilter = document.getElementById("statusFilter"); const typeFilter = document.getElementById("typeFilter"); const dateFilter = document.getElementById("dateFilter"); const resetFiltersBtn = document.getElementById("resetFiltersBtn");
+    [docSearchInput, statusFilter, typeFilter, dateFilter].forEach(input => { input.addEventListener(input.tagName === "SELECT" ? "change" : "input", triggerSearch); });
+    resetFiltersBtn.addEventListener("click", () => { docSearchInput.value = ""; statusFilter.value = "all"; typeFilter.value = "all"; dateFilter.value = ""; state.visibleDocuments = [...state.documents]; state.page = 1; sortVisibleDocuments(); renderDocuments(); });
 
     function triggerSearch() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(async () => {
-        const q = docSearchInput.value.trim();
-        const status = statusFilter.value;
-        const type = typeFilter.value;
-        const date = dateFilter.value;
-
-        if (!q && status === "all" && type === "all" && !date) {
-          state.visibleDocuments = [...state.documents];
-          state.page = 1;
-          sortVisibleDocuments();
-          renderDocuments();
-          return;
-        }
-
-        const params = new URLSearchParams();
-        if (q) params.append("q", q);
-        if (status && status !== "all") params.append("status", status);
-        if (type && type !== "all") params.append("type", type);
-        if (date) params.append("date", date);
-
-        try {
-          const res = await fetch(`/documents/search?${params.toString()}`, { credentials: "include" });
-          state.visibleDocuments = res.ok ? await res.json() : [];
-          state.page = 1;
-          sortVisibleDocuments();
-          renderDocuments();
-        } catch (err) {
-          console.error("Search/filter error", err);
-        }
+        const q = docSearchInput.value.trim(); const status = statusFilter.value; const type = typeFilter.value; const date = dateFilter.value;
+        if (!q && status === "all" && type === "all" && !date) { state.visibleDocuments = [...state.documents]; state.page = 1; sortVisibleDocuments(); renderDocuments(); return; }
+        const params = new URLSearchParams(); if (q) params.append("q", q); if (status && status !== "all") params.append("status", status); if (type && type !== "all") params.append("type", type); if (date) params.append("date", date);
+        try { const res = await fetch(`/documents/search?${params.toString()}`, { credentials: "include" }); state.visibleDocuments = res.ok ? await res.json() : []; state.page = 1; sortVisibleDocuments(); renderDocuments(); } catch (err) { console.error("Search/filter error", err); }
       }, 260);
     }
 
@@ -3093,107 +774,30 @@
       const pending = state.stats.pending || state.documents.filter(doc => doc.status === "pending").length;
       const lowConfidence = state.documents.filter(doc => getConfidence(doc) < 88).length;
       const insights = [
-        {
-          icon: "zap",
-          title: "Automation suggestion",
-          copy: pending > 0 ? `${pending} pending documents can be grouped into a priority review sprint.` : "Approval queue is clear. Keep auto-routing active for new uploads."
-        },
-        {
-          icon: "alert-triangle",
-          title: "Document anomaly",
-          copy: lowConfidence ? `${lowConfidence} documents have confidence below 88% and should be checked manually.` : "No low-confidence anomalies detected in the current workspace."
-        },
-        {
-          icon: "git-branch",
-          title: "Workflow bottleneck",
-          copy: "Review lane has the highest handoff time. AI suggests routing finance files directly to approvers."
-        },
-        {
-          icon: "clock",
-          title: "Approval delay",
-          copy: "Escalate files that remain pending for more than 48 hours to maintain SLA health."
-        }
+        { icon: "zap", title: "Automation suggestion", copy: pending > 0 ? `${pending} pending documents can be grouped into a priority review sprint.` : "Approval queue is clear. Keep auto-routing active for new uploads." },
+        { icon: "alert-triangle", title: "Document anomaly", copy: lowConfidence ? `${lowConfidence} documents have confidence below 88% and should be checked manually.` : "No low-confidence anomalies detected in the current workspace." },
+        { icon: "git-branch", title: "Workflow bottleneck", copy: "Review lane has the highest handoff time. AI suggests routing finance files directly to approvers." },
+        { icon: "clock", title: "Approval delay", copy: "Escalate files that remain pending for more than 48 hours to maintain SLA health." }
       ];
-
-      const markup = insights.map(item => `
-        <div class="insight-item">
-          <div class="insight-icon"><i data-feather="${item.icon}"></i></div>
-          <div><p class="insight-title">${escapeHtml(item.title)}</p><p class="insight-copy">${escapeHtml(item.copy)}</p></div>
-        </div>
-      `).join("");
-
-      document.getElementById("insightsList").innerHTML = markup;
-      document.getElementById("insightsPageList").innerHTML = markup;
-      feather.replace();
+      const markup = insights.map(item => `<div class="insight-item"><div class="insight-icon"><i data-feather="${item.icon}"></i></div><div><p class="insight-title">${escapeHtml(item.title)}</p><p class="insight-copy">${escapeHtml(item.copy)}</p></div></div>`).join("");
+      document.getElementById("insightsList").innerHTML = markup; document.getElementById("insightsPageList").innerHTML = markup; if (window.feather) feather.replace();
     }
-
     document.getElementById("refreshInsightsBtn").addEventListener("click", renderInsights);
 
-    async function loadRecentActivity() {
-      try {
-        const res = await fetch("/activities/recent", { credentials: "include" });
-        state.activities = res.ok ? await res.json() : [];
-      } catch (err) {
-        console.error("Recent activity error", err);
-      }
-      renderRecentActivity();
-    }
-
+    async function loadRecentActivity() { try { const res = await fetch("/activities/recent", { credentials: "include" }); state.activities = res.ok ? await res.json() : []; } catch (err) { console.error("Recent activity error", err); } renderRecentActivity(); }
     function renderRecentActivity() {
-      const fallback = state.documents.slice(0, 5).map(doc => ({
-        user: { username: "AI Intake" },
-        action: "uploaded and queued",
-        entityName: doc.fileName,
-        entityType: "document",
-        createdAt: doc.createdAt
-      }));
+      const fallback = state.documents.slice(0, 5).map(doc => ({ user: { username: "AI Intake" }, action: "uploaded and queued", entityName: doc.fileName, entityType: "document", createdAt: doc.createdAt }));
       const activities = state.activities.length ? state.activities : fallback;
-      const markup = activities.length ? activities.map(activity => {
-        const actor = activity.user?.username || "User";
-        const initials = actor.split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase() || "AI";
-        return `
-          <div class="timeline-item">
-            <div class="timeline-avatar">${escapeHtml(initials)}</div>
-            <div>
-              <p class="timeline-title"><strong>${escapeHtml(actor)}</strong> ${escapeHtml(activity.action || "updated")} <span style="color: var(--cyan);">${escapeHtml(activity.entityName || "")}</span></p>
-              <div class="timeline-meta">
-                <span class="badge">${escapeHtml(activity.entityType || "workflow")}</span>
-                <span>${relativeTime(activity.createdAt)}</span>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("") : '<div class="empty-state">No recent activity yet.</div>';
-
-      document.getElementById("activityList").innerHTML = markup;
-      document.getElementById("activityPopoverList").innerHTML = markup;
-      feather.replace();
+      const markup = activities.length ? activities.map(activity => { const actor = activity.user?.username || "User"; const initials = actor.split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase() || "AI"; return `<div class="timeline-item"><div class="timeline-avatar">${escapeHtml(initials)}</div><div><p class="timeline-title"><strong>${escapeHtml(actor)}</strong> ${escapeHtml(activity.action || "updated")} <span style="color: var(--cyan);">${escapeHtml(activity.entityName || "")}</span></p><div class="timeline-meta"><span class="badge">${escapeHtml(activity.entityType || "workflow")}</span><span>${relativeTime(activity.createdAt)}</span></div></div></div>`; }).join("") : '<div class="empty-state">No recent activity yet.</div>';
+      document.getElementById("activityList").innerHTML = markup; document.getElementById("activityPopoverList").innerHTML = markup; if (window.feather) feather.replace();
     }
-
-    activityFeedBtn.addEventListener("click", () => activityPopover.classList.toggle("hidden"));
-    notificationBtn.addEventListener("click", () => activityPopover.classList.toggle("hidden"));
-
-    document.addEventListener("click", event => {
-      const clickedActivity = activityPopover.contains(event.target) || activityFeedBtn.contains(event.target) || notificationBtn.contains(event.target);
-      if (!clickedActivity) activityPopover.classList.add("hidden");
-    });
+    activityFeedBtn.addEventListener("click", () => activityPopover.classList.toggle("hidden")); notificationBtn.addEventListener("click", () => activityPopover.classList.toggle("hidden"));
+    document.addEventListener("click", event => { const clickedActivity = activityPopover.contains(event.target) || activityFeedBtn.contains(event.target) || notificationBtn.contains(event.target); if (!clickedActivity) activityPopover.classList.add("hidden"); });
 
     function renderApprovalQueue() {
       const approvals = state.documents.filter(doc => ["pending", "processing", "review", "changes_requested"].includes(doc.status));
-      document.getElementById("approvalQueue").innerHTML = approvals.length ? approvals.map(doc => `
-        <div class="timeline-item">
-          <div class="timeline-avatar">${String(getCategory(doc)).slice(0, 2).toUpperCase()}</div>
-          <div>
-            <p class="timeline-title">${escapeHtml(doc.fileName)}</p>
-            <div class="timeline-meta">
-              <span class="badge ${escapeHtml(doc.status)}">${escapeHtml(formatStatus(doc.status))}</span>
-              <span>${getConfidence(doc)}% AI confidence</span>
-              <button class="button" type="button" data-preview="${escapeHtml(getDocumentId(doc))}"><i data-feather="eye"></i>Preview</button>
-            </div>
-          </div>
-        </div>
-      `).join("") : '<div class="empty-state">No approval items are waiting right now.</div>';
-      feather.replace();
+      document.getElementById("approvalQueue").innerHTML = approvals.length ? approvals.map(doc => `<div class="timeline-item"><div class="timeline-avatar">${String(getCategory(doc)).slice(0, 2).toUpperCase()}</div><div><p class="timeline-title">${escapeHtml(doc.fileName)}</p><div class="timeline-meta"><span class="badge ${escapeHtml(doc.status)}">${escapeHtml(formatStatus(doc.status))}</span><span>${getConfidence(doc)}% AI confidence</span><button class="button" type="button" data-preview="${escapeHtml(getDocumentId(doc))}"><i data-feather="eye"></i>Preview</button></div></div></div>`).join("") : '<div class="empty-state">No approval items are waiting right now.</div>';
+      if (window.feather) feather.replace();
     }
 
     function renderKanban() {
@@ -3203,203 +807,59 @@
         { key: "review", title: "In Review", color: "var(--violet)" },
         { key: "approved", title: "Approved", color: "var(--emerald)" }
       ];
-
-      document.getElementById("kanbanBoard").innerHTML = columns.map(column => {
-        const items = workflowItems.filter(item => item.status === column.key);
-        return `
-          <section class="kanban-column">
-            <div class="kanban-head">
-              <div class="kanban-title"><span class="status-dot" style="background: ${column.color};"></span>${column.title}</div>
-              <span class="badge">${items.length}</span>
-            </div>
-            <div class="kanban-dropzone" data-status="${column.key}">
-              ${items.map(createKanbanCard).join("")}
-            </div>
-          </section>
-        `;
-      }).join("");
-      feather.replace();
+      document.getElementById("kanbanBoard").innerHTML = columns.map(column => { const items = workflowItems.filter(item => item.status === column.key); return `<section class="kanban-column"><div class="kanban-head"><div class="kanban-title"><span class="status-dot" style="background:${column.color};"></span>${column.title}</div><span class="badge">${items.length}</span></div><div class="kanban-dropzone" data-status="${column.key}">${items.map(createKanbanCard).join("")}</div></section>`; }).join("");
+      if (window.feather) feather.replace();
     }
-
     function createKanbanCard(item) {
       const progress = item.status === "pending" ? 16 : item.status === "processing" ? 46 : item.status === "review" ? 74 : 100;
-      return `
-        <article class="kanban-card" draggable="true" data-workflow-id="${item.id}">
-          <div class="metric-top">
-            <span class="badge ${item.priority === "High" ? "rejected" : item.priority === "Medium" ? "pending" : "approved"}">${item.priority}</span>
-            <button class="icon-button" type="button" title="More"><i data-feather="more-horizontal"></i></button>
-          </div>
-          <p class="timeline-title" style="margin-top: 12px;">${escapeHtml(item.title)}</p>
-          <div class="timeline-meta">
-            <span class="badge"><i data-feather="file-text"></i>${escapeHtml(item.type)}</span>
-            <span>${item.aiConfidence}% AI match</span>
-          </div>
-          <div class="metric-top" style="margin-top: 13px;">
-            <span class="panel-subtitle">Assigned to ${escapeHtml(item.assignee)}</span>
-            <span class="avatar" style="width: 28px; height: 28px; border-radius: 10px; font-size: 0.7rem;">${escapeHtml(item.assignee.slice(0, 2))}</span>
-          </div>
-          <div class="progress-track" style="margin-top: 12px;"><span style="width: ${progress}%;"></span></div>
-        </article>
-      `;
+      return `<article class="kanban-card" draggable="true" data-workflow-id="${item.id}"><div class="metric-top"><span class="badge ${item.priority === "High" ? "rejected" : item.priority === "Medium" ? "pending" : "approved"}">${item.priority}</span><button class="icon-button" type="button" title="More"><i data-feather="more-horizontal"></i></button></div><p class="timeline-title" style="margin-top:12px;">${escapeHtml(item.title)}</p><div class="timeline-meta"><span class="badge"><i data-feather="file-text"></i>${escapeHtml(item.type)}</span><span>${item.aiConfidence}% AI match</span></div><div class="metric-top" style="margin-top:13px;"><span class="panel-subtitle">Assigned to ${escapeHtml(item.assignee)}</span><span class="avatar" style="width:28px;height:28px;border-radius:10px;font-size:0.7rem;">${escapeHtml(item.assignee.slice(0,2))}</span></div><div class="progress-track" style="margin-top:12px;"><span style="width:${progress}%;"></span></div></article>`;
     }
+    document.getElementById("kanbanBoard").addEventListener("dragstart", event => { const card = event.target.closest(".kanban-card"); if (!card) return; card.classList.add("dragging"); event.dataTransfer.setData("text/plain", card.dataset.workflowId); });
+    document.getElementById("kanbanBoard").addEventListener("dragend", event => { const card = event.target.closest(".kanban-card"); if (card) card.classList.remove("dragging"); document.querySelectorAll(".kanban-dropzone").forEach(zone => zone.classList.remove("is-over")); });
+    document.getElementById("kanbanBoard").addEventListener("dragover", event => { const zone = event.target.closest(".kanban-dropzone"); if (!zone) return; event.preventDefault(); zone.classList.add("is-over"); });
+    document.getElementById("kanbanBoard").addEventListener("dragleave", event => { const zone = event.target.closest(".kanban-dropzone"); if (zone) zone.classList.remove("is-over"); });
+    document.getElementById("kanbanBoard").addEventListener("drop", event => { const zone = event.target.closest(".kanban-dropzone"); if (!zone) return; event.preventDefault(); const id = event.dataTransfer.getData("text/plain"); const item = workflowItems.find(entry => entry.id === id); if (item) { item.status = zone.dataset.status; renderKanban(); updateMetrics(); } });
 
-    document.getElementById("kanbanBoard").addEventListener("dragstart", event => {
-      const card = event.target.closest(".kanban-card");
-      if (!card) return;
-      card.classList.add("dragging");
-      event.dataTransfer.setData("text/plain", card.dataset.workflowId);
-    });
-
-    document.getElementById("kanbanBoard").addEventListener("dragend", event => {
-      const card = event.target.closest(".kanban-card");
-      if (card) card.classList.remove("dragging");
-      document.querySelectorAll(".kanban-dropzone").forEach(zone => zone.classList.remove("is-over"));
-    });
-
-    document.getElementById("kanbanBoard").addEventListener("dragover", event => {
-      const zone = event.target.closest(".kanban-dropzone");
-      if (!zone) return;
-      event.preventDefault();
-      zone.classList.add("is-over");
-    });
-
-    document.getElementById("kanbanBoard").addEventListener("dragleave", event => {
-      const zone = event.target.closest(".kanban-dropzone");
-      if (zone) zone.classList.remove("is-over");
-    });
-
-    document.getElementById("kanbanBoard").addEventListener("drop", event => {
-      const zone = event.target.closest(".kanban-dropzone");
-      if (!zone) return;
-      event.preventDefault();
-      const id = event.dataTransfer.getData("text/plain");
-      const item = workflowItems.find(entry => entry.id === id);
-      if (item) {
-        item.status = zone.dataset.status;
-        renderKanban();
-        updateMetrics();
-      }
-    });
-
-    function openSearchModal(query = "") {
-      toggleModal(aiSearchModal, true);
-      aiSearchInput.value = query;
-      renderAISuggestions(query);
-      setTimeout(() => aiSearchInput.focus(), 40);
-    }
-
-    function closeAISearch() {
-      toggleModal(aiSearchModal, false);
-      searchInput.value = "";
-    }
-
+    function openSearchModal(query = "") { toggleModal(aiSearchModal, true); aiSearchInput.value = query; renderAISuggestions(query); setTimeout(() => aiSearchInput.focus(), 40); }
+    function closeAISearch() { toggleModal(aiSearchModal, false); searchInput.value = ""; }
     searchInput.addEventListener("focus", () => openSearchModal(searchInput.value));
     searchInput.addEventListener("click", () => openSearchModal(searchInput.value));
     document.getElementById("heroSearchBtn").addEventListener("click", () => openSearchModal());
     document.getElementById("assistantQuickAction").addEventListener("click", () => openSearchModal());
     document.getElementById("smartSearchOpenBtn").addEventListener("click", () => openSearchModal());
     closeSearchModal.addEventListener("click", closeAISearch);
-    aiSearchModal.addEventListener("click", event => {
-      if (event.target === aiSearchModal) closeAISearch();
-    });
-
-    document.addEventListener("keydown", event => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        openSearchModal();
-      }
-      if (event.key === "Escape") {
-        closeAISearch();
-        closePreview();
-        toggleModal(uploadModal, false);
-      }
-    });
-
+    aiSearchModal.addEventListener("click", event => { if (event.target === aiSearchModal) closeAISearch(); });
+    document.addEventListener("keydown", event => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); openSearchModal(); } if (event.key === "Escape") { closeAISearch(); closePreview(); toggleModal(uploadModal, false); activityPopover.classList.add("hidden"); } });
     aiSearchInput.addEventListener("input", () => renderAISuggestions(aiSearchInput.value));
-    aiSearchInput.addEventListener("keydown", event => {
-      if (event.key === "ArrowDown") {
-        event.preventDefault();
-        const first = aiSuggestions.querySelector("button");
-        if (first) first.focus();
-      }
-      if (event.key === "Enter") {
-        event.preventDefault();
-        const first = aiSuggestions.querySelector("button");
-        if (first) first.click();
-      }
-    });
-
-    document.querySelectorAll(".smart-prompt").forEach(button => {
-      button.addEventListener("click", () => openSearchModal(button.dataset.query));
-    });
+    aiSearchInput.addEventListener("keydown", event => { if (event.key === "ArrowDown") { event.preventDefault(); const first = aiSuggestions.querySelector("button"); if (first) first.focus(); } if (event.key === "Enter") { event.preventDefault(); const first = aiSuggestions.querySelector("button"); if (first) first.click(); } });
+    document.querySelectorAll(".smart-prompt").forEach(button => button.addEventListener("click", () => openSearchModal(button.dataset.query)));
 
     function renderAISuggestions(query = "") {
       const normalized = query.trim().toLowerCase();
-      let matches = state.documents.filter(doc => {
-        const keywords = Array.isArray(doc.keywords) ? doc.keywords : [];
-        const haystack = [doc.fileName, doc.fileType, doc.status, getCategory(doc), ...keywords].join(" ").toLowerCase();
-        return !normalized || haystack.includes(normalized) || normalized.split(/\s+/).some(token => haystack.includes(token));
-      }).slice(0, 5);
-
+      let matches = state.documents.filter(doc => { const keywords = Array.isArray(doc.keywords) ? doc.keywords : []; const haystack = [doc.fileName, doc.fileType, doc.status, getCategory(doc), ...keywords].join(" ").toLowerCase(); return !normalized || haystack.includes(normalized) || normalized.split(/\s+/).some(token => haystack.includes(token)); }).slice(0, 5);
       if (!matches.length && state.documents.length) matches = state.documents.slice(0, 3);
-
-      const promptSuggestions = [
-        "Find all pending finance invoices from March.",
-        "Show documents with low AI confidence.",
-        "Which approvals are delayed today?"
-      ];
-
-      const docsMarkup = matches.map(doc => `
-        <button class="suggestion-button" type="button" data-preview="${escapeHtml(getDocumentId(doc))}">
-          <span class="file-glyph"><i data-feather="file-text"></i></span>
-          <span>
-            <strong class="doc-title">${escapeHtml(doc.fileName)}</strong>
-            <span class="doc-sub">${escapeHtml(getCategory(doc))} - ${escapeHtml(formatStatus(doc.status))} - ${getConfidence(doc)}% confidence</span>
-          </span>
-          <i data-feather="arrow-up-right"></i>
-        </button>
-      `).join("");
-
-      const promptsMarkup = promptSuggestions.map(prompt => `
-        <button class="suggestion-button" type="button" data-search-prompt="${escapeHtml(prompt)}">
-          <span class="file-glyph"><i data-feather="command"></i></span>
-          <span>
-            <strong class="doc-title">${escapeHtml(prompt)}</strong>
-            <span class="doc-sub">Semantic query suggestion</span>
-          </span>
-          <i data-feather="send"></i>
-        </button>
-      `).join("");
-
-      aiSuggestions.innerHTML = docsMarkup + promptsMarkup;
-      feather.replace();
+      const promptSuggestions = ["Find all pending finance invoices from March.", "Show documents with low AI confidence.", "Which approvals are delayed today?"];
+      const docsMarkup = matches.map(doc => `<button class="suggestion-button" type="button" data-preview="${escapeHtml(getDocumentId(doc))}"><span class="file-glyph"><i data-feather="file-text"></i></span><span><strong class="doc-title">${escapeHtml(doc.fileName)}</strong><span class="doc-sub">${escapeHtml(getCategory(doc))} - ${escapeHtml(formatStatus(doc.status))} - ${getConfidence(doc)}% confidence</span></span><i data-feather="arrow-up-right"></i></button>`).join("");
+      const promptsMarkup = promptSuggestions.map(prompt => `<button class="suggestion-button" type="button" data-search-prompt="${escapeHtml(prompt)}"><span class="file-glyph"><i data-feather="command"></i></span><span><strong class="doc-title">${escapeHtml(prompt)}</strong><span class="doc-sub">Semantic query suggestion</span></span><i data-feather="send"></i></button>`).join("");
+      aiSuggestions.innerHTML = docsMarkup + promptsMarkup; if (window.feather) feather.replace();
     }
+    aiSuggestions.addEventListener("click", event => { const promptButton = event.target.closest("[data-search-prompt]"); if (promptButton) { aiSearchInput.value = promptButton.dataset.searchPrompt; renderAISuggestions(aiSearchInput.value); return; } const previewButton = event.target.closest("[data-preview]"); if (previewButton) { const doc = state.documents.find(item => String(getDocumentId(item)) === String(previewButton.dataset.preview)); if (doc) { closeAISearch(); openPreview(doc); } } });
 
-    aiSuggestions.addEventListener("click", event => {
-      const promptButton = event.target.closest("[data-search-prompt]");
-      if (promptButton) {
-        aiSearchInput.value = promptButton.dataset.searchPrompt;
-        renderAISuggestions(aiSearchInput.value);
-        return;
-      }
-      const previewButton = event.target.closest("[data-preview]");
-      if (previewButton) {
-        const doc = state.documents.find(item => String(getDocumentId(item)) === String(previewButton.dataset.preview));
-        if (doc) {
-          closeAISearch();
-          openPreview(doc);
-        }
-      }
-    });
+    function renderUploadCount() { /* placeholder for future file count UI */ }
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      setGreeting();
-      renderKanban();
-      renderHeatmap();
-      renderInsights();
-      await Promise.all([loadDocuments(), loadDashboardStats(), loadRecentActivity()]);
-    });
+    scrollTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    window.addEventListener("scroll", () => { scrollTopBtn.classList.toggle("visible", window.scrollY > 400); }, { passive: true });
+
+    function syncThemeDefaults() { document.body.classList.remove("focus-theme"); }
+    syncThemeDefaults();
+    setGreeting();
+    renderKanban();
+    renderHeatmap();
+    renderInsights();
+    loadDocuments();
+    loadDashboardStats();
+    loadRecentActivity();
+    if (window.feather) feather.replace();
   </script>
 </body>
-
 </html>
