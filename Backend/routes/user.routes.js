@@ -67,7 +67,7 @@ router.post(
         });
       }
 
-      const { username, email, password } = req.body;
+      const { username, email, password, role } = req.body;
       const confirmPassword = req.body['confirm-password'];
 
       if (password !== confirmPassword) {
@@ -92,6 +92,7 @@ router.post(
         username,
         email: email.toLowerCase(),
         password: hashedPassword,
+        role: role || "viewer",
       });
 
       await newUser.save(); 

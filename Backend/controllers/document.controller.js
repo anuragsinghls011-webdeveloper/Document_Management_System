@@ -45,18 +45,36 @@ async function enrichDocument(docId, filePath, originalName) {
   });
 }
 
-function queueDocumentEnrichment(docId, filePath, originalName) {
-  setImmediate(() => {
-    enrichDocument(docId, filePath, originalName).catch((err) => {
+const enrichmentQueue = [];
+let isProcessingQueue = false;
+
+async function processEnrichmentQueue() {
+  if (isProcessingQueue) return;
+  isProcessingQueue = true;
+
+  while (enrichmentQueue.length > 0) {
+    const { docId, filePath, originalName } = enrichmentQueue.shift();
+    try {
+      await enrichDocument(docId, filePath, originalName);
+    } catch (err) {
       console.error("DOCUMENT ENRICHMENT ERROR", err);
-      Document.findByIdAndUpdate(docId, {
-        status: "pending",
-        summary: "No summary available."
-      }).catch((updateErr) => {
+      try {
+        await Document.findByIdAndUpdate(docId, {
+          status: "pending",
+          summary: "No summary available."
+        });
+      } catch (updateErr) {
         console.error("FAILED TO MARK DOCUMENT PENDING AFTER ENRICHMENT ERROR", updateErr);
-      });
-    });
-  });
+      }
+    }
+  }
+
+  isProcessingQueue = false;
+}
+
+function queueDocumentEnrichment(docId, filePath, originalName) {
+  enrichmentQueue.push({ docId, filePath, originalName });
+  processEnrichmentQueue();
 }
 
 
@@ -188,23 +206,23 @@ exports.search = async (req, res) => {
 
     const query = { userId };
 
-    
+
     if (q && q.trim() !== "") {
       query.fileName = { $regex: escapeRegex(q), $options: "i" };
     }
 
-    
+
     const normalizedStatus = normalizeStatus(status);
     if (normalizedStatus) {
       query.status = normalizedStatus;
     }
 
-    
+
     if (type && type !== "all") {
       query.fileType = { $regex: new RegExp(`^${escapeRegex(type)}$`, "i") };
     }
 
-    
+
     if (date) {
       const start = new Date(date);
       if (Number.isNaN(start.getTime())) {
@@ -253,14 +271,14 @@ exports.deleteDocument = async (req, res) => {
     if (!doc) {
       return res.status(404).json({ message: "Document not found" });
     }
-    
+
     // Optionally delete the file from disk (fs.unlink)
     const fs = require("fs");
     const filePath = path.join(__dirname, "..", doc.filePath);
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }
-    
+
     res.json({ message: "Document deleted successfully" });
   } catch (err) {
     console.error("Delete error:", err);
@@ -275,7 +293,7 @@ exports.downloadDocument = async (req, res) => {
     if (!doc) {
       return res.status(404).send("Document not found");
     }
-    
+
     const filePath = path.join(__dirname, "..", doc.filePath);
     res.download(filePath, doc.fileName);
   } catch (err) {
@@ -291,7 +309,7 @@ exports.viewDocument = async (req, res) => {
     if (!doc) {
       return res.status(404).send("Document not found");
     }
-    
+
     const filePath = path.join(__dirname, "..", doc.filePath);
     res.sendFile(filePath);
   } catch (err) {

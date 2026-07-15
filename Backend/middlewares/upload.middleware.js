@@ -70,6 +70,6 @@ module.exports = multer({
   fileFilter,
   limits: {
     fileSize: 10 * 1024 * 1024,
-    files: 100
+    files: 1000
   }
 });
