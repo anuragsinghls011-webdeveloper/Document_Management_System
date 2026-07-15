@@ -194,9 +194,9 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" id="submitBtn"
+                    <button type="submit" id="submitBtn" 
                         class="w-full mt-8 bg-white text-black font-medium py-3 px-4 rounded transition-all duration-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base focus:ring-white flex justify-center items-center gap-2">
-                        <span>Start Synthesizing</span>
+                        <span>Register</span>
                         <i class="ph ph-arrow-right"></i>
                     </button>
                     
@@ -346,23 +346,59 @@
                     submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
                     submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin text-xl"></i> Initializing Workspace...`;
 
-                    setTimeout(() => {
-                        // Success State
-                        form.classList.add('hidden');
+                    fetch('/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: name,
+                            email: email,
+                            password: pwd,
+                            "confirm-password": pwd
+                        })
+                    })
+                    .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+                    .then(({ status, ok, data }) => {
+                        if (ok) {
+                            form.classList.add('hidden');
+                            formMessage.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                            formMessage.classList.add('bg-white/5', 'text-white', 'border-white/10', 'p-6', 'flex-col', 'items-center', 'text-center', 'animate-fade-in');
+                            
+                            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+                            document.getElementById('formMessageIcon').className = 'ph-light ph-check-circle text-4xl text-white mb-2';
+                            document.getElementById('formMessageText').innerHTML = `
+                                <h3 class="text-xl font-serif mb-2">Welcome to the Vault, ${displayRole}</h3>
+                                <p class="text-sm text-gray-400 font-light mb-6">Your intelligent archive is ready. Please proceed to login.</p>
+                                <button onclick="window.location.href='/login'" class="w-full px-4 py-2 bg-white text-black rounded text-sm font-medium hover:bg-gray-200 transition-colors">Go to Login</button>
+                            `;
+                        } else {
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                            submitBtn.innerHTML = `<span>Register</span><i class="ph ph-arrow-right"></i>`;
+                            
+                            formMessage.classList.remove('hidden', 'bg-white/5', 'text-white', 'border-white/10', 'flex-col', 'items-center', 'text-center');
+                            formMessage.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                            document.getElementById('formMessageIcon').className = 'ph-fill ph-warning-circle text-lg mt-0.5 text-red-400';
+                            
+                            let errorMsg = data.message || "Registration failed. Please try again.";
+                            if (data.errors && data.errors.length > 0) {
+                                errorMsg = data.errors.map(err => err.msg).join("<br>");
+                            }
+                            document.getElementById('formMessageText').innerHTML = errorMsg;
+                        }
+                    })
+                    .catch(error => {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                        submitBtn.innerHTML = `<span>Register</span><i class="ph ph-arrow-right"></i>`;
                         
-                        formMessage.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'border-red-500/20');
-                        formMessage.classList.add('bg-white/5', 'text-white', 'border-white/10', 'p-6', 'flex-col', 'items-center', 'text-center', 'animate-fade-in');
-                        
-                        // Capitalize role for the display message
-                        const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-
-                        document.getElementById('formMessageIcon').className = 'ph-light ph-check-circle text-4xl text-white mb-2';
-                        document.getElementById('formMessageText').innerHTML = `
-                            <h3 class="text-xl font-serif mb-2">Welcome to the Vault, ${displayRole}</h3>
-                            <p class="text-sm text-gray-400 font-light mb-6">Your intelligent archive is ready. We've sent a verification link to <span class="text-white">${email}</span>.</p>
-                            <button onclick="window.location.reload()" class="w-full px-4 py-2 bg-white text-black rounded text-sm font-medium hover:bg-gray-200 transition-colors">Enter System</button>
-                        `;
-                    }, 2000); 
+                        formMessage.classList.remove('hidden', 'bg-white/5', 'text-white', 'border-white/10', 'flex-col', 'items-center', 'text-center');
+                        formMessage.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                        document.getElementById('formMessageIcon').className = 'ph-fill ph-warning-circle text-lg mt-0.5 text-red-400';
+                        document.getElementById('formMessageText').innerHTML = "Network error. Please try again.";
+                    });
                 } else {
                     // Error State
                     formMessage.classList.remove('hidden', 'bg-white/5', 'text-white', 'border-white/10', 'flex-col', 'items-center', 'text-center');

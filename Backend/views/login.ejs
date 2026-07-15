@@ -190,7 +190,7 @@
                     <!-- Submit Button -->
                     <button type="submit" id="submitBtn"
                         class="w-full mt-8 bg-white text-black font-medium py-3 px-4 rounded transition-all duration-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base focus:ring-white flex justify-center items-center gap-2">
-                        <span>Access Vault</span>
+                        <span>Login</span>
                         <i class="ph ph-sign-in"></i>
                     </button>
                     
@@ -331,22 +331,51 @@
                     submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
                     submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin text-xl"></i> Authenticating...`;
 
-                    setTimeout(() => {
-                        // Success State
-                        form.classList.add('hidden');
+                    fetch('/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password: pwd })
+                    })
+                    .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+                    .then(({ status, ok, data }) => {
+                        if (ok) {
+                            form.classList.add('hidden');
+                            formMessage.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                            formMessage.classList.add('bg-white/5', 'text-white', 'border-white/10', 'p-6', 'flex-col', 'items-center', 'text-center', 'animate-fade-in');
+                            
+                            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+                            document.getElementById('formMessageIcon').className = 'ph-light ph-check-circle text-4xl text-white mb-2';
+                            document.getElementById('formMessageText').innerHTML = `
+                                <h3 class="text-xl font-serif mb-2">Authentication Successful, ${displayRole}</h3>
+                                <p class="text-sm text-gray-400 font-light mb-6">Welcome back to the Vault. Redirecting to your dashboard...</p>
+                            `;
+                            setTimeout(() => {
+                                window.location.href = data.redirect || '/dashboard';
+                            }, 1000);
+                        } else {
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                            submitBtn.innerHTML = `<span>Login</span><i class="ph ph-sign-in"></i>`;
+                            
+                            formMessage.classList.remove('hidden', 'bg-white/5', 'text-white', 'border-white/10', 'flex-col', 'items-center', 'text-center');
+                            formMessage.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                            document.getElementById('formMessageIcon').className = 'ph-fill ph-warning-circle text-lg mt-0.5 text-red-400';
+                            document.getElementById('formMessageText').innerHTML = data.message || "Invalid login credentials.";
+                        }
+                    })
+                    .catch(error => {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                        submitBtn.innerHTML = `<span>Login</span><i class="ph ph-sign-in"></i>`;
                         
-                        formMessage.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'border-red-500/20');
-                        formMessage.classList.add('bg-white/5', 'text-white', 'border-white/10', 'p-6', 'flex-col', 'items-center', 'text-center', 'animate-fade-in');
-                        
-                        const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-
-                        document.getElementById('formMessageIcon').className = 'ph-light ph-check-circle text-4xl text-white mb-2';
-                        document.getElementById('formMessageText').innerHTML = `
-                            <h3 class="text-xl font-serif mb-2">Authentication Successful, ${displayRole}</h3>
-                            <p class="text-sm text-gray-400 font-light mb-6">Welcome back to the Vault. Redirecting to your dashboard...</p>
-                            <button onclick="window.location.reload()" class="w-full px-4 py-2 bg-white text-black rounded text-sm font-medium hover:bg-gray-200 transition-colors">Go to Dashboard</button>
-                        `;
-                    }, 1500); 
+                        formMessage.classList.remove('hidden', 'bg-white/5', 'text-white', 'border-white/10', 'flex-col', 'items-center', 'text-center');
+                        formMessage.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                        document.getElementById('formMessageIcon').className = 'ph-fill ph-warning-circle text-lg mt-0.5 text-red-400';
+                        document.getElementById('formMessageText').innerHTML = "Network error. Please try again.";
+                    });
                 } else {
                     // Error State
                     formMessage.classList.remove('hidden', 'bg-white/5', 'text-white', 'border-white/10', 'flex-col', 'items-center', 'text-center');
