@@ -1,273 +1,377 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Account — Document Intelligence</title>
-  <meta name="description" content="Create your enterprise document intelligence account.">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/enterprise.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
-  <script defer src="/assets/js/enterprise.js"></script>
-</head>
-<body>
-  <main class="auth-shell min-h-screen py-6 lg:py-10">
-    <div class="auth-grid items-stretch">
-      <section class="auth-visual reveal hidden overflow-hidden rounded-[32px] p-8 lg:block">
-        <div class="space-y-10">
-          <div>
-            <div class="hero-kicker">Enterprise Onboarding</div>
-            <h1 class="hero-title mt-6 max-w-xl leading-[0.92]">Create an account for your premium AI document workspace.</h1>
-            <p class="hero-copy mt-5 max-w-lg text-white/70">Bring OCR, semantic search, approvals, analytics, and audit trails into one elegant enterprise platform.</p>
-          </div>
-
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div class="summary-card"><p class="caption">Setup time</p><p class="text-2xl font-bold">Under 5 min</p></div>
-            <div class="summary-card"><p class="caption">Workspace roles</p><p class="text-2xl font-bold">Flexible</p></div>
-            <div class="summary-card"><p class="caption">Security</p><p class="text-2xl font-bold">Enterprise</p></div>
-            <div class="summary-card"><p class="caption">Automation</p><p class="text-2xl font-bold">Ready</p></div>
-          </div>
-
-          <div class="hero-card">
-            <p class="kicker mb-4">What you get</p>
-            <div class="space-y-3 text-sm text-white/65">
-              <div class="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3"><span>AI summaries</span><span class="badge approved">Included</span></div>
-              <div class="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3"><span>Approval workflow</span><span class="badge pending">Live</span></div>
-              <div class="flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3"><span>Audit logging</span><span class="badge">Enabled</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="form-card reveal mx-auto w-full max-w-xl rounded-[32px] p-6 sm:p-8 lg:p-10">
-        <div class="flex items-center justify-between">
-          <a href="/" class="inline-flex items-center gap-2 text-white/55 transition hover:text-white">
-            <i data-feather="arrow-left" class="h-4 w-4"></i>
-            Back to home
-          </a>
-          <span class="badge">Secure onboarding</span>
-        </div>
-
-        <div class="mt-10 space-y-3">
-          <div class="hero-kicker">Create account</div>
-          <h2 class="dashboard-title text-[clamp(2rem,4vw,3rem)] leading-[0.95]">Start your enterprise workspace.</h2>
-          <p class="body-copy max-w-md">Create an account to manage documents with AI-driven workflows, premium UX, and enterprise-grade controls.</p>
-        </div>
-
-        <form id="registerForm" class="mt-10 space-y-5" action="/register" method="POST" novalidate>
-          <div id="globalError" class="hidden rounded-2xl border border-[rgba(255,90,95,0.3)] bg-[rgba(255,90,95,0.08)] px-4 py-3 text-sm text-danger"></div>
-
-          <div>
-            <label for="fullName" class="mb-2 block text-sm font-semibold text-white/75">Full name</label>
-            <input id="fullName" name="username" type="text" autocomplete="name" required class="input-field" placeholder="John Doe">
-            <p id="nameError" class="caption mt-2 hidden text-danger">Please enter your full name.</p>
-          </div>
-
-          <div>
-            <label for="email" class="mb-2 block text-sm font-semibold text-white/75">Email address</label>
-            <input id="email" name="email" type="email" autocomplete="email" required class="input-field" placeholder="you@company.com">
-            <p id="emailError" class="caption mt-2 hidden text-danger">Please enter a valid email address.</p>
-          </div>
-
-          <div>
-            <label for="password" class="mb-2 block text-sm font-semibold text-white/75">Password</label>
-            <input id="password" name="password" type="password" autocomplete="new-password" required class="input-field" placeholder="At least 8 characters">
-            <div class="strength-bar mt-3"><div id="strengthFill" class="fill"></div></div>
-            <p id="strengthLabel" class="strength-label text-white/40">Enter a password</p>
-            <p id="passwordError" class="caption mt-2 hidden text-danger">Password is too weak.</p>
-          </div>
-
-          <div>
-            <label for="confirm-password" class="mb-2 block text-sm font-semibold text-white/75">Confirm password</label>
-            <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required class="input-field" placeholder="Repeat your password">
-            <p id="matchIndicator" class="match-indicator"></p>
-            <p id="confirmError" class="caption mt-2 hidden text-danger">Passwords do not match.</p>
-          </div>
-
-          <button type="submit" id="submitBtn" class="submit-btn magnetic w-full">
-            <span class="btn-text">Create account</span>
-            <span class="spinner"></span>
-          </button>
-        </form>
-
-        <div class="my-8 flex items-center gap-3">
-          <span class="h-px flex-1 bg-white/8"></span>
-          <span class="text-xs uppercase tracking-[0.28em] text-white/35">or continue with</span>
-          <span class="h-px flex-1 bg-white/8"></span>
-        </div>
-
-        <div class="grid grid-cols-3 gap-3">
-          <button class="icon-button h-12 w-full rounded-2xl" type="button" aria-label="Sign up with Google"><i data-feather="chrome"></i></button>
-          <button class="icon-button h-12 w-full rounded-2xl" type="button" aria-label="Sign up with GitHub"><i data-feather="github"></i></button>
-          <button class="icon-button h-12 w-full rounded-2xl" type="button" aria-label="Sign up with Microsoft"><i data-feather="grid"></i></button>
-        </div>
-
-        <p class="mt-8 text-center text-sm text-white/55">
-          Already have an account?
-          <a href="/login" class="font-semibold text-white transition hover:text-[#BFD4FF]">Sign in</a>
-        </p>
-      </section>
-    </div>
-  </main>
-
-  <script>
-    if (window.feather) feather.replace();
-
-    const form = document.getElementById('registerForm');
-    const nameInput = document.getElementById('fullName');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const confirmInput = document.getElementById('confirm-password');
-    const submitBtn = document.getElementById('submitBtn');
-    const strengthFill = document.getElementById('strengthFill');
-    const strengthLabel = document.getElementById('strengthLabel');
-    const matchIndicator = document.getElementById('matchIndicator');
-    const globalError = document.getElementById('globalError');
-
-    const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const getStrength = pw => {
-      let score = 0;
-      if (pw.length >= 8) score += 1;
-      if (pw.length >= 12) score += 1;
-      if (/[A-Z]/.test(pw)) score += 1;
-      if (/[0-9]/.test(pw)) score += 1;
-      if (/[^A-Za-z0-9]/.test(pw)) score += 1;
-      return score;
-    };
-
-    const showError = (input, errorEl) => {
-      input.classList.add('error');
-      errorEl.classList.remove('hidden');
-    };
-
-    const clearError = (input, errorEl) => {
-      input.classList.remove('error');
-      errorEl.classList.add('hidden');
-    };
-
-    const updateStrength = () => {
-      const score = getStrength(passwordInput.value);
-      const levels = [
-        { width: '0%', color: 'transparent', label: 'Enter a password' },
-        { width: '20%', color: '#FF5A5F', label: 'Very weak' },
-        { width: '40%', color: '#FFC857', label: 'Weak' },
-        { width: '60%', color: '#FFC857', label: 'Fair' },
-        { width: '80%', color: '#00D084', label: 'Strong' },
-        { width: '100%', color: '#8A5CFF', label: 'Very strong' }
-      ];
-      const level = passwordInput.value.length === 0 ? levels[0] : levels[Math.min(score, 5)];
-      strengthFill.style.width = level.width;
-      strengthFill.style.background = level.color;
-      strengthLabel.textContent = level.label;
-      strengthLabel.style.color = level.color === 'transparent' ? '#64748b' : level.color;
-    };
-
-    const checkMatch = () => {
-      const pw = passwordInput.value;
-      const cpw = confirmInput.value;
-
-      if (!cpw) {
-        matchIndicator.style.display = 'none';
-        confirmInput.classList.remove('success', 'error');
-        return;
-      }
-
-      matchIndicator.style.display = 'block';
-      if (pw === cpw) {
-        matchIndicator.textContent = '✓ Passwords match';
-        matchIndicator.style.color = '#00D084';
-        confirmInput.classList.add('success');
-        confirmInput.classList.remove('error');
-      } else {
-        matchIndicator.textContent = '✗ Passwords do not match';
-        matchIndicator.style.color = '#FF5A5F';
-        confirmInput.classList.remove('success');
-      }
-    };
-
-    passwordInput.addEventListener('input', () => {
-      clearError(passwordInput, document.getElementById('passwordError'));
-      globalError.classList.add('hidden');
-      updateStrength();
-      checkMatch();
-    });
-
-    confirmInput.addEventListener('input', () => {
-      clearError(confirmInput, document.getElementById('confirmError'));
-      globalError.classList.add('hidden');
-      checkMatch();
-    });
-
-    nameInput.addEventListener('input', () => {
-      clearError(nameInput, document.getElementById('nameError'));
-      globalError.classList.add('hidden');
-    });
-
-    emailInput.addEventListener('input', () => {
-      clearError(emailInput, document.getElementById('emailError'));
-      globalError.classList.add('hidden');
-    });
-
-    form.addEventListener('submit', event => {
-      event.preventDefault();
-      let valid = true;
-
-      if (!nameInput.value.trim()) {
-        showError(nameInput, document.getElementById('nameError'));
-        valid = false;
-      }
-
-      if (!validateEmail(emailInput.value.trim())) {
-        showError(emailInput, document.getElementById('emailError'));
-        valid = false;
-      }
-
-      if (getStrength(passwordInput.value) < 2) {
-        showError(passwordInput, document.getElementById('passwordError'));
-        valid = false;
-      }
-
-      if (passwordInput.value !== confirmInput.value) {
-        showError(confirmInput, document.getElementById('confirmError'));
-        valid = false;
-      }
-
-      if (!valid) return;
-
-      submitBtn.classList.add('loading');
-      submitBtn.disabled = true;
-
-      const body = new URLSearchParams(new FormData(form)).toString();
-
-      fetch(form.action, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        },
-        body
-      })
-      .then(async response => {
-        const isJson = response.headers.get('content-type')?.includes('application/json');
-        const data = isJson ? await response.json() : null;
-
-        if (!response.ok) {
-          throw new Error(data?.message || 'Registration failed. Please try again.');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDMS - The Intelligent Archive | Register</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Space+Mono&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    },
+                    colors: {
+                        base: '#070707',
+                        surface: '#111111',
+                        border: '#222222',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #070707;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070707;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Input autofill styling for dark mode */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px #111111 inset !important;
+            -webkit-text-fill-color: white !important;
+            transition: background-color 5000s ease-in-out 0s;
         }
 
-        window.location.href = data?.redirect || '/login';
-      })
-      .catch(error => {
-        submitBtn.classList.remove('loading');
-        submitBtn.disabled = false;
-        globalError.textContent = error.message;
-        globalError.classList.remove('hidden');
-      });
-    });
-  </script>
+        /* Standardize select dropdown background in some browsers */
+        select option {
+            background-color: #111111;
+            color: #ffffff;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col relative selection:bg-white selection:text-black">
+
+    <!-- Canvas Background -->
+    <canvas id="particleCanvas" class="fixed inset-0 z-0 pointer-events-none opacity-60"></canvas>
+
+    <!-- Top Navigation (Matching Screenshot) -->
+    <nav class="relative z-50 w-full flex items-center justify-between px-6 py-5 border-b border-white/5 backdrop-blur-sm">
+        <div class="flex items-center gap-10">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-white group-hover:scale-105 transition-transform">
+                    <rect x="12" y="2" width="14" height="14" transform="rotate(45 12 2)" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="12" y="8" width="5.5" height="5.5" transform="rotate(45 12 8)" fill="currentColor"/>
+                </svg>
+                <span class="font-mono text-lg tracking-widest text-white">IDMS</span>
+            </a>
+            
+            <!-- Links -->
+            <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+                <a href="#" class="hover:text-white transition-colors">Dashboard</a>
+                <a href="#" class="hover:text-white transition-colors">Analytics</a>
+                <a href="#" class="hover:text-white transition-colors">Workflows</a>
+                <a href="#" class="hover:text-white transition-colors">About Us</a>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-6">
+            <button class="text-gray-400 hover:text-white transition-colors">
+                <i class="ph ph-magnifying-glass text-xl"></i>
+            </button>
+            <a href="#" class="text-sm text-gray-300 hover:text-white transition-colors">Sign in</a>
+            <a href="#" class="bg-white text-black px-5 py-2 rounded text-sm font-medium hover:bg-gray-200 transition-colors">Register</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-grow flex items-center justify-center px-4 py-12">
+        <div class="w-full max-w-md">
+            
+            <!-- Typography Header -->
+            <div class="text-center mb-10 animate-fade-in">
+                <p class="font-mono text-[10px] tracking-[0.3em] text-gray-500 uppercase mb-4">The Intelligent Archive</p>
+                <h1 class="text-4xl md:text-5xl font-serif text-white mb-2">Join the <span class="italic text-gray-300">Vault</span></h1>
+                <p class="text-sm text-gray-400 font-light mt-4 px-4">
+                    Create an account to begin synthesizing your documents and building your knowledge graph.
+                </p>
+            </div>
+
+            <!-- Registration Form -->
+            <div class="bg-surface/80 backdrop-blur-xl border border-white/5 rounded-xl p-8 shadow-2xl animate-fade-in delay-100">
+                
+                <!-- Global Error / Success Messages -->
+                <div id="formMessage" class="hidden mb-6 p-4 rounded text-sm flex items-start gap-3 border transition-all duration-300">
+                    <i id="formMessageIcon" class="ph text-lg mt-0.5"></i>
+                    <div id="formMessageText"></div>
+                </div>
+
+                <form id="registrationForm" class="space-y-5" novalidate>
+                    
+                    <!-- Name -->
+                    <div>
+                        <label for="fullName" class="block text-xs font-mono text-gray-400 uppercase tracking-wider mb-2">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" required
+                            class="w-full px-4 py-3 bg-base border border-border rounded text-sm text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all placeholder-gray-600"
+                            placeholder="John Doe">
+                        <p class="hidden text-red-400 text-xs mt-1 font-light" id="nameError">Please enter your full name</p>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-xs font-mono text-gray-400 uppercase tracking-wider mb-2">Work Email</label>
+                        <input type="email" id="email" name="email" required
+                            class="w-full px-4 py-3 bg-base border border-border rounded text-sm text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all placeholder-gray-600"
+                            placeholder="john@company.com">
+                        <p class="hidden text-red-400 text-xs mt-1 font-light" id="emailError">Please enter a valid email address</p>
+                    </div>
+
+                    <!-- Role Based Access Selection -->
+                    <div>
+                        <label for="role" class="block text-xs font-mono text-gray-400 uppercase tracking-wider mb-2">System Role</label>
+                        <div class="relative">
+                            <select id="role" name="role" required
+                                class="w-full px-4 py-3 bg-base border border-border rounded text-sm text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all appearance-none cursor-pointer">
+                                <option value="" disabled selected class="text-gray-600">Select your access level...</option>
+                                <option value="admin">Administrator (Full Access)</option>
+                                <option value="editor">Editor (Upload & Synthesize)</option>
+                                <option value="viewer">Viewer (Read Only)</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                <i class="ph ph-caret-down"></i>
+                            </div>
+                        </div>
+                        <p class="hidden text-red-400 text-xs mt-1 font-light" id="roleError">Please select a system role</p>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-xs font-mono text-gray-400 uppercase tracking-wider mb-2">Password</label>
+                        <div class="relative">
+                            <input type="password" id="password" name="password" required
+                                class="w-full px-4 py-3 bg-base border border-border rounded text-sm text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all placeholder-gray-600 pr-10"
+                                placeholder="••••••••">
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-white transition-colors focus:outline-none">
+                                <i class="ph ph-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                        <p class="hidden text-red-400 text-xs mt-1 font-light" id="passwordError">Password must be at least 8 characters</p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submitBtn"
+                        class="w-full mt-8 bg-white text-black font-medium py-3 px-4 rounded transition-all duration-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base focus:ring-white flex justify-center items-center gap-2">
+                        <span>Start Synthesizing</span>
+                        <i class="ph ph-arrow-right"></i>
+                    </button>
+                    
+                    <!-- Terms -->
+                    <p class="text-center text-xs text-gray-600 mt-6 font-light">
+                        By registering, you agree to our <a href="#" class="text-gray-400 hover:text-white underline decoration-gray-600 underline-offset-2 transition-colors">Terms of Service</a> and <a href="#" class="text-gray-400 hover:text-white underline decoration-gray-600 underline-offset-2 transition-colors">Privacy Policy</a>.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            /* -----------------------------------------------------------
+               1. Particle Canvas Background Animation
+            ----------------------------------------------------------- */
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            let particles = [];
+            const particleCount = 70; // Adjust for density
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    // Size varies between 1px and 4px to match screenshot squares
+                    this.size = Math.random() * 3 + 1; 
+                    // Movement speed
+                    this.speedX = Math.random() * 0.4 - 0.2;
+                    this.speedY = Math.random() * -0.5 - 0.1; // Float upwards slightly
+                    // Opacity between 0.1 and 0.6
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                }
+
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+
+                    // Wrap around edges
+                    if (this.y < 0) this.y = canvas.height;
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.x > canvas.width) this.x = 0;
+                }
+
+                draw() {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.fillRect(this.x, this.y, this.size, this.size);
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                requestAnimationFrame(animateParticles);
+            }
+
+            initParticles();
+            animateParticles();
+
+            /* -----------------------------------------------------------
+               2. Form Logic & Validation
+            ----------------------------------------------------------- */
+            const form = document.getElementById('registrationForm');
+            const passwordInput = document.getElementById('password');
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            const submitBtn = document.getElementById('submitBtn');
+            const formMessage = document.getElementById('formMessage');
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            let isPasswordVisible = false;
+
+            // Toggle Password
+            togglePasswordBtn.addEventListener('click', () => {
+                isPasswordVisible = !isPasswordVisible;
+                passwordInput.type = isPasswordVisible ? 'text' : 'password';
+                eyeIcon.className = isPasswordVisible ? 'ph ph-eye-slash' : 'ph ph-eye';
+            });
+
+            // Toggle Error UI
+            function toggleError(inputId, errorId, isValid) {
+                const input = document.getElementById(inputId);
+                const error = document.getElementById(errorId);
+                if (!isValid) {
+                    input.classList.add('border-red-500/50', 'focus:border-red-500', 'focus:ring-red-500');
+                    input.classList.remove('border-border', 'focus:border-white', 'focus:ring-white');
+                    error.classList.remove('hidden');
+                } else {
+                    input.classList.remove('border-red-500/50', 'focus:border-red-500', 'focus:ring-red-500');
+                    input.classList.add('border-border', 'focus:border-white', 'focus:ring-white');
+                    error.classList.add('hidden');
+                }
+            }
+
+            // Submit Handler
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                formMessage.classList.add('hidden');
+
+                const name = document.getElementById('fullName').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const role = document.getElementById('role').value;
+                const pwd = passwordInput.value;
+
+                let isValid = true;
+                
+                const isNameValid = name.length > 0;
+                toggleError('fullName', 'nameError', isNameValid);
+                if(!isNameValid) isValid = false;
+
+                const isEmailValid = emailRegex.test(email);
+                toggleError('email', 'emailError', isEmailValid);
+                if(!isEmailValid) isValid = false;
+
+                const isRoleValid = role !== "";
+                toggleError('role', 'roleError', isRoleValid);
+                if(!isRoleValid) isValid = false;
+
+                const isPwdValid = pwd.length >= 8;
+                toggleError('password', 'passwordError', isPwdValid);
+                if(!isPwdValid) isValid = false;
+
+                if (isValid) {
+                    // Simulate Loading
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+                    submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin text-xl"></i> Initializing Workspace...`;
+
+                    setTimeout(() => {
+                        // Success State
+                        form.classList.add('hidden');
+                        
+                        formMessage.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                        formMessage.classList.add('bg-white/5', 'text-white', 'border-white/10', 'p-6', 'flex-col', 'items-center', 'text-center', 'animate-fade-in');
+                        
+                        // Capitalize role for the display message
+                        const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+
+                        document.getElementById('formMessageIcon').className = 'ph-light ph-check-circle text-4xl text-white mb-2';
+                        document.getElementById('formMessageText').innerHTML = `
+                            <h3 class="text-xl font-serif mb-2">Welcome to the Vault, ${displayRole}</h3>
+                            <p class="text-sm text-gray-400 font-light mb-6">Your intelligent archive is ready. We've sent a verification link to <span class="text-white">${email}</span>.</p>
+                            <button onclick="window.location.reload()" class="w-full px-4 py-2 bg-white text-black rounded text-sm font-medium hover:bg-gray-200 transition-colors">Enter System</button>
+                        `;
+                    }, 2000); 
+                } else {
+                    // Error State
+                    formMessage.classList.remove('hidden', 'bg-white/5', 'text-white', 'border-white/10', 'flex-col', 'items-center', 'text-center');
+                    formMessage.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                    document.getElementById('formMessageIcon').className = 'ph-fill ph-warning-circle text-lg mt-0.5 text-red-400';
+                    document.getElementById('formMessageText').innerHTML = `Please review the highlighted fields above.`;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
