@@ -19,7 +19,11 @@ const allowedExtensions = new Set([
   ".csv",
   ".json",
   ".xml",
-  ".log"
+  ".log",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx"
 ]);
 
 const allowedMimeTypes = new Set([
@@ -34,7 +38,11 @@ const allowedMimeTypes = new Set([
   "text/csv",
   "application/json",
   "application/xml",
-  "text/xml"
+  "text/xml",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 ]);
 
 const storage = multer.diskStorage({

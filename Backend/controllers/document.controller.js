@@ -103,7 +103,7 @@ exports.upload = async (req, res) => {
 
 exports.getDocuments = async (req, res) => {
   try {
-    const isAdmin = req.user && req.user.role === "admin";
+    const isAdmin = req.userRole === "admin";
 
     if (isAdmin && req.query.all === "true") {
       const docs = await Document.find().sort({ createdAt: -1 });
@@ -245,3 +245,58 @@ exports.recent = async (req, res) => {
     res.status(500).json([]);
   }
 };
+
+exports.deleteDocument = async (req, res) => {
+  try {
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const doc = await Document.findOneAndDelete({ _id: req.params.id, userId });
+    if (!doc) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+    
+    // Optionally delete the file from disk (fs.unlink)
+    const fs = require("fs");
+    const filePath = path.join(__dirname, "..", doc.filePath);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    
+    res.json({ message: "Document deleted successfully" });
+  } catch (err) {
+    console.error("Delete error:", err);
+    res.status(500).json({ message: "Failed to delete document" });
+  }
+};
+
+exports.downloadDocument = async (req, res) => {
+  try {
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const doc = await Document.findOne({ _id: req.params.id, userId });
+    if (!doc) {
+      return res.status(404).send("Document not found");
+    }
+    
+    const filePath = path.join(__dirname, "..", doc.filePath);
+    res.download(filePath, doc.fileName);
+  } catch (err) {
+    console.error("Download error:", err);
+    res.status(500).send("Failed to download document");
+  }
+};
+
+exports.viewDocument = async (req, res) => {
+  try {
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const doc = await Document.findOne({ _id: req.params.id, userId });
+    if (!doc) {
+      return res.status(404).send("Document not found");
+    }
+    
+    const filePath = path.join(__dirname, "..", doc.filePath);
+    res.sendFile(filePath);
+  } catch (err) {
+    console.error("View error:", err);
+    res.status(500).send("Failed to view document");
+  }
+};
+

@@ -13,4 +13,8 @@ router.get("/stats", auth, controller.stats);
 router.get("/search", auth, controller.search);
 router.get("/recent", auth, controller.recent);
 
+router.get("/:id/view", auth, controller.viewDocument);
+router.get("/:id/download", auth, controller.downloadDocument);
+router.delete("/:id", auth, controller.deleteDocument);
+
 module.exports = router;

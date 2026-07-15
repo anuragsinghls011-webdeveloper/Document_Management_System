@@ -707,83 +707,8 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="doc-name">
-                                    <div class="doc-icon"><i class='bx bxs-file-pdf'></i></div>
-                                    <div>
-                                        <div style="font-weight: 500; color: var(--text-main);">Q2_Financial_Report.pdf</div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted);">2.4 MB</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Finance</td>
-                            <td>Sarah Jenkins</td>
-                            <td>Just now</td>
-                            <td><span class="status-badge status-completed">Completed</span></td>
-                            <td>
-                                <button class="action-btn"><i class='bx bx-download'></i></button>
-                                <button class="action-btn"><i class='bx bx-show'></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="doc-name">
-                                    <div class="doc-icon"><i class='bx bxs-file-doc'></i></div>
-                                    <div>
-                                        <div style="font-weight: 500; color: var(--text-main);">Employee_Contract_Template.docx</div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted);">1.1 MB</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>HR</td>
-                            <td>Michael Chen</td>
-                            <td>15 mins ago</td>
-                            <td><span class="status-badge status-processing">Processing</span></td>
-                            <td>
-                                <button class="action-btn"><i class='bx bx-download'></i></button>
-                                <button class="action-btn"><i class='bx bx-show'></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="doc-name">
-                                    <div class="doc-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger-color);"><i class='bx bxs-file-image'></i></div>
-                                    <div>
-                                        <div style="font-weight: 500; color: var(--text-main);">Vendor_Invoice_8932.png</div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted);">4.5 MB</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Procurement</td>
-                            <td>System API</td>
-                            <td>1 hour ago</td>
-                            <td><span class="status-badge status-failed">Failed OCR</span></td>
-                            <td>
-                                <button class="action-btn"><i class='bx bx-refresh'></i></button>
-                                <button class="action-btn"><i class='bx bx-show'></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="doc-name">
-                                    <div class="doc-icon"><i class='bx bxs-file-pdf'></i></div>
-                                    <div>
-                                        <div style="font-weight: 500; color: var(--text-main);">Marketing_Strategy_2024.pdf</div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted);">8.2 MB</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Marketing</td>
-                            <td>Emma Davis</td>
-                            <td>3 hours ago</td>
-                            <td><span class="status-badge status-completed">Completed</span></td>
-                            <td>
-                                <button class="action-btn"><i class='bx bx-download'></i></button>
-                                <button class="action-btn"><i class='bx bx-show'></i></button>
-                            </td>
-                        </tr>
+                    <tbody id="recent-activity-body">
+                        <!-- Rendered by JS -->
                     </tbody>
                 </table>
             </div>
@@ -796,127 +721,130 @@
         Chart.defaults.color = '#94a3b8';
         Chart.defaults.font.family = "'Outfit', sans-serif";
         
-        // Processing Volume Chart
-        const ctxVolume = document.getElementById('volumeChart').getContext('2d');
-        
-        // Gradient for line chart
-        const gradientBlue = ctxVolume.createLinearGradient(0, 0, 0, 300);
-        gradientBlue.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
-        gradientBlue.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/dashboard/stats');
+                if (!response.ok) throw new Error('Failed to fetch stats');
+                const data = await response.json();
 
-        new Chart(ctxVolume, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Processed Documents',
-                    data: [320, 450, 410, 580, 520, 210, 190],
-                    borderColor: '#6366f1',
-                    backgroundColor: gradientBlue,
-                    borderWidth: 3,
-                    pointBackgroundColor: '#0b0f19',
-                    pointBorderColor: '#6366f1',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    fill: true,
-                    tension: 0.4 // Smooth curves
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(20, 27, 45, 0.9)',
-                        titleColor: '#f8fafc',
-                        bodyColor: '#f8fafc',
-                        borderColor: 'rgba(255, 255, 255, 0.1)',
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return context.parsed.y + ' Documents';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.05)',
-                            drawBorder: false
-                        },
-                        border: { display: false }
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                            drawBorder: false
-                        },
-                        border: { display: false }
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-            }
-        });
+                // Update Stats
+                document.querySelector('.stats-grid .stat-card:nth-child(1) .stat-value').textContent = data.totalDocuments.toLocaleString();
+                document.querySelector('.stats-grid .stat-card:nth-child(2) .stat-value').textContent = data.processedToday.toLocaleString();
+                document.querySelector('.stats-grid .stat-card:nth-child(3) .stat-value').textContent = data.pendingReview.toLocaleString();
+                document.querySelector('.stats-grid .stat-card:nth-child(4) .stat-value').textContent = data.accuracy + '%';
 
-        // Document Types Doughnut Chart
-        const ctxType = document.getElementById('typeChart').getContext('2d');
-        new Chart(ctxType, {
-            type: 'doughnut',
-            data: {
-                labels: ['Invoices', 'Contracts', 'Reports', 'Receipts', 'Other'],
-                datasets: [{
-                    data: [35, 25, 20, 15, 5],
-                    backgroundColor: [
-                        '#6366f1', // Indigo
-                        '#8b5cf6', // Purple
-                        '#10b981', // Emerald
-                        '#f59e0b', // Amber
-                        '#64748b'  // Slate
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
+                // Update Recent Activity Table
+                const tbody = document.querySelector('.table-card tbody');
+                tbody.innerHTML = '';
+                
+                if (data.recentDocuments && data.recentDocuments.length > 0) {
+                    data.recentDocuments.forEach(doc => {
+                        const ext = (doc.fileType || "unknown").toLowerCase();
+                        let iconClass = "icon-doc";
+                        let iconBx = "bxs-file-doc";
+                        let iconStyle = "";
+                        if (ext === "pdf") { iconClass = "icon-pdf"; iconBx = "bxs-file-pdf"; }
+                        else if (["jpg", "jpeg", "png"].includes(ext)) { iconStyle = "background: rgba(239, 68, 68, 0.1); color: var(--danger-color);"; iconBx = "bxs-file-image"; }
+                        
+                        let statusClass = "status-processing";
+                        let statusText = doc.status || "Pending";
+                        if (doc.status === "verified" || doc.status === "approved" || doc.status === "success") {
+                            statusClass = "status-completed";
+                            statusText = "Completed";
+                        } else if (doc.status === "rejected" || doc.status === "failed") {
+                            statusClass = "status-failed";
+                            statusText = "Failed";
                         }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(20, 27, 45, 0.9)',
-                        titleColor: '#f8fafc',
-                        bodyColor: '#f8fafc',
-                        borderColor: 'rgba(255, 255, 255, 0.1)',
-                        borderWidth: 1,
-                        padding: 12,
-                        callbacks: {
-                            label: function(context) {
-                                return ' ' + context.parsed + '%';
-                            }
-                        }
-                    }
+
+                        const dateStr = new Date(doc.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                        
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div class="doc-name">
+                                    <div class="doc-icon" style="${iconStyle}"><i class='bx ${iconBx}'></i></div>
+                                    <div>
+                                        <div style="font-weight: 500; color: var(--text-main);">${doc.fileName}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">${(doc.fileType || "unknown").toUpperCase()}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>General</td>
+                            <td>User</td>
+                            <td>${dateStr}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>
+                                <button class="action-btn" onclick="window.location.href='/api/documents/${doc._id}/download'"><i class='bx bx-download'></i></button>
+                                <button class="action-btn" onclick="window.open('/api/documents/${doc._id}/view', '_blank')"><i class='bx bx-show'></i></button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">No recent activity</td></tr>';
                 }
+
+                // Render Processing Volume Chart
+                const ctxVolume = document.getElementById('volumeChart').getContext('2d');
+                const gradientBlue = ctxVolume.createLinearGradient(0, 0, 0, 300);
+                gradientBlue.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+                gradientBlue.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+                new Chart(ctxVolume, {
+                    type: 'line',
+                    data: {
+                        labels: data.volume.labels,
+                        datasets: [{
+                            label: 'Processed Documents',
+                            data: data.volume.data,
+                            borderColor: '#6366f1',
+                            backgroundColor: gradientBlue,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#0b0f19',
+                            pointBorderColor: '#6366f1',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(20, 27, 45, 0.9)', titleColor: '#f8fafc', bodyColor: '#f8fafc', borderColor: 'rgba(255, 255, 255, 0.1)', borderWidth: 1, padding: 12, displayColors: false, callbacks: { label: function(context) { return context.parsed.y + ' Documents'; } } } },
+                        scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false }, border: { display: false } }, x: { grid: { display: false, drawBorder: false }, border: { display: false } } },
+                        interaction: { intersect: false, mode: 'index' },
+                    }
+                });
+
+                // Render Document Types Doughnut Chart
+                const ctxType = document.getElementById('typeChart').getContext('2d');
+                new Chart(ctxType, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.types.labels,
+                        datasets: [{
+                            data: data.types.data,
+                            backgroundColor: ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#64748b'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' } }, tooltip: { backgroundColor: 'rgba(20, 27, 45, 0.9)', titleColor: '#f8fafc', bodyColor: '#f8fafc', borderColor: 'rgba(255, 255, 255, 0.1)', borderWidth: 1, padding: 12 } }
+                    }
+                });
+
+            } catch (err) {
+                console.error('Error loading dashboard data:', err);
             }
-        });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadDashboardData);
     </script>
 </body>
 </html>

@@ -526,8 +526,17 @@
                 <p>Manage, search, and organize all your enterprise documents.</p>
             </div>
             <div class="header-actions">
-                <button class="btn-primary" onclick="alert('Upload modal would open here')">
-                    <i class='bx bx-upload' style="font-size: 1.2rem;"></i>
+                <input
+                    type="file"
+                    id="documentUpload"
+                    style="display:none"
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    onchange="uploadDocument(event)"
+                />
+                <button
+                    class="btn-primary"
+                    onclick="document.getElementById('documentUpload').click()">
+                    <i class="bx bx-upload" style="font-size:1.2rem"></i>
                     Upload Document
                 </button>
             </div>
@@ -576,177 +585,8 @@
                             <th style="text-align: right;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Doc 1 -->
-                        <tr>
-                            <td>
-                                <div class="doc-info">
-                                    <div class="doc-icon icon-pdf"><i class='bx bxs-file-pdf'></i></div>
-                                    <div>
-                                        <div class="doc-name">
-                                            Q2_Financial_Report_Final.pdf
-                                        </div>
-                                        <div class="doc-meta">
-                                            <span>2.4 MB</span>
-                                            <span style="color: rgba(255,255,255,0.2)">|</span>
-                                            <span>v1.2</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>Finance</span></td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <img src="https://ui-avatars.com/api/?name=Sarah+Jenkins&background=8b5cf6&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
-                                    Sarah Jenkins
-                                </div>
-                            </td>
-                            <td>Oct 24, 2024</td>
-                            <td><span class="status-badge status-verified"><i class='bx bx-check-circle'></i> Verified</span></td>
-                            <td>
-                                <div class="action-btns" style="justify-content: flex-end;">
-                                    <button class="action-btn btn-view" title="View"><i class='bx bx-show'></i></button>
-                                    <button class="action-btn btn-download" title="Download"><i class='bx bx-download'></i></button>
-                                    <button class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Doc 2 -->
-                        <tr>
-                            <td>
-                                <div class="doc-info">
-                                    <div class="doc-icon icon-doc"><i class='bx bxs-file-doc'></i></div>
-                                    <div>
-                                        <div class="doc-name">
-                                            Employee_Handbook_2024.docx
-                                        </div>
-                                        <div class="doc-meta">
-                                            <span>1.1 MB</span>
-                                            <span style="color: rgba(255,255,255,0.2)">|</span>
-                                            <span>v3.0</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>HR</span></td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=10b981&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
-                                    Michael Chen
-                                </div>
-                            </td>
-                            <td>Oct 23, 2024</td>
-                            <td><span class="status-badge status-pending"><i class='bx bx-time-five'></i> Pending</span></td>
-                            <td>
-                                <div class="action-btns" style="justify-content: flex-end;">
-                                    <button class="action-btn btn-view" title="View"><i class='bx bx-show'></i></button>
-                                    <button class="action-btn btn-download" title="Download"><i class='bx bx-download'></i></button>
-                                    <button class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Doc 3 -->
-                        <tr>
-                            <td>
-                                <div class="doc-info">
-                                    <div class="doc-icon icon-xls"><i class='bx bxs-spreadsheet'></i></div>
-                                    <div>
-                                        <div class="doc-name">
-                                            Client_Billing_Oct.xlsx
-                                        </div>
-                                        <div class="doc-meta">
-                                            <span>856 KB</span>
-                                            <span style="color: rgba(255,255,255,0.2)">|</span>
-                                            <span>v1.0</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>Finance</span></td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
-                                    Admin
-                                </div>
-                            </td>
-                            <td>Oct 22, 2024</td>
-                            <td><span class="status-badge status-verified"><i class='bx bx-check-circle'></i> Verified</span></td>
-                            <td>
-                                <div class="action-btns" style="justify-content: flex-end;">
-                                    <button class="action-btn btn-view" title="View"><i class='bx bx-show'></i></button>
-                                    <button class="action-btn btn-download" title="Download"><i class='bx bx-download'></i></button>
-                                    <button class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Doc 4 -->
-                        <tr>
-                            <td>
-                                <div class="doc-info">
-                                    <div class="doc-icon icon-img"><i class='bx bxs-image'></i></div>
-                                    <div>
-                                        <div class="doc-name">
-                                            Vendor_Invoice_8932.png
-                                        </div>
-                                        <div class="doc-meta">
-                                            <span>4.5 MB</span>
-                                            <span style="color: rgba(255,255,255,0.2)">|</span>
-                                            <span>Scan</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>Legal</span></td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <div style="width: 1.5rem; height: 1.5rem; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;">API</div>
-                                    System API
-                                </div>
-                            </td>
-                            <td>Oct 21, 2024</td>
-                            <td><span class="status-badge status-rejected"><i class='bx bx-x-circle'></i> OCR Failed</span></td>
-                            <td>
-                                <div class="action-btns" style="justify-content: flex-end;">
-                                    <button class="action-btn btn-view" title="View"><i class='bx bx-show'></i></button>
-                                    <button class="action-btn btn-download" title="Download"><i class='bx bx-download'></i></button>
-                                    <button class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Doc 5 -->
-                        <tr>
-                            <td>
-                                <div class="doc-info">
-                                    <div class="doc-icon icon-pdf"><i class='bx bxs-file-pdf'></i></div>
-                                    <div>
-                                        <div class="doc-name">
-                                            Marketing_Strategy_2025.pdf
-                                        </div>
-                                        <div class="doc-meta">
-                                            <span>8.2 MB</span>
-                                            <span style="color: rgba(255,255,255,0.2)">|</span>
-                                            <span>v2.1</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>Marketing</span></td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <img src="https://ui-avatars.com/api/?name=Emma+Davis&background=f59e0b&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
-                                    Emma Davis
-                                </div>
-                            </td>
-                            <td>Oct 20, 2024</td>
-                            <td><span class="status-badge status-verified"><i class='bx bx-check-circle'></i> Verified</span></td>
-                            <td>
-                                <div class="action-btns" style="justify-content: flex-end;">
-                                    <button class="action-btn btn-view" title="View"><i class='bx bx-show'></i></button>
-                                    <button class="action-btn btn-download" title="Download"><i class='bx bx-download'></i></button>
-                                    <button class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
-                                </div>
-                            </td>
-                        </tr>
+                    <tbody id="docs-table-body">
+                        <!-- Rendered by JS -->
                     </tbody>
                 </table>
             </div>
@@ -770,7 +610,145 @@
     </main>
 
     <script>
-        // Optional JS for interactions like search filtering could go here
+        async function fetchDocuments() {
+            try {
+                const response = await fetch("/api/documents?all=true");
+                const documents = await response.json();
+                
+                const tbody = document.getElementById("docs-table-body");
+                tbody.innerHTML = "";
+
+                if (documents.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No documents found.</td></tr>`;
+                    return;
+                }
+
+                documents.forEach(doc => {
+                    const ext = (doc.fileType || "unknown").toLowerCase();
+                    let iconClass = "icon-doc";
+                    let iconBx = "bxs-file-doc";
+                    if (ext === "pdf") { iconClass = "icon-pdf"; iconBx = "bxs-file-pdf"; }
+                    else if (["jpg", "jpeg", "png"].includes(ext)) { iconClass = "icon-img"; iconBx = "bxs-image"; }
+                    else if (["xls", "xlsx"].includes(ext)) { iconClass = "icon-xls"; iconBx = "bxs-spreadsheet"; }
+
+                    let statusClass = "status-pending";
+                    let statusIcon = "bx-time-five";
+                    let statusText = doc.status || "Pending";
+                    if (doc.status === "verified" || doc.status === "approved" || doc.status === "success") {
+                        statusClass = "status-verified";
+                        statusIcon = "bx-check-circle";
+                    } else if (doc.status === "rejected" || doc.status === "failed") {
+                        statusClass = "status-rejected";
+                        statusIcon = "bx-x-circle";
+                    }
+
+                    const dateStr = new Date(doc.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>
+                            <div class="doc-info">
+                                <div class="doc-icon ${iconClass}"><i class='bx ${iconBx}'></i></div>
+                                <div>
+                                    <div class="doc-name">${doc.fileName}</div>
+                                    <div class="doc-meta">
+                                        <span>Unknown Size</span>
+                                        <span style="color: rgba(255,255,255,0.2)">|</span>
+                                        <span>${(doc.fileType || "unknown").toUpperCase()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>General</span></td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
+                                User
+                            </div>
+                        </td>
+                        <td>${dateStr}</td>
+                        <td><span class="status-badge ${statusClass}"><i class='bx ${statusIcon}'></i> <span style="text-transform:capitalize;">${statusText}</span></span></td>
+                        <td>
+                            <div class="action-btns" style="justify-content: flex-end;">
+                                <button class="action-btn btn-view" title="View" onclick="viewDocument('${doc._id}')"><i class='bx bx-show'></i></button>
+                                <button class="action-btn btn-download" title="Download" onclick="downloadDocument('${doc._id}')"><i class='bx bx-download'></i></button>
+                                <button class="action-btn btn-delete" title="Delete" onclick="deleteDocument('${doc._id}')"><i class='bx bx-trash'></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Failed to load documents", err);
+            }
+        }
+
+        async function uploadDocument(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("documents", file);
+
+            try {
+                const response = await fetch("/api/documents/upload", {
+                    method: "POST",
+                    body: formData
+                });
+                
+                let data;
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    data = { message: text };
+                }
+
+                console.log("Upload response:", response.status, data);
+
+                if (response.ok) {
+                    alert("Upload Successful");
+                    fetchDocuments(); // refresh list
+                } else {
+                    alert("Upload Failed: " + (data.message || "Unknown error"));
+                }
+            } catch (err) {
+                console.error("Fetch error:", err);
+                alert("Upload Failed: " + err.message);
+            } finally {
+                // Clear the input so the same file can be uploaded again
+                event.target.value = "";
+            }
+        }
+
+        async function viewDocument(id) {
+            window.open(`/api/documents/${id}/view`, '_blank');
+        }
+
+        async function downloadDocument(id) {
+            window.location.href = `/api/documents/${id}/download`;
+        }
+
+        async function deleteDocument(id) {
+            if (!confirm("Are you sure you want to delete this document?")) return;
+            try {
+                const response = await fetch(`/api/documents/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    fetchDocuments(); // refresh list
+                } else {
+                    alert("Failed to delete document");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error deleting document");
+            }
+        }
+
+        // Initialize documents
+        document.addEventListener("DOMContentLoaded", fetchDocuments);
+
+        // Search UI effects
         const searchInput = document.querySelector('.search-container input');
         searchInput.addEventListener('focus', () => {
             document.querySelector('.search-container i').style.color = 'var(--primary-color)';
