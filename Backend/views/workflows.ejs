@@ -458,7 +458,7 @@
 
             const selectedNode = nodes.find(n => n.selected);
 
-            const saveWorkflow = async (isPublish = false) => {
+            const saveWorkflow = async (isPublish = false, silent = false) => {
                 setIsSaving(true);
                 try {
                     const payload = {
@@ -479,24 +479,33 @@
                     const result = await res.json();
                     if (result.success) {
                         setWorkflowId(result.workflow._id);
-                        alert(`Workflow ${isPublish ? 'Published' : 'Saved'}!`);
+                        if (!silent) {
+                            alert(`Workflow ${isPublish ? 'Published' : 'Saved'}!`);
+                        }
                         if (isPublish) {
                             await fetch(`/api/workflows/${result.workflow._id}/publish`, { method: 'POST' });
                         }
+                        setIsSaving(false);
+                        return result.workflow._id;
                     } else {
-                        alert("Error saving: " + result.message);
+                        if (!silent) alert("Error saving: " + result.message);
+                        setIsSaving(false);
+                        return null;
                     }
                 } catch (err) {
                     console.error(err);
-                    alert("Network error");
+                    if (!silent) alert("Network error");
+                    setIsSaving(false);
+                    return null;
                 }
-                setIsSaving(false);
             };
 
             const executeWorkflow = async () => {
-                if (!workflowId) return alert("Please save the workflow first!");
+                const currentId = await saveWorkflow(false, true);
+                if (!currentId) return;
+                
                 try {
-                    const res = await fetch(`/api/workflows/${workflowId}/execute`, { method: 'POST' });
+                    const res = await fetch(`/api/workflows/${currentId}/execute`, { method: 'POST' });
                     const result = await res.json();
                     if (result.success) {
                         alert(`Execution started! ID: ${result.executionId}`);
