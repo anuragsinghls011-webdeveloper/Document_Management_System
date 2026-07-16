@@ -16,7 +16,7 @@ exports.createWorkflow = async (req, res) => {
       description,
       nodes: nodes || [],
       edges: edges || [],
-      createdBy: req.user ? req.user.userId : null
+      createdBy: req.user ? req.user.id : null
     });
     await workflow.save();
     res.status(201).json({ success: true, workflow });

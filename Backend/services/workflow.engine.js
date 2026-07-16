@@ -40,27 +40,27 @@ class WorkflowEngine {
 
       const nodeType = node.data?.type || node.type;
 
-      switch (nodeType) {
-        case "approvalNode":
-        case "approval":
-          // Approvals wait for external input. Mark as pending.
-          status = "Pending";
-          message = "Waiting for approval";
-          execution.status = "Paused"; // Pause execution
-          break;
-        case "delayNode":
-        case "delay":
-          status = "Pending";
-          message = "Delay started";
-          execution.status = "Paused";
-          break;
-        case "endNode":
-        case "end":
-          return this.completeExecution(execution);
-        default:
-          // Simulate some processing time for standard nodes
-          await new Promise(resolve => setTimeout(resolve, 500));
-          break;
+      if (typeof nodeType === 'string' && nodeType.startsWith('approval')) {
+        // Approvals wait for external input. Mark as pending.
+        status = "Pending";
+        message = "Waiting for approval";
+        execution.status = "Paused"; // Pause execution
+      } else {
+        switch (nodeType) {
+          case "delayNode":
+          case "delay":
+            status = "Pending";
+            message = "Delay started";
+            execution.status = "Paused";
+            break;
+          case "endNode":
+          case "end":
+            return this.completeExecution(execution);
+          default:
+            // Simulate some processing time for standard nodes
+            await new Promise(resolve => setTimeout(resolve, 500));
+            break;
+        }
       }
 
       // Log execution
