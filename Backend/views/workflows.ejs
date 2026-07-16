@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,7 +36,7 @@
             }
         }
     </script>
-    
+
     <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -57,8 +58,20 @@
             --sidebar-width: 260px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
         /* Legacy Sidebar Styles */
         .app-sidebar {
@@ -71,12 +84,57 @@
             flex-direction: column;
             z-index: 50;
         }
-        .logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.5rem; font-weight: 700; margin-bottom: 3rem; color: var(--text-main); text-decoration: none; background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .logo i { background: linear-gradient(135deg, var(--primary-color), #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
-        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1rem; border-radius: 0.75rem; color: var(--text-muted); text-decoration: none; font-weight: 500; transition: all 0.25s; position: relative; overflow: hidden; }
-        .nav-item:hover, .nav-item.active { color: var(--text-main); background: rgba(255, 255, 255, 0.03); }
-        .nav-item.active { border-left: 3px solid var(--primary-color); }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--text-main);
+            text-decoration: none;
+            background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--primary-color);
+        }
 
         .main-content {
             flex: 1;
@@ -91,11 +149,13 @@
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
         }
+
         .react-flow__handle {
             width: 8px;
             height: 8px;
             background: #6366f1;
         }
+
         .react-flow__panel {
             background: rgba(20, 27, 45, 0.8);
             border-radius: 8px;
@@ -103,6 +163,7 @@
         }
     </style>
 </head>
+
 <body class="dark text-slate-200">
 
     <!-- Legacy Sidebar -->
@@ -130,14 +191,14 @@
 
     <script type="text/babel" data-type="module">
         const { useState, useCallback, useRef, useEffect } = React;
-        const { 
-            ReactFlow, 
-            ReactFlowProvider, 
-            addEdge, 
-            useNodesState, 
-            useEdgesState, 
-            Controls, 
-            Background, 
+        const {
+            ReactFlow,
+            ReactFlowProvider,
+            addEdge,
+            useNodesState,
+            useEdgesState,
+            Controls,
+            Background,
             Panel,
             MarkerType,
             Handle,
@@ -152,6 +213,11 @@
                 ocr: "bx-scan text-purple-400",
                 ai: "bx-brain text-pink-400",
                 approval: "bx-check-shield text-orange-400",
+                approval_l1: "bx-user-check text-blue-400",
+                approval_l2: "bx-user-voice text-indigo-400",
+                approval_l3: "bx-user-pin text-purple-400",
+                approval_hr: "bx-group text-pink-400",
+                approval_legal: "bx-briefcase text-yellow-500",
                 decision: "bx-git-compare text-yellow-400",
                 notification: "bx-bell text-cyan-400",
                 archive: "bx-archive text-gray-400",
@@ -191,7 +257,12 @@
                 { type: 'upload', label: 'Upload Doc', icon: 'bx-upload' },
                 { type: 'ocr', label: 'OCR Engine', icon: 'bx-scan' },
                 { type: 'ai', label: 'AI Extraction', icon: 'bx-brain' },
-                { type: 'approval', label: 'Approval Step', icon: 'bx-check-shield' },
+                { type: 'approval', label: 'Generic Approval', icon: 'bx-check-shield' },
+                { type: 'approval_l1', label: 'L1 Approval (Lead)', icon: 'bx-user-check' },
+                { type: 'approval_l2', label: 'L2 Approval (Manager)', icon: 'bx-user-voice' },
+                { type: 'approval_l3', label: 'L3 Approval (Director)', icon: 'bx-user-pin' },
+                { type: 'approval_hr', label: 'HR Approval', icon: 'bx-group' },
+                { type: 'approval_legal', label: 'Legal Approval', icon: 'bx-briefcase' },
                 { type: 'decision', label: 'Decision (If/Else)', icon: 'bx-git-compare' },
                 { type: 'notification', label: 'Notification', icon: 'bx-bell' },
                 { type: 'archive', label: 'Archive', icon: 'bx-archive' },
@@ -206,7 +277,7 @@
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 space-y-3">
                         {nodeCategories.map((node) => (
-                            <div 
+                            <div
                                 key={node.type}
                                 className="flex items-center gap-3 p-3 bg-dark-900 border border-slate-700 rounded-lg cursor-grab hover:border-brand-500 transition-colors"
                                 onDragStart={(event) => onDragStart(event, node.type, node.label)}
@@ -245,37 +316,42 @@
                         <span className="text-xs px-2 py-1 bg-slate-700 rounded text-slate-300 uppercase">{data.type}</span>
                     </div>
                     <div className="flex-1 overflow-y-auto p-5 space-y-5">
-                        
+
                         {/* Common Field */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-medium text-slate-400">Node Label</label>
-                            <input 
-                                type="text" 
-                                value={data.label || ''} 
+                            <input
+                                type="text"
+                                value={data.label || ''}
                                 onChange={(e) => handleChange('label', e.target.value)}
                                 className="w-full bg-dark-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
                             />
                         </div>
 
                         {/* Dynamic Fields based on type */}
-                        {data.type === 'approval' && (
+                        {data.type?.startsWith('approval') && (
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-medium text-slate-400">Approver Role</label>
-                                    <select 
-                                        value={data.role || ''} 
+                                    <select
+                                        value={data.role || ''}
                                         onChange={(e) => handleChange('role', e.target.value)}
                                         className="w-full bg-dark-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
                                     >
                                         <option value="">Select Role</option>
+                                        <option value="Team Lead">Team Lead</option>
                                         <option value="Manager">Manager</option>
                                         <option value="Department Head">Department Head</option>
-                                        <option value="Finance">Finance Director</option>
+                                        <option value="Director">Director</option>
+                                        <option value="VP">VP</option>
+                                        <option value="HR Manager">HR Manager</option>
+                                        <option value="Legal Counsel">Legal Counsel</option>
+                                        <option value="Finance Director">Finance Director</option>
                                     </select>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checked={data.allowReject || false}
                                         onChange={(e) => handleChange('allowReject', e.target.checked)}
                                         id="allowReject"
@@ -290,8 +366,8 @@
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-medium text-slate-400">OCR Engine</label>
-                                    <select 
-                                        value={data.engine || 'standard'} 
+                                    <select
+                                        value={data.engine || 'standard'}
                                         onChange={(e) => handleChange('engine', e.target.value)}
                                         className="w-full bg-dark-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
                                     >
@@ -307,8 +383,8 @@
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-medium text-slate-400">Extraction Prompt</label>
-                                    <textarea 
-                                        value={data.prompt || ''} 
+                                    <textarea
+                                        value={data.prompt || ''}
                                         onChange={(e) => handleChange('prompt', e.target.value)}
                                         rows="4"
                                         placeholder="e.g. Extract invoice total and date..."
@@ -317,7 +393,7 @@
                                 </div>
                             </div>
                         )}
-                        
+
                     </div>
                 </div>
             );
@@ -437,7 +513,7 @@
                     {/* Topbar */}
                     <div className="h-14 bg-dark-800 border-b border-slate-700/50 flex items-center justify-between px-4 shrink-0 z-10">
                         <div className="flex items-center gap-4">
-                            <input 
+                            <input
                                 type="text"
                                 value={workflowName}
                                 onChange={e => setWorkflowName(e.target.value)}
@@ -460,7 +536,7 @@
 
                     <div className="flex flex-1 overflow-hidden relative">
                         <Sidebar />
-                        
+
                         <div className="flex-1 h-full relative" ref={reactFlowWrapper}>
                             <ReactFlow
                                 nodes={nodes}
@@ -498,4 +574,5 @@
         root.render(<App />);
     </script>
 </body>
+
 </html>
