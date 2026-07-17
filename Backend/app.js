@@ -13,6 +13,7 @@ const documentRoutes = require("./routes/document.routes");
 const activityRoutes = require("./routes/activity.routes");
 const documentsRoute = require('./routes/documents.routes');
 const workflowsRoute = require('./routes/workflows.routes');
+const analyticsRoutes = require('./routes/analytics.routes');
 const auth = require("./middlewares/auth.middleware");
 const adminOnly = require("./middlewares/admin.middleware");
 
@@ -48,6 +49,8 @@ app.get("/admin/pending-docs", auth, adminOnly, (req, res) => res.render("admin/
 app.use("/dashboard", dashboardRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/documents", documentsRoute);
+app.get("/analytics", auth, (req, res) => res.render("analytics"));
+app.use("/api/analytics", analyticsRoutes);
 app.use("/", workflowsRoute); // workflows APIs and view
 app.use("/", activityRoutes);
 app.use("/admin", adminRoutes);

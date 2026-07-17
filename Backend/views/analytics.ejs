@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detailed Analytics | Document Management System</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            /* Colors */
+            --bg-color: #0b0f19;
+            --surface-color: rgba(20, 27, 45, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            /* Animated Background Blob */
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.12), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.12), transparent 25%);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid var(--surface-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--text-main);
+            text-decoration: none;
+            background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item:hover::before,
+        .nav-item.active::before {
+            transform: translateX(0);
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            animation: slideDown 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .header-title h1 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--surface-border);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            width: 300px;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            outline: none;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .search-bar i {
+            color: var(--text-muted);
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-muted);
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: var(--danger-color);
+            border-radius: 50%;
+            border: 2px solid var(--bg-color);
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+            border-radius: 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--surface-border);
+            transition: all 0.2s ease;
+        }
+
+        .profile-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .profile-img {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            margin-top: 2.5rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.6s ease backwards;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .icon-blue {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+        }
+
+        .icon-green {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .icon-orange {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .icon-purple {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .icon-pink {
+            background: rgba(236, 72, 153, 0.1);
+            color: #ec4899;
+        }
+
+        .icon-cyan {
+            background: rgba(6, 182, 212, 0.1);
+            color: #06b6d4;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-trend {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .trend-up {
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            color: var(--danger-color);
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .charts-grid-equal {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .chart-card {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .chart-actions select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            outline: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .chart-actions select option {
+            background: var(--bg-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animation Delays */
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        .charts-grid .chart-card:nth-child(1) { animation-delay: 0.3s; }
+        .charts-grid .chart-card:nth-child(2) { animation-delay: 0.4s; }
+        .charts-grid-equal .chart-card:nth-child(1) { animation-delay: 0.5s; }
+        .charts-grid-equal .chart-card:nth-child(2) { animation-delay: 0.6s; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-grid, .charts-grid-equal {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .header-actions .search-bar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="logo">
+            <i class='bx bxs-box'></i>
+            DocuFlow
+        </a>
+        <ul class="nav-links">
+            <li><a href="/dashboard" class="nav-item"><i class='bx bx-grid-alt'></i> Dashboard</a></li>
+            <li><a href="/documents" class="nav-item"><i class='bx bx-file'></i> Documents</a></li>
+            <li><a href="/workflows" class="nav-item"><i class='bx bx-git-branch'></i> Workflows</a></li>
+            <li><a href="/analytics" class="nav-item active"><i class='bx bx-chart'></i> Analytics</a></li>
+            <li><a href="/settings" class="nav-item"><i class='bx bx-cog'></i> Settings</a></li>
+        </ul>
+
+        <div style="margin-top: auto;">
+            <div
+                style="background: rgba(99, 102, 241, 0.1); padding: 1.25rem; border-radius: 1rem; border: 1px solid rgba(99, 102, 241, 0.2); text-align: center;">
+                <i class='bx bx-cloud-upload'
+                    style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                <h4 style="font-size: 0.875rem; margin-bottom: 0.25rem;">Storage Used</h4>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">75% of 100GB</p>
+                <div
+                    style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                    <div
+                        style="width: 75%; height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border-radius: 3px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-title">
+                <h1>Advanced Analytics & AI Insights</h1>
+                <p>Discover deep insights and AI impact across your organization.</p>
+            </div>
+            <div class="header-actions">
+                <div class="search-bar">
+                    <i class='bx bx-search'></i>
+                    <input type="text" placeholder="Search analytics...">
+                </div>
+                <button class="icon-btn">
+                    <i class='bx bx-bell'></i>
+                    <span class="notification-badge"></span>
+                </button>
+                <div class="profile-btn">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="Profile"
+                        class="profile-img">
+                    <span style="font-weight: 500; font-size: 0.875rem; margin-right: 0.5rem;">Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <h2 class="section-title"><i class='bx bx-bulb'></i> AI Value & Impact</h2>
+
+        <!-- AI Impact Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Hours Saved by AI</div>
+                    <div class="stat-icon icon-cyan"><i class='bx bx-time'></i></div>
+                </div>
+                <div class="stat-value" id="stat-time-saved">--</div>
+                <div class="stat-trend trend-up">
+                    <i class='bx bx-trending-up'></i>
+                    <span>vs manual processing</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Auto-Approval Rate</div>
+                    <div class="stat-icon icon-purple"><i class='bx bx-check-shield'></i></div>
+                </div>
+                <div class="stat-value" id="stat-auto-approval">--</div>
+                <div class="stat-trend trend-up">
+                    <i class='bx bx-trending-up'></i>
+                    <span>No human intervention</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Avg. Extraction Confidence</div>
+                    <div class="stat-icon icon-blue"><i class='bx bx-brain'></i></div>
+                </div>
+                <div class="stat-value" id="stat-confidence">--</div>
+                <div class="stat-trend trend-up">
+                    <i class='bx bx-trending-up'></i>
+                    <span>High precision</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Documents Summarized</div>
+                    <div class="stat-icon icon-pink"><i class='bx bx-align-left'></i></div>
+                </div>
+                <div class="stat-value" id="stat-summarized">--</div>
+                <div class="stat-trend trend-up">
+                    <i class='bx bx-trending-up'></i>
+                    <span>Auto-generated summaries</span>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title"><i class='bx bx-bar-chart-alt-2'></i> Usage Overview</h2>
+
+        <!-- General Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Total Uploads</div>
+                    <div class="stat-icon icon-blue"><i class='bx bx-cloud-upload'></i></div>
+                </div>
+                <div class="stat-value" id="stat-total-uploads">--</div>
+                <div class="stat-trend trend-up">
+                    <i class='bx bx-trending-up'></i>
+                    <span>vs last month</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Active Workflows</div>
+                    <div class="stat-icon icon-purple"><i class='bx bx-git-commit'></i></div>
+                </div>
+                <div class="stat-value" id="stat-active-workflows">--</div>
+                <div class="stat-trend trend-up">
+                    <i class='bx bx-trending-up'></i>
+                    <span>vs last month</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Storage Efficiency</div>
+                    <div class="stat-icon icon-green"><i class='bx bx-hdd'></i></div>
+                </div>
+                <div class="stat-value" id="stat-storage">--</div>
+                <div class="stat-trend trend-up">
+                    <i class='bx bx-trending-up'></i>
+                    <span>improvement</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Processing Errors</div>
+                    <div class="stat-icon icon-orange"><i class='bx bx-error'></i></div>
+                </div>
+                <div class="stat-value" id="stat-errors">--</div>
+                <div class="stat-trend trend-down">
+                    <i class='bx bx-trending-down'></i>
+                    <span>vs last week</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Charts Row -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Document Upload Trends (Monthly)</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="uploadsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Documents by Type</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="docsTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Charts Row -->
+        <div class="charts-grid-equal">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">User Activity by Day</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="userActivityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Processing Status Breakdown</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="processingStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Charts Row -->
+        <div class="charts-grid-equal">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Top Extracted Keywords (AI)</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="keywordsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Workflow Status Breakdown</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="workflowStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Chart Configuration Script -->
+    <script>
+        // Set Chart.js defaults for dark theme
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(20, 27, 45, 0.9)';
+        Chart.defaults.plugins.tooltip.titleColor = '#f8fafc';
+        Chart.defaults.plugins.tooltip.bodyColor = '#f8fafc';
+        Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,0.1)';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+        
+        // Common grid options
+        const gridOptions = {
+            color: 'rgba(255, 255, 255, 0.05)',
+            borderColor: 'transparent'
+        };
+
+        async function fetchAnalyticsData() {
+            try {
+                const response = await fetch('/api/analytics/data');
+                const result = await response.json();
+                const stats = result.stats;
+                const charts = result.charts;
+
+                // Update Overview Stats
+                document.getElementById('stat-total-uploads').textContent = stats.totalUploads.toLocaleString();
+                document.getElementById('stat-active-workflows').textContent = stats.activeWorkflows.toLocaleString();
+                document.getElementById('stat-storage').textContent = stats.storageEfficiency.toFixed(1) + '%';
+                document.getElementById('stat-errors').textContent = stats.processingErrors.toLocaleString();
+
+                // Update AI Impact Stats
+                document.getElementById('stat-time-saved').textContent = stats.timeSavedHours.toLocaleString() + ' h';
+                document.getElementById('stat-auto-approval').textContent = stats.autoApprovalRate + '%';
+                document.getElementById('stat-confidence').textContent = stats.averageConfidence.toFixed(1) + '%';
+                document.getElementById('stat-summarized').textContent = stats.docsWithSummary.toLocaleString();
+
+                // 1. Uploads Line Chart
+                const uploadsCtx = document.getElementById('uploadsChart').getContext('2d');
+                const gradientBlue = uploadsCtx.createLinearGradient(0, 0, 0, 400);
+                gradientBlue.addColorStop(0, 'rgba(99, 102, 241, 0.5)');
+                gradientBlue.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+                new Chart(uploadsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: charts.uploads.labels,
+                        datasets: [{
+                            label: 'New Documents',
+                            data: charts.uploads.data,
+                            borderColor: '#6366f1',
+                            backgroundColor: gradientBlue,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#0b0f19',
+                            pointBorderColor: '#6366f1',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: gridOptions, ticks: { padding: 10 } },
+                            x: { grid: { display: false }, ticks: { padding: 10 } }
+                        }
+                    }
+                });
+
+                // 2. Documents by Type Doughnut Chart
+                const docsTypeCtx = document.getElementById('docsTypeChart').getContext('2d');
+                new Chart(docsTypeCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: charts.docsType.labels,
+                        datasets: [{
+                            data: charts.docsType.data,
+                            backgroundColor: ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#3b82f6'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true, padding: 20, font: { size: 12 } }
+                            }
+                        }
+                    }
+                });
+
+                // 3. User Activity Bar Chart
+                const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
+                new Chart(userActivityCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: charts.userActivity.labels,
+                        datasets: [{
+                            label: 'Active Users',
+                            data: charts.userActivity.data,
+                            backgroundColor: '#8b5cf6',
+                            borderRadius: 6,
+                            barPercentage: 0.6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: gridOptions },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+
+                // 4. Processing Status Doughnut Chart
+                const processingStatusCtx = document.getElementById('processingStatusChart').getContext('2d');
+                new Chart(processingStatusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: charts.processingStatus.labels,
+                        datasets: [{
+                            data: charts.processingStatus.data,
+                            backgroundColor: [
+                                '#10b981', // Approved (Success)
+                                '#f59e0b', // Pending (Warning)
+                                '#ef4444'  // Rejected (Danger)
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true, padding: 20, font: { size: 12 } }
+                            }
+                        }
+                    }
+                });
+
+                // 5. Top Keywords Horizontal Bar Chart
+                const keywordsCtx = document.getElementById('keywordsChart').getContext('2d');
+                new Chart(keywordsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: charts.topKeywords.labels,
+                        datasets: [{
+                            label: 'Keyword Mentions',
+                            data: charts.topKeywords.data,
+                            backgroundColor: 'rgba(6, 182, 212, 0.8)', // Cyan
+                            borderRadius: 6,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y', // Makes it horizontal
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { beginAtZero: true, grid: gridOptions },
+                            y: { grid: { display: false } }
+                        }
+                    }
+                });
+
+                // 6. Workflow Status Polar Area Chart
+                const workflowStatusCtx = document.getElementById('workflowStatusChart').getContext('2d');
+                new Chart(workflowStatusCtx, {
+                    type: 'polarArea',
+                    data: {
+                        labels: charts.workflowStatus.labels,
+                        datasets: [{
+                            data: charts.workflowStatus.data,
+                            backgroundColor: [
+                                'rgba(99, 102, 241, 0.7)',  // Primary
+                                'rgba(16, 185, 129, 0.7)', // Success
+                                'rgba(239, 68, 68, 0.7)' // Danger
+                            ],
+                            borderColor: '#0b0f19',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { usePointStyle: true, font: { size: 12 } }
+                            }
+                        },
+                        scales: {
+                            r: {
+                                ticks: { display: false },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                angleLines: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error fetching analytics data:", error);
+            }
+        }
+
+        // Initialize Analytics
+        fetchAnalyticsData();
+    </script>
+</body>
+</html>
