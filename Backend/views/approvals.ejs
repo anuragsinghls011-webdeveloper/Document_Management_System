@@ -425,7 +425,7 @@
             grid.innerHTML = '<div class="loader-container"><div class="loader"></div></div>';
             
             try {
-                const response = await fetch('/admin/pending');
+                const response = await fetch('/api/approvals/pending');
                 const data = await response.json();
                 
                 if (data.success && data.documents) {
@@ -521,7 +521,11 @@
 
         async function quickApprove(id) {
             try {
-                const response = await fetch(`/admin/approve/${id}`, { method: 'POST' });
+                const response = await fetch(`/api/approvals/${id}/decision`, { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'approve' })
+                });
                 if (response.ok) {
                     loadApprovals(); // Refresh queue
                 } else {
@@ -549,10 +553,10 @@
             const reason = document.getElementById('rejectReason').value;
             
             try {
-                const response = await fetch(`/admin/reject/${currentRejectId}`, {
+                const response = await fetch(`/api/approvals/${currentRejectId}/decision`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ reason })
+                    body: JSON.stringify({ action: 'reject', comments: reason })
                 });
                 if (response.ok) {
                     closeRejectModal();

@@ -364,10 +364,15 @@
 
     document.getElementById('approveBtn').addEventListener('click', async () => {
       try {
-        const res = await fetch(`/admin/approve/${docId}`, { method: 'POST', credentials: 'include' });
+        const res = await fetch(`/api/approvals/${docId}/decision`, { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'approve' }),
+          credentials: 'include' 
+        });
         if (res.ok) {
           showModal('success', 'Document approved', 'The document has been approved and archived in the audit trail.', () => {
-            window.location.href = '/admin/dashboard';
+            window.location.href = '/approvals';
           });
         } else {
           const data = await res.json();
@@ -381,15 +386,15 @@
     document.getElementById('rejectBtn').addEventListener('click', async () => {
       const notes = document.getElementById('decisionNotes').value.trim();
       try {
-        const res = await fetch(`/admin/reject/${docId}`, {
+        const res = await fetch(`/api/approvals/${docId}/decision`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reason: notes }),
+          body: JSON.stringify({ action: 'reject', comments: notes }),
           credentials: 'include'
         });
         if (res.ok) {
           showModal('success', 'Document rejected', 'The document has been rejected and the submitter has been notified.', () => {
-            window.location.href = '/admin/dashboard';
+            window.location.href = '/approvals';
           });
         } else {
           const data = await res.json();
@@ -407,15 +412,15 @@
         return;
       }
       try {
-        const res = await fetch(`/admin/request-changes/${docId}`, {
+        const res = await fetch(`/api/approvals/${docId}/decision`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ comment: notes }),
+          body: JSON.stringify({ action: 'request_changes', comments: notes }),
           credentials: 'include'
         });
         if (res.ok) {
           showModal('success', 'Changes requested', 'The document owner has been notified of the requested changes.', () => {
-            window.location.href = '/admin/dashboard';
+            window.location.href = '/approvals';
           });
         } else {
           const data = await res.json();

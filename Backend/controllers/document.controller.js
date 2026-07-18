@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const path = require("path");
 const Document = require("../models/document.model");
+const Approval = require("../models/approval.model");
 const Activity = require("../models/activity.model");
 const extractText = require("../services/ocr.service");
 const { extractKeywords, generateSummary } = require("../services/ai.service");
@@ -37,12 +38,20 @@ async function enrichDocument(docId, filePath, originalName) {
   const keywords = extractKeywords(text);
   const summary = generateSummary(text) || "No summary available.";
 
-  await Document.findByIdAndUpdate(docId, {
+  const updatedDoc = await Document.findByIdAndUpdate(docId, {
     extractedText: text,
     summary,
     keywords,
     status: "pending"
-  });
+  }, { new: true });
+
+  if (updatedDoc) {
+    await Approval.create({
+      documentId: updatedDoc._id,
+      requestedBy: updatedDoc.userId,
+      status: "pending"
+    });
+  }
 }
 
 const enrichmentQueue = [];
@@ -59,10 +68,18 @@ async function processEnrichmentQueue() {
     } catch (err) {
       console.error("DOCUMENT ENRICHMENT ERROR", err);
       try {
-        await Document.findByIdAndUpdate(docId, {
+        const updatedDoc = await Document.findByIdAndUpdate(docId, {
           status: "pending",
           summary: "No summary available."
-        });
+        }, { new: true });
+        
+        if (updatedDoc) {
+          await Approval.create({
+            documentId: updatedDoc._id,
+            requestedBy: updatedDoc.userId,
+            status: "pending"
+          });
+        }
       } catch (updateErr) {
         console.error("FAILED TO MARK DOCUMENT PENDING AFTER ENRICHMENT ERROR", updateErr);
       }

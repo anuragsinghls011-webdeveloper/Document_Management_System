@@ -14,6 +14,7 @@ const activityRoutes = require("./routes/activity.routes");
 const documentsRoute = require('./routes/documents.routes');
 const workflowsRoute = require('./routes/workflows.routes');
 const analyticsRoutes = require('./routes/analytics.routes');
+const approvalsApiRoutes = require('./routes/approvals.routes');
 const auth = require("./middlewares/auth.middleware");
 const adminOnly = require("./middlewares/admin.middleware");
 const roleAuth = require("./middlewares/role.middleware");
@@ -52,6 +53,7 @@ app.use("/api/documents", documentRoutes);
 app.use("/documents", documentsRoute);
 app.get("/analytics", auth, (req, res) => res.render("analytics"));
 app.get("/approvals", auth, roleAuth(["admin", "GM"]), (req, res) => res.render("approvals"));
+app.use("/api/approvals", approvalsApiRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/", workflowsRoute); // workflows APIs and view
 app.use("/", activityRoutes);
