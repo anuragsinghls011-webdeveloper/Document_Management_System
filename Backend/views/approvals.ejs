@@ -462,15 +462,15 @@
                 
                 const card = document.createElement('div');
                 card.className = 'approval-card';
-                card.style.animationDelay = \`\${index * 0.1}s\`;
+                card.style.animationDelay = `${index * 0.1}s`;
                 
-                card.innerHTML = \`
+                card.innerHTML = `
                     <div class="card-header">
                         <div class="card-icon">
-                            <i class='bx \${iconClass}'></i>
+                            <i class='bx ${iconClass}'></i>
                         </div>
                         <div class="card-title-group">
-                            <div class="card-title" title="\${doc.fileName}">\${doc.fileName}</div>
+                            <div class="card-title" title="${doc.fileName}">${doc.fileName}</div>
                             <div class="card-meta">
                                 <i class='bx bx-time'></i> Pending Review
                             </div>
@@ -480,30 +480,30 @@
                     <div class="card-details">
                         <div class="detail-row">
                             <span class="detail-label">Submitted by</span>
-                            <span class="detail-value">\${submitterName}</span>
+                            <span class="detail-value">${submitterName}</span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">Date</span>
-                            <span class="detail-value">\${date}</span>
+                            <span class="detail-value">${date}</span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">Type</span>
-                            <span class="detail-value">\${fileType}</span>
+                            <span class="detail-value">${fileType}</span>
                         </div>
                     </div>
                     
                     <div class="card-actions">
-                        <button class="btn btn-success" onclick="quickApprove('\${doc._id}')" title="Quick Approve">
+                        <button class="btn btn-success" onclick="quickApprove('${doc._id}')" title="Quick Approve">
                             <i class='bx bx-check'></i>
                         </button>
-                        <button class="btn btn-danger" onclick="openRejectModal('\${doc._id}')" title="Reject">
+                        <button class="btn btn-danger" onclick="openRejectModal('${doc._id}')" title="Reject">
                             <i class='bx bx-x'></i>
                         </button>
-                        <button class="btn btn-primary" onclick="reviewDocument('\${doc._id}')" title="Open detailed review workspace">
+                        <button class="btn btn-primary" onclick="reviewDocument('${doc._id}')" title="Open detailed review workspace">
                             <i class='bx bx-search-alt-2'></i> Review
                         </button>
                     </div>
-                \`;
+                `;
                 
                 grid.appendChild(card);
             });
@@ -521,7 +521,7 @@
 
         async function quickApprove(id) {
             try {
-                const response = await fetch(\`/admin/approve/\${id}\`, { method: 'POST' });
+                const response = await fetch(`/admin/approve/${id}`, { method: 'POST' });
                 if (response.ok) {
                     loadApprovals(); // Refresh queue
                 } else {
@@ -549,7 +549,7 @@
             const reason = document.getElementById('rejectReason').value;
             
             try {
-                const response = await fetch(\`/admin/reject/\${currentRejectId}\`, {
+                const response = await fetch(`/admin/reject/${currentRejectId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ reason })
@@ -567,7 +567,7 @@
         });
 
         function reviewDocument(id) {
-            window.location.href = \`/admin/pending-docs?id=\${id}\`;
+            window.location.href = `/admin/pending-docs?id=${id}`;
         }
     </script>
 </body>
