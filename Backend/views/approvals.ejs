@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approvals Queue | Document Management System</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Colors */
+            --bg-color: #0b0f19;
+            --surface-color: rgba(20, 27, 45, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --success-hover: #059669;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.12), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.12), transparent 25%);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid var(--surface-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--text-main);
+            text-decoration: none;
+            background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item:hover::before, .nav-item.active::before {
+            transform: translateX(0);
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .nav-item i { font-size: 1.25rem; }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2.5rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            animation: slideDown 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .header-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* Approvals Grid */
+        .approvals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .approval-card {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s forwards ease-out;
+        }
+
+        .approval-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .approval-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--warning-color), var(--primary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .approval-card:hover::before { opacity: 1; }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .card-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .card-title-group { flex: 1; min-width: 0; }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .card-meta i { font-size: 0.9rem; }
+
+        .card-details {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .detail-label { color: var(--text-muted); }
+        .detail-value { font-weight: 500; color: #e2e8f0; }
+
+        .card-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: auto;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+        }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        .btn-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .btn-success:hover { background: var(--success-hover); color: #fff; transform: translateY(-2px); }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .btn-danger:hover { background: var(--danger-hover); color: #fff; transform: translateY(-2px); }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed var(--surface-border);
+            border-radius: 1.25rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+        .empty-state p { color: var(--text-muted); }
+
+        /* Loader */
+        .loader-container {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            padding: 4rem;
+        }
+        
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animations */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="logo">
+            <i class='bx bxs-box'></i>
+            DocuFlow
+        </a>
+        <ul class="nav-links">
+            <li><a href="/dashboard" class="nav-item"><i class='bx bx-grid-alt'></i> Dashboard</a></li>
+            <li><a href="/documents" class="nav-item"><i class='bx bx-file'></i> Documents</a></li>
+            <% if (locals.userRole === 'admin' || locals.userRole === 'GM') { %>
+            <li><a href="/workflows" class="nav-item"><i class='bx bx-git-branch'></i> Workflows</a></li>
+            <li><a href="/approvals" class="nav-item active"><i class='bx bx-check-shield'></i> Approvals</a></li>
+            <% } %>
+            <li><a href="/analytics" class="nav-item"><i class='bx bx-chart'></i> Analytics</a></li>
+            <li><a href="/settings" class="nav-item"><i class='bx bx-cog'></i> Settings</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <div class="header-title">
+                <h1>Pending Approvals</h1>
+                <p>Review and manage documents waiting for your approval.</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="loadApprovals()" style="width: auto; padding: 0.6rem 1.2rem;">
+                    <i class='bx bx-refresh'></i> Refresh Queue
+                </button>
+            </div>
+        </div>
+
+        <div class="approvals-grid" id="approvalsGrid">
+            <!-- Loader -->
+            <div class="loader-container" id="loader">
+                <div class="loader"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Reject Modal -->
+    <div id="rejectModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center;">
+        <div style="background: var(--surface-color); padding: 2rem; border-radius: 1.25rem; border: 1px solid var(--surface-border); width: 100%; max-width: 400px; animation: slideDown 0.3s ease;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.25rem;">Reject Document</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Please provide a reason for rejection.</p>
+            <textarea id="rejectReason" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--surface-border); color: #fff; padding: 0.75rem; border-radius: 0.5rem; outline: none; resize: vertical; min-height: 80px;" placeholder="Reason for rejection..."></textarea>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn" style="background: rgba(255,255,255,0.1); color: #fff;" onclick="closeRejectModal()">Cancel</button>
+                <button class="btn btn-danger" id="confirmRejectBtn">Confirm Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadApprovals);
+
+        let currentRejectId = null;
+
+        async function loadApprovals() {
+            const grid = document.getElementById('approvalsGrid');
+            grid.innerHTML = '<div class="loader-container"><div class="loader"></div></div>';
+            
+            try {
+                const response = await fetch('/admin/pending');
+                const data = await response.json();
+                
+                if (data.success && data.documents) {
+                    renderApprovals(data.documents);
+                } else {
+                    grid.innerHTML = '<div class="empty-state"><i class="bx bx-error"></i><h3>Failed to load approvals</h3><p>Please try again later.</p></div>';
+                }
+            } catch (error) {
+                console.error("Error fetching approvals:", error);
+                grid.innerHTML = '<div class="empty-state"><i class="bx bx-error"></i><h3>Connection Error</h3><p>Could not connect to the server.</p></div>';
+            }
+        }
+
+        function renderApprovals(documents) {
+            const grid = document.getElementById('approvalsGrid');
+            grid.innerHTML = '';
+            
+            if (documents.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class='bx bx-check-double'></i>
+                        <h3>All caught up!</h3>
+                        <p>There are no pending documents to review right now.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            documents.forEach((doc, index) => {
+                const date = new Date(doc.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+                const submitterName = doc.userId ? (doc.userId.username || doc.userId.email || 'Unknown') : 'Unknown';
+                const fileType = doc.fileType ? doc.fileType.toUpperCase() : 'DOCUMENT';
+                const iconClass = getFileIcon(doc.fileType);
+                
+                const card = document.createElement('div');
+                card.className = 'approval-card';
+                card.style.animationDelay = \`\${index * 0.1}s\`;
+                
+                card.innerHTML = \`
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class='bx \${iconClass}'></i>
+                        </div>
+                        <div class="card-title-group">
+                            <div class="card-title" title="\${doc.fileName}">\${doc.fileName}</div>
+                            <div class="card-meta">
+                                <i class='bx bx-time'></i> Pending Review
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Submitted by</span>
+                            <span class="detail-value">\${submitterName}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Date</span>
+                            <span class="detail-value">\${date}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Type</span>
+                            <span class="detail-value">\${fileType}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-actions">
+                        <button class="btn btn-success" onclick="quickApprove('\${doc._id}')" title="Quick Approve">
+                            <i class='bx bx-check'></i>
+                        </button>
+                        <button class="btn btn-danger" onclick="openRejectModal('\${doc._id}')" title="Reject">
+                            <i class='bx bx-x'></i>
+                        </button>
+                        <button class="btn btn-primary" onclick="reviewDocument('\${doc._id}')" title="Open detailed review workspace">
+                            <i class='bx bx-search-alt-2'></i> Review
+                        </button>
+                    </div>
+                \`;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function getFileIcon(fileType) {
+            if (!fileType) return 'bx-file-blank';
+            const type = fileType.toLowerCase();
+            if (type.includes('pdf')) return 'bxs-file-pdf';
+            if (type.includes('word') || type.includes('doc')) return 'bxs-file-doc';
+            if (type.includes('image') || type.includes('png') || type.includes('jpg')) return 'bxs-file-image';
+            if (type.includes('text') || type.includes('txt')) return 'bxs-file-txt';
+            return 'bx-file-blank';
+        }
+
+        async function quickApprove(id) {
+            try {
+                const response = await fetch(\`/admin/approve/\${id}\`, { method: 'POST' });
+                if (response.ok) {
+                    loadApprovals(); // Refresh queue
+                } else {
+                    alert('Failed to approve document.');
+                }
+            } catch (error) {
+                console.error('Error approving document:', error);
+                alert('An error occurred while approving.');
+            }
+        }
+
+        function openRejectModal(id) {
+            currentRejectId = id;
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectModal').style.display = 'flex';
+        }
+
+        function closeRejectModal() {
+            currentRejectId = null;
+            document.getElementById('rejectModal').style.display = 'none';
+        }
+
+        document.getElementById('confirmRejectBtn').addEventListener('click', async () => {
+            if (!currentRejectId) return;
+            const reason = document.getElementById('rejectReason').value;
+            
+            try {
+                const response = await fetch(\`/admin/reject/\${currentRejectId}\`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                if (response.ok) {
+                    closeRejectModal();
+                    loadApprovals(); // Refresh queue
+                } else {
+                    alert('Failed to reject document.');
+                }
+            } catch (error) {
+                console.error('Error rejecting document:', error);
+                alert('An error occurred while rejecting.');
+            }
+        });
+
+        function reviewDocument(id) {
+            window.location.href = \`/admin/pending-docs?id=\${id}\`;
+        }
+    </script>
+</body>
+</html>
