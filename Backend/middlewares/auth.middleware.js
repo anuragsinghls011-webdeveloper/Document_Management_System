@@ -11,6 +11,7 @@ module.exports = (req, res, next) => {
       id: decoded.userId
     };
     req.userRole = decoded.role;
+    res.locals.userRole = decoded.role;
 
     next();
   } catch (err) {
