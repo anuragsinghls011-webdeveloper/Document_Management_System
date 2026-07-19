@@ -6,28 +6,21 @@ const Activity = require("../models/activity.model");
 // Fetch pending approvals
 exports.getPendingApprovals = async (req, res) => {
   try {
-    const pendingApprovals = await Approval.find({ status: "pending" })
-      .populate({
-        path: "documentId",
-        select: "fileName fileType createdAt summary keywords",
-      })
-      .populate("requestedBy", "username email")
+    const pendingDocs = await Document.find({ status: "pending" })
+      .populate("userId", "username email")
       .sort({ createdAt: -1 });
 
-    // Format the response to match the frontend expectations which expects 'documents' array
-    const documents = pendingApprovals
-      .filter(approval => approval.documentId) // ensure doc still exists
-      .map(approval => ({
-        _id: approval.documentId._id,
-        approvalId: approval._id, // Keep approval id for later use
-        fileName: approval.documentId.fileName,
-        fileType: approval.documentId.fileType,
-        createdAt: approval.createdAt, // approval requested date
-        userId: approval.requestedBy,
-        status: approval.status,
-        summary: approval.documentId.summary,
-        keywords: approval.documentId.keywords,
-      }));
+    // Format the response to match the frontend expectations
+    const documents = pendingDocs.map(doc => ({
+        _id: doc._id,
+        fileName: doc.fileName,
+        fileType: doc.fileType,
+        createdAt: doc.createdAt,
+        userId: doc.userId,
+        status: doc.status,
+        summary: doc.summary,
+        keywords: doc.keywords,
+    }));
 
     res.json({ success: true, documents });
   } catch (error) {
