@@ -4,18 +4,20 @@ const Document = require("../models/document.model");
 exports.stats = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user.id);
+    const isAdmin = req.userRole === "admin";
+    const baseQuery = isAdmin ? {} : { userId };
     
     const [total, today, pending, rejected, recentDocs, typeAgg] = await Promise.all([
-      Document.countDocuments({ userId }),
+      Document.countDocuments({ ...baseQuery }),
       Document.countDocuments({
-        userId,
+        ...baseQuery,
         createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) }
       }),
-      Document.countDocuments({ userId, status: { $in: ["pending", "review"] } }),
-      Document.countDocuments({ userId, status: "rejected" }),
-      Document.find({ userId }).sort({ createdAt: -1 }).limit(5),
+      Document.countDocuments({ ...baseQuery, status: { $in: ["pending", "review"] } }),
+      Document.countDocuments({ ...baseQuery, status: "rejected" }),
+      Document.find({ ...baseQuery }).sort({ createdAt: -1 }).limit(5),
       Document.aggregate([
-        { $match: { userId } },
+        { $match: isAdmin ? {} : { userId } },
         { $group: { _id: "$fileType", count: { $sum: 1 } } }
       ])
     ]);
@@ -28,7 +30,7 @@ exports.stats = async (req, res) => {
     sevenDaysAgo.setHours(0,0,0,0);
     
     const volumeAgg = await Document.aggregate([
-      { $match: { userId, createdAt: { $gte: sevenDaysAgo } } },
+      { $match: { ...(isAdmin ? {} : { userId }), createdAt: { $gte: sevenDaysAgo } } },
       { $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
           count: { $sum: 1 }

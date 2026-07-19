@@ -139,14 +139,10 @@ exports.upload = async (req, res) => {
 exports.getDocuments = async (req, res) => {
   try {
     const isAdmin = req.userRole === "admin";
-
-    if (isAdmin && req.query.all === "true") {
-      const docs = await Document.find().sort({ createdAt: -1 });
-      return res.json(docs);
-    }
-
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const docs = await Document.find({ userId }).sort({ createdAt: -1 });
+    const baseQuery = isAdmin ? {} : { userId };
+
+    const docs = await Document.find(baseQuery).sort({ createdAt: -1 });
 
     res.json(docs);
   } catch (err) {
@@ -158,8 +154,11 @@ exports.getDocuments = async (req, res) => {
 
 exports.myDocuments = async (req, res) => {
   try {
+    const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const docs = await Document.find({ userId }).sort({ createdAt: -1 });
+    const baseQuery = isAdmin ? {} : { userId };
+
+    const docs = await Document.find(baseQuery).sort({ createdAt: -1 });
 
     res.json(docs);
   } catch (err) {
@@ -171,20 +170,22 @@ exports.myDocuments = async (req, res) => {
 
 exports.stats = async (req, res) => {
   try {
+    const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
+    const baseQuery = isAdmin ? {} : { userId };
 
     const [total, today, pending, archived, monthlyAgg] = await Promise.all([
-      Document.countDocuments({ userId }),
+      Document.countDocuments(baseQuery),
       Document.countDocuments({
-        userId,
+        ...baseQuery,
         createdAt: {
           $gte: new Date(new Date().setHours(0, 0, 0, 0))
         }
       }),
-      Document.countDocuments({ userId, status: "pending" }),
-      Document.countDocuments({ userId, status: "archived" }),
+      Document.countDocuments({ ...baseQuery, status: "pending" }),
+      Document.countDocuments({ ...baseQuery, status: "archived" }),
       Document.aggregate([
-        { $match: { userId } },
+        { $match: isAdmin ? {} : { userId } },
         {
           $group: {
             _id: { $month: "$createdAt" },
@@ -218,10 +219,11 @@ exports.stats = async (req, res) => {
 
 exports.search = async (req, res) => {
   try {
+    const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
     const { q, status, type, date } = req.query;
 
-    const query = { userId };
+    const query = isAdmin ? {} : { userId };
 
 
     if (q && q.trim() !== "") {
@@ -264,8 +266,11 @@ exports.search = async (req, res) => {
 
 exports.recent = async (req, res) => {
   try {
+    const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const docs = await Document.find({ userId })
+    const baseQuery = isAdmin ? {} : { userId };
+
+    const docs = await Document.find(baseQuery)
       .sort({ createdAt: -1 })
       .limit(5);
 
@@ -283,8 +288,11 @@ exports.recent = async (req, res) => {
 
 exports.deleteDocument = async (req, res) => {
   try {
+    const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const doc = await Document.findOneAndDelete({ _id: req.params.id, userId });
+    const baseQuery = isAdmin ? { _id: req.params.id } : { _id: req.params.id, userId };
+    
+    const doc = await Document.findOneAndDelete(baseQuery);
     if (!doc) {
       return res.status(404).json({ message: "Document not found" });
     }
@@ -305,8 +313,11 @@ exports.deleteDocument = async (req, res) => {
 
 exports.downloadDocument = async (req, res) => {
   try {
+    const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const doc = await Document.findOne({ _id: req.params.id, userId });
+    const baseQuery = isAdmin ? { _id: req.params.id } : { _id: req.params.id, userId };
+
+    const doc = await Document.findOne(baseQuery);
     if (!doc) {
       return res.status(404).send("Document not found");
     }
@@ -321,8 +332,11 @@ exports.downloadDocument = async (req, res) => {
 
 exports.viewDocument = async (req, res) => {
   try {
+    const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const doc = await Document.findOne({ _id: req.params.id, userId });
+    const baseQuery = isAdmin ? { _id: req.params.id } : { _id: req.params.id, userId };
+
+    const doc = await Document.findOne(baseQuery);
     if (!doc) {
       return res.status(404).send("Document not found");
     }

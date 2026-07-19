@@ -42,9 +42,8 @@ router.post(
   "/register",
 
   body("username").trim().isLength({ min: 3 }).withMessage("Username must be at least 3 characters long"),
-  body("email").trim().isEmail().normalizeEmail().withMessage("Enter a valid email address"),
+  body("email").trim().isEmail().withMessage("Enter a valid email address"),
   body("password")
-    .trim()
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters long")
     .matches(/[A-Z]/)
@@ -78,13 +77,17 @@ router.post(
         });
       }
 
-      const existingUser = await User.findOne({
-        $or: [{ email: email.toLowerCase() }, { username }]
-      });
-
-      if (existingUser) {
+      const existingEmail = await User.findOne({ email: email.toLowerCase() });
+      if (existingEmail) {
         return res.status(400).json({
-          message: "User already exists",
+          message: "User with this email already exists",
+        });
+      }
+
+      const existingUsername = await User.findOne({ username });
+      if (existingUsername) {
+        return res.status(400).json({
+          message: "Username is already taken",
         });
       }
 

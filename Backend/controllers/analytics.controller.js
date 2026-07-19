@@ -6,23 +6,25 @@ const Activity = require("../models/activity.model");
 exports.getAnalyticsData = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user.id);
+    const isAdmin = req.userRole === "admin";
+    const baseQuery = isAdmin ? {} : { userId };
 
     // 1. Total Uploads
-    const totalUploads = await Document.countDocuments({ userId });
+    const totalUploads = await Document.countDocuments({ ...baseQuery });
 
     // 2. Active Workflows
-    const activeWorkflows = await Workflow.countDocuments({ createdBy: userId, status: "Published" });
+    const activeWorkflows = await Workflow.countDocuments({ ...(isAdmin ? {} : { createdBy: userId }), status: "Published" });
 
     // 3. Storage Efficiency (mocked based on standard compression rates)
     const storageEfficiency = 92.4; 
 
     // 4. Processing Errors
-    const processingErrors = await Document.countDocuments({ userId, status: "rejected" });
+    const processingErrors = await Document.countDocuments({ ...baseQuery, status: "rejected" });
 
     // 5. AI Value Metrics
-    const docsWithSummary = await Document.countDocuments({ userId, summary: { $ne: "", $exists: true } });
-    const docsApproved = await Document.countDocuments({ userId, status: "approved" });
-    const docsPending = await Document.countDocuments({ userId, status: { $in: ["pending", "review", "processing"] } });
+    const docsWithSummary = await Document.countDocuments({ ...baseQuery, summary: { $ne: "", $exists: true } });
+    const docsApproved = await Document.countDocuments({ ...baseQuery, status: "approved" });
+    const docsPending = await Document.countDocuments({ ...baseQuery, status: { $in: ["pending", "review", "processing"] } });
     
     const timeSavedHours = Math.round((totalUploads * 15) / 60); // Assuming 15 mins saved per doc
     const autoApprovalRate = totalUploads > 0 ? ((docsApproved / totalUploads) * 100).toFixed(1) : 0;
@@ -30,7 +32,7 @@ exports.getAnalyticsData = async (req, res) => {
 
     // 6. Top Extracted Keywords
     const topKeywordsAgg = await Document.aggregate([
-      { $match: { userId } },
+      { $match: isAdmin ? {} : { userId } },
       { $unwind: "$keywords" },
       { $group: { _id: "$keywords", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
@@ -47,7 +49,7 @@ exports.getAnalyticsData = async (req, res) => {
     sixMonthsAgo.setHours(0, 0, 0, 0);
 
     const uploadsAgg = await Document.aggregate([
-      { $match: { userId, createdAt: { $gte: sixMonthsAgo } } },
+      { $match: { ...(isAdmin ? {} : { userId }), createdAt: { $gte: sixMonthsAgo } } },
       { $group: {
           _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
           count: { $sum: 1 }
@@ -72,7 +74,7 @@ exports.getAnalyticsData = async (req, res) => {
 
     // 8. Documents by Type
     const typeAgg = await Document.aggregate([
-      { $match: { userId } },
+      { $match: isAdmin ? {} : { userId } },
       { $group: { _id: "$fileType", count: { $sum: 1 } } }
     ]);
 
@@ -92,7 +94,7 @@ exports.getAnalyticsData = async (req, res) => {
     sevenDaysAgo.setHours(0,0,0,0);
     
     const activityAgg = await Activity.aggregate([
-      { $match: { user: userId, createdAt: { $gte: sevenDaysAgo } } },
+      { $match: { ...(isAdmin ? {} : { user: userId }), createdAt: { $gte: sevenDaysAgo } } },
       { $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
           count: { $sum: 1 }
@@ -115,7 +117,7 @@ exports.getAnalyticsData = async (req, res) => {
 
     // 10. Workflow Status Breakdown
     const workflowStatusAgg = await Workflow.aggregate([
-      { $match: { createdBy: userId } },
+      { $match: isAdmin ? {} : { createdBy: userId } },
       { $group: { _id: "$status", count: { $sum: 1 } } }
     ]);
     
