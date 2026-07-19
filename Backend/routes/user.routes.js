@@ -175,6 +175,11 @@ router.post('/login', loginLimiter, async (req, res) => {
   }
 });
 
+router.get("/logout", (req, res) => {
+  res.clearCookie("token", getCookieOptions());
+  return res.redirect("/");
+});
+
 router.post("/logout", (req, res) => {
   res.clearCookie("token", getCookieOptions());
 
