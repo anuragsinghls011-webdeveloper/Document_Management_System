@@ -165,7 +165,12 @@ router.post('/login', loginLimiter, async (req, res) => {
     });
 
     if (req.headers['accept']?.includes('application/json')) {
-      return res.json({ success: true, redirect: "/dashboard" });
+      return res.json({ 
+        success: true, 
+        redirect: "/dashboard", 
+        role: user.role, 
+        username: user.username 
+      });
     }
     res.redirect("/dashboard");
   } catch (err) {

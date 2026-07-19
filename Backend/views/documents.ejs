@@ -736,8 +736,8 @@
                         <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>General</span></td>
                         <td>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
-                                User
+                                <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(user.username) %>&background=6366f1&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
+                                <%= user.username %>
                             </div>
                         </td>
                         <td>${dateStr}</td>

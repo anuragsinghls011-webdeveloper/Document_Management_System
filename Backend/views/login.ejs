@@ -188,28 +188,7 @@
                             email address</p>
                     </div>
 
-                    <!-- Role Based Access Selection -->
-                    <div>
-                        <label for="role"
-                            class="block text-xs font-mono text-gray-400 uppercase tracking-wider mb-2">System
-                            Role</label>
-                        <div class="relative">
-                            <select id="role" name="role" required
-                                class="w-full px-4 py-3 bg-base border border-border rounded text-sm text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all appearance-none cursor-pointer">
-                                <option value="" disabled selected class="text-gray-600">Select your access level...
-                                </option>
-                                <option value="admin">Administrator (Full Access)</option>
-                                <option value="editor">Editor (Upload & Synthesize)</option>
-                                <option value="viewer">Viewer (Read Only)</option>
-                            </select>
-                            <div
-                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                                <i class="ph ph-caret-down"></i>
-                            </div>
-                        </div>
-                        <p class="hidden text-red-400 text-xs mt-1 font-light" id="roleError">Please select a system
-                            role</p>
-                    </div>
+                    <!-- Role Based Access Selection Removed -->
 
                     <!-- Password -->
                     <div>
@@ -355,7 +334,6 @@
                 formMessage.classList.add('hidden');
 
                 const email = document.getElementById('email').value.trim();
-                const role = document.getElementById('role').value;
                 const pwd = passwordInput.value;
 
                 let isValid = true;
@@ -363,10 +341,6 @@
                 const isEmailValid = emailRegex.test(email);
                 toggleError('email', 'emailError', isEmailValid);
                 if (!isEmailValid) isValid = false;
-
-                const isRoleValid = role !== "";
-                toggleError('role', 'roleError', isRoleValid);
-                if (!isRoleValid) isValid = false;
 
                 const isPwdValid = pwd.length > 0;
                 toggleError('password', 'passwordError', isPwdValid);
@@ -393,10 +367,11 @@
                                 formMessage.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'border-red-500/20');
                                 formMessage.classList.add('bg-white/5', 'text-white', 'border-white/10', 'p-6', 'flex-col', 'items-center', 'text-center', 'animate-fade-in');
 
-                                const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+                                const userRole = data.role || "User";
+                                const displayRole = userRole.charAt(0).toUpperCase() + userRole.slice(1);
                                 document.getElementById('formMessageIcon').className = 'ph-light ph-check-circle text-4xl text-white mb-2';
                                 document.getElementById('formMessageText').innerHTML = `
-                                <h3 class="text-xl font-serif mb-2">Authentication Successful, ${displayRole}</h3>
+                                <h3 class="text-xl font-serif mb-2">Authentication Successful, ${data.username || displayRole}</h3>
                                 <p class="text-sm text-gray-400 font-light mb-6">Welcome back to the Vault. Redirecting to your dashboard...</p>
                             `;
                                 setTimeout(() => {

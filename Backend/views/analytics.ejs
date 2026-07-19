@@ -580,9 +580,9 @@
                     <span class="notification-badge"></span>
                 </button>
                 <div class="profile-btn">
-                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="Profile"
+                    <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(user.username) %>&background=6366f1&color=fff" alt="Profile"
                         class="profile-img">
-                    <span style="font-weight: 500; font-size: 0.875rem; margin-right: 0.5rem;">Admin</span>
+                    <span style="font-weight: 500; font-size: 0.875rem; margin-right: 0.5rem; text-transform: capitalize;"><%= user.username %></span>
                 </div>
             </div>
         </header>
