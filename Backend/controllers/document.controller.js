@@ -221,7 +221,13 @@ exports.search = async (req, res) => {
   try {
     const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const { q, status, type, date } = req.query;
+    let { q, status, type, date } = req.query;
+
+    // Coerce arrays to strings to prevent DoS via type juggling
+    q = typeof q === 'string' ? q : (Array.isArray(q) ? q[0] : (q ? String(q) : ''));
+    status = typeof status === 'string' ? status : (Array.isArray(status) ? status[0] : (status ? String(status) : ''));
+    type = typeof type === 'string' ? type : (Array.isArray(type) ? type[0] : (type ? String(type) : ''));
+    date = typeof date === 'string' ? date : (Array.isArray(date) ? date[0] : (date ? String(date) : ''));
 
     const query = isAdmin ? {} : { userId };
 

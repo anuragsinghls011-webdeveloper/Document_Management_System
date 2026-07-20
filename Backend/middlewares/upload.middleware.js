@@ -58,7 +58,7 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
   const extension = path.extname(file.originalname).toLowerCase();
-  if (allowedExtensions.has(extension) || allowedMimeTypes.has(file.mimetype)) {
+  if (allowedExtensions.has(extension) && allowedMimeTypes.has(file.mimetype)) {
     return cb(null, true);
   }
 

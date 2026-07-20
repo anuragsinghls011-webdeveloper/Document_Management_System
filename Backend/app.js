@@ -19,6 +19,10 @@ const auth = require("./middlewares/auth.middleware");
 const adminOnly = require("./middlewares/admin.middleware");
 const roleAuth = require("./middlewares/role.middleware");
 
+const cors = require("cors");
+const mongoSanitize = require("express-mongo-sanitize");
+const rateLimit = require("express-rate-limit");
+
 const app = express();
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -34,6 +38,18 @@ function validateConfig() {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.set("trust proxy", isProduction ? 1 : 0);
+
+// Global Security Middleware
+app.use(cors());
+app.use(mongoSanitize());
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many requests from this IP, please try again later." }
+});
+app.use(globalLimiter);
 
 app.use(morgan('dev'));
 app.use(helmet({ contentSecurityPolicy: false }));
