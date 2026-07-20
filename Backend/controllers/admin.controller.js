@@ -13,7 +13,25 @@ exports.pendingDocs = async (req, res) => {
       .populate("userId", "username email")
       .sort({ createdAt: -1 });
 
-    res.json({ success: true, documents: pendingDocs });
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const approvedToday = await Document.countDocuments({
+      status: "approved",
+      updatedAt: { $gte: startOfToday }
+    });
+
+    const rejectedToday = await Document.countDocuments({
+      status: "rejected",
+      updatedAt: { $gte: startOfToday }
+    });
+
+    res.json({ 
+      success: true, 
+      documents: pendingDocs,
+      approvedToday,
+      rejectedToday
+    });
   } catch (error) {
     console.error("PENDING DOCS ERROR:", error);
     res.status(500).json({ success: false, message: "Server error" });

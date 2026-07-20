@@ -937,7 +937,13 @@
                     let statusText = doc.status || "Pending";
                     if (doc.status === "verified" || doc.status === "approved" || doc.status === "success" || doc.status === "review") {
                         statusClass = "status-completed";
-                        statusText = doc.status === "review" ? "In Review" : "Completed";
+                        if (doc.status === "review") {
+                            statusText = "In Review";
+                        } else if (doc.status === "approved") {
+                            statusText = "Approved";
+                        } else {
+                            statusText = "Completed";
+                        }
                     } else if (doc.status === "rejected" || doc.status === "failed") {
                         statusClass = "status-failed";
                         statusText = "Failed";

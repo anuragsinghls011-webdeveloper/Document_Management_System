@@ -273,9 +273,13 @@
         if (!res.ok) throw new Error("failed to fetch");
         const data = await res.json();
         state.documents = Array.isArray(data.documents) ? data.documents : [];
+        state.approvedToday = data.approvedToday || 0;
+        state.rejectedToday = data.rejectedToday || 0;
       } catch (error) {
         console.error(error);
         state.documents = [];
+        state.approvedToday = 0;
+        state.rejectedToday = 0;
       }
       renderQueue();
       renderMetrics();
@@ -287,8 +291,8 @@
       const docs = state.documents;
       queueBadge.innerHTML = `<span class="pulse-dot"></span> ${docs.length} pending`;
       document.getElementById("railPending").textContent = docs.length;
-      document.getElementById("railApproved").textContent = docs.filter(doc => doc.status === "approved").length;
-      document.getElementById("railRejected").textContent = docs.filter(doc => doc.status === "rejected").length;
+      document.getElementById("railApproved").textContent = state.approvedToday || 0;
+      document.getElementById("railRejected").textContent = state.rejectedToday || 0;
 
       if (!docs.length) {
         pendingBody.innerHTML = '<tr><td colspan="4" class="empty-state">No pending documents. The queue is clear.</td></tr>';
