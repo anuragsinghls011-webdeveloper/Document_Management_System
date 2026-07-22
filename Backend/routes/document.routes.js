@@ -13,9 +13,13 @@ router.get("/my", auth, controller.myDocuments);
 router.get("/stats", auth, controller.stats);
 router.get("/search", auth, controller.search);
 router.get("/recent", auth, controller.recent);
+router.post("/reanalyze", auth, checkRole(["admin", "generalManager"]), controller.reanalyzeAll);
 
 router.get("/:id/view", auth, controller.viewDocument);
 router.get("/:id/download", auth, controller.downloadDocument);
+router.get("/:id/analysis", auth, controller.getAnalysis);
+router.post("/:id/reanalyze", auth, controller.reanalyzeSingle);
 router.delete("/:id", auth, checkRole(["admin", "generalManager"]), controller.deleteDocument);
 
 module.exports = router;
+

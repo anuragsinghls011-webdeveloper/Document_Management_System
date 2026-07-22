@@ -106,6 +106,12 @@ if (require.main === module) {
     .then(() => {
       app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
+
+        // Auto-fix stuck documents on startup
+        const { reanalyzeStuckDocuments } = require("./controllers/document.controller");
+        reanalyzeStuckDocuments().catch(err =>
+          console.error("Startup reanalyze failed:", err)
+        );
       });
     })
     .catch((error) => {

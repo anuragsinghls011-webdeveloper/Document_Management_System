@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documents | Document Management System</title>
+    <meta name="description" content="AI-powered document management with intelligent classification, department routing, and analysis.">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,6 +25,7 @@
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --danger-color: #ef4444;
+            --info-color: #06b6d4;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --sidebar-width: 260px;
@@ -217,7 +219,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0.6rem 1.25rem;
             border-radius: 2rem;
-            width: 350px;
+            width: 320px;
             transition: all 0.3s ease;
         }
 
@@ -244,7 +246,8 @@
 
         .filters {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
+            flex-wrap: wrap;
         }
 
         .filter-select {
@@ -256,7 +259,7 @@
             outline: none;
             cursor: pointer;
             font-family: inherit;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
@@ -292,10 +295,10 @@
 
         th {
             text-align: left;
-            padding: 1.25rem 1.5rem;
+            padding: 1.25rem 1.25rem;
             color: var(--text-muted);
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             border-bottom: 1px solid var(--surface-border);
             background: rgba(255, 255, 255, 0.02);
             text-transform: uppercase;
@@ -303,9 +306,9 @@
         }
 
         td {
-            padding: 1.25rem 1.5rem;
+            padding: 1rem 1.25rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             vertical-align: middle;
         }
 
@@ -321,19 +324,19 @@
         .doc-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .doc-icon {
-            width: 2.75rem;
-            height: 2.75rem;
+            width: 2.5rem;
+            height: 2.5rem;
             background: rgba(99, 102, 241, 0.1);
             color: var(--primary-color);
-            border-radius: 0.75rem;
+            border-radius: 0.6rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             flex-shrink: 0;
             transition: transform 0.2s ease;
         }
@@ -342,75 +345,93 @@
             transform: scale(1.1);
         }
 
-        .icon-pdf {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger-color);
-        }
-
-        .icon-doc {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-        }
-
-        .icon-img {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success-color);
-        }
-
-        .icon-xls {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning-color);
-        }
+        .icon-pdf { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+        .icon-doc { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .icon-img { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .icon-xls { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
 
         .doc-name {
             font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.15rem;
+            font-size: 0.9rem;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .doc-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .doc-meta {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
         .status-badge {
-            padding: 0.35rem 0.85rem;
+            padding: 0.3rem 0.75rem;
             border-radius: 2rem;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 0.35rem;
+            gap: 0.3rem;
             letter-spacing: 0.03em;
         }
 
-        .status-verified {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success-color);
-            border: 1px solid rgba(16, 185, 129, 0.2);
+        .status-verified { background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .status-rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .status-processing { background: rgba(99, 102, 241, 0.1); color: var(--primary-color); border: 1px solid rgba(99, 102, 241, 0.2); }
+
+        /* ─── AI Department Badges ─────────────────────────────────── */
+        .dept-badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.4rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .dept-finance { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25); }
+        .dept-hr { background: rgba(236, 72, 153, 0.12); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.25); }
+        .dept-legal { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.25); }
+        .dept-it { background: rgba(6, 182, 212, 0.12); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.25); }
+        .dept-marketing { background: rgba(34, 197, 94, 0.12); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.25); }
+        .dept-operations { background: rgba(249, 115, 22, 0.12); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.25); }
+        .dept-sales { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.25); }
+        .dept-audit { background: rgba(168, 85, 247, 0.12); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.25); }
+        .dept-general { background: rgba(148, 163, 184, 0.12); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.25); }
+        .dept-unknown { background: rgba(148, 163, 184, 0.08); color: #64748b; border: 1px solid rgba(148, 163, 184, 0.15); }
+
+        .doc-type-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
         }
 
-        .status-pending {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning-color);
-            border: 1px solid rgba(245, 158, 11, 0.2);
+        /* ─── Processing Pulse Animation ──────────────────────────── */
+        @keyframes aiPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
-
-        .status-rejected {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger-color);
-            border: 1px solid rgba(239, 68, 68, 0.2);
+        .ai-analyzing {
+            animation: aiPulse 1.5s ease-in-out infinite;
+        }
+        .ai-analyzing-text {
+            color: var(--primary-color);
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
         }
 
         .action-btns {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.35rem;
         }
 
         .action-btn {
@@ -418,14 +439,14 @@
             border: 1px solid transparent;
             color: var(--text-muted);
             cursor: pointer;
-            width: 2.25rem;
-            height: 2.25rem;
+            width: 2rem;
+            height: 2rem;
             border-radius: 0.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .action-btn:hover {
@@ -434,39 +455,23 @@
             border-color: rgba(255, 255, 255, 0.1);
         }
 
-        .btn-view:hover {
-            color: var(--primary-color);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .btn-download:hover {
-            color: var(--success-color);
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .btn-delete:hover {
-            color: var(--danger-color);
-            background: rgba(239, 68, 68, 0.1);
-        }
+        .btn-view:hover { color: var(--primary-color); background: rgba(99, 102, 241, 0.1); }
+        .btn-download:hover { color: var(--success-color); background: rgba(16, 185, 129, 0.1); }
+        .btn-delete:hover { color: var(--danger-color); background: rgba(239, 68, 68, 0.1); }
+        .btn-ai:hover { color: var(--info-color); background: rgba(6, 182, 212, 0.1); }
 
         /* Pagination */
         .pagination {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem;
+            padding: 1.25rem 1.5rem;
             border-top: 1px solid var(--surface-border);
         }
 
-        .page-info {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
+        .page-info { color: var(--text-muted); font-size: 0.85rem; }
 
-        .page-controls {
-            display: flex;
-            gap: 0.5rem;
-        }
+        .page-controls { display: flex; gap: 0.5rem; }
 
         .page-btn {
             background: rgba(255, 255, 255, 0.05);
@@ -477,48 +482,282 @@
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 500;
+            font-size: 0.85rem;
         }
 
-        .page-btn:hover:not(:disabled) {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        .page-btn:hover:not(:disabled) { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .page-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ─── AI Analysis Slide-Out Panel ─────────────────────────── */
+        .analysis-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .analysis-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
-        .page-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        .analysis-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 480px;
+            max-width: 90vw;
+            height: 100vh;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 30, 0.99) 100%);
+            border-left: 1px solid var(--surface-border);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .analysis-panel.active {
+            transform: translateX(0);
         }
 
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .panel-header {
+            padding: 1.75rem 2rem 1.25rem;
+            border-bottom: 1px solid var(--surface-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .panel-header h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .panel-header h2 i {
+            background: linear-gradient(135deg, var(--info-color), var(--primary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.3rem;
+        }
+
+        .panel-close {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-muted);
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+        }
+        .panel-close:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .panel-body {
+            padding: 1.75rem 2rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--surface-border);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            transition: all 0.2s;
+        }
+        .analysis-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .card-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 0.65rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .card-label i {
+            font-size: 0.85rem;
+        }
+
+        .card-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .card-value-sm {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* Confidence Bar */
+        .confidence-container {
+            width: 100%;
+        }
+        .confidence-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .confidence-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .confidence-high { background: linear-gradient(90deg, #10b981, #34d399); }
+        .confidence-medium { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .confidence-low { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+        .confidence-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.35rem;
+        }
+        .confidence-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .confidence-pct {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* Keywords Pills */
+        .keywords-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.25rem;
+        }
+        .keyword-pill {
+            padding: 0.25rem 0.65rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            background: rgba(99, 102, 241, 0.1);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.2s;
+        }
+        .keyword-pill:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Routed-to section */
+        .routed-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        .routed-avatar {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+        .routed-info .routed-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+        .routed-info .routed-role {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: capitalize;
+        }
+
+        /* ─── Loading Skeleton ────────────────────────────────────── */
+        .skeleton-row {
+            background: rgba(255, 255, 255, 0.03);
+            animation: aiPulse 1.5s ease-in-out infinite;
+        }
+        .skeleton-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 6px;
+            margin: 4px 0;
+        }
+
+        /* ─── Toast Notification ──────────────────────────────────── */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success-color);
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(12px);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.error {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: var(--danger-color);
         }
 
         /* Animations */
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         /* Responsive */
@@ -528,29 +767,15 @@
                 gap: 1rem;
                 align-items: stretch;
             }
-
-            .search-container {
-                width: 100%;
-            }
+            .search-container { width: 100%; }
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-
-            table th:nth-child(3),
-            table td:nth-child(3),
-            table th:nth-child(4),
-            table td:nth-child(4) {
-                display: none;
-                /* Hide less important columns on mobile */
-            }
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; width: 100%; }
+            table th:nth-child(3), table td:nth-child(3),
+            table th:nth-child(4), table td:nth-child(4) { display: none; }
+            .analysis-panel { width: 100vw; max-width: 100vw; }
         }
     </style>
 </head>
@@ -578,16 +803,10 @@
         <div style="margin-top: auto;">
             <div
                 style="background: rgba(99, 102, 241, 0.1); padding: 1.25rem; border-radius: 1rem; border: 1px solid rgba(99, 102, 241, 0.2); text-align: center;">
-                <i class='bx bx-cloud-upload'
-                    style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
-                <h4 style="font-size: 0.875rem; margin-bottom: 0.25rem;">Storage Used</h4>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">75% of 100GB</p>
-                <div
-                    style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
-                    <div
-                        style="width: 75%; height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border-radius: 3px;">
-                    </div>
-                </div>
+                <i class='bx bx-brain'
+                    style="font-size: 2rem; color: var(--info-color); margin-bottom: 0.5rem;"></i>
+                <h4 style="font-size: 0.875rem; margin-bottom: 0.25rem;">AI Powered</h4>
+                <p style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.5;">Documents are auto-analyzed & routed to the right department</p>
             </div>
         </div>
     </aside>
@@ -598,13 +817,17 @@
         <header class="header">
             <div class="header-title">
                 <h1>Document Repository</h1>
-                <p>Manage, search, and organize all your enterprise documents.</p>
+                <p>AI-powered analysis, classification, and automatic department routing.</p>
             </div>
             <div class="header-actions">
                 <% if (typeof userRole !== 'undefined' && ['admin', 'editor', 'financeManager', 'hrManager', 'generalManager'].includes(userRole)) { %>
-                <input type="file" id="documentUpload" style="display:none" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                <input type="file" id="documentUpload" style="display:none" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.csv,.html,.xml"
                     onchange="uploadDocument(event)" multiple />
-                <button class="btn-primary" onclick="document.getElementById('documentUpload').click()">
+                <button class="btn-primary" style="background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:var(--info-color);box-shadow:none;" id="reanalyzeAllBtn" onclick="reanalyzeAllDocs()">
+                    <i class="bx bx-refresh" style="font-size:1.2rem"></i>
+                    Re-analyze All
+                </button>
+                <button class="btn-primary" id="uploadBtn" onclick="document.getElementById('documentUpload').click()">
                     <i class="bx bx-upload" style="font-size:1.2rem"></i>
                     Upload Document
                 </button>
@@ -616,27 +839,38 @@
         <div class="toolbar">
             <div class="search-container">
                 <i class='bx bx-search'></i>
-                <input type="text" placeholder="Search by name, content, or metadata...">
+                <input type="text" id="searchInput" placeholder="Search by name, content, or metadata...">
             </div>
             <div class="filters">
-                <select class="filter-select">
-                    <option value="">All Categories</option>
-                    <option value="finance">Finance & Tax</option>
-                    <option value="hr">Human Resources</option>
-                    <option value="legal">Legal & Contracts</option>
-                    <option value="marketing">Marketing</option>
+                <select class="filter-select" id="filterDepartment">
+                    <option value="">All Departments</option>
+                    <option value="Finance">💰 Finance</option>
+                    <option value="HR">👥 HR</option>
+                    <option value="Legal">⚖️ Legal</option>
+                    <option value="IT">💻 IT</option>
+                    <option value="Marketing">📢 Marketing</option>
+                    <option value="Operations">🔧 Operations</option>
+                    <option value="Sales">📊 Sales</option>
+                    <option value="Audit">🔍 Audit</option>
+                    <option value="General">📁 General</option>
                 </select>
-                <select class="filter-select">
+                <select class="filter-select" id="filterStatus">
                     <option value="">Any Status</option>
-                    <option value="verified">Verified</option>
+                    <option value="processing">Processing</option>
                     <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>
+                    <option value="changes_requested">Changes Requested</option>
                 </select>
-                <select class="filter-select">
-                    <option value="">Upload Date</option>
-                    <option value="today">Today</option>
-                    <option value="week">Last 7 Days</option>
-                    <option value="month">Last 30 Days</option>
+                <select class="filter-select" id="filterType">
+                    <option value="">All Types</option>
+                    <option value="pdf">PDF</option>
+                    <option value="doc">DOC</option>
+                    <option value="docx">DOCX</option>
+                    <option value="jpg">JPG</option>
+                    <option value="png">PNG</option>
+                    <option value="txt">TXT</option>
+                    <option value="csv">CSV</option>
                 </select>
             </div>
         </div>
@@ -648,9 +882,9 @@
                     <thead>
                         <tr>
                             <th>File Details</th>
-                            <th>Category</th>
-                            <th>Uploaded By</th>
-                            <th>Date Modified</th>
+                            <th>AI Classification</th>
+                            <th>Department</th>
+                            <th>Routed To</th>
                             <th>Status</th>
                             <th style="text-align: right;">Actions</th>
                         </tr>
@@ -662,102 +896,368 @@
             </div>
 
             <!-- Pagination -->
-            <div class="pagination">
-                <div class="page-info">
-                    Showing <span style="color: var(--text-main); font-weight: 500;">1</span> to <span
-                        style="color: var(--text-main); font-weight: 500;">5</span> of <span
-                        style="color: var(--text-main); font-weight: 500;">12,485</span> entries
-                </div>
-                <div class="page-controls">
-                    <button class="page-btn" disabled><i class='bx bx-chevron-left'></i> Prev</button>
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">3</button>
-                    <span style="color: var(--text-muted); padding: 0.5rem;">...</span>
-                    <button class="page-btn">84</button>
-                    <button class="page-btn">Next <i class='bx bx-chevron-right'></i></button>
-                </div>
+            <div class="pagination" id="paginationContainer">
+                <div class="page-info" id="pageInfo">Loading documents...</div>
+                <div class="page-controls" id="pageControls"></div>
             </div>
         </div>
     </main>
 
+    <!-- AI Analysis Overlay -->
+    <div class="analysis-overlay" id="analysisOverlay" onclick="closeAnalysisPanel()"></div>
+
+    <!-- AI Analysis Slide-Out Panel -->
+    <div class="analysis-panel" id="analysisPanel">
+        <div class="panel-header">
+            <h2><i class='bx bx-brain'></i> AI Document Analysis</h2>
+            <button class="panel-close" onclick="closeAnalysisPanel()"><i class='bx bx-x'></i></button>
+        </div>
+        <div class="panel-body" id="panelBody">
+            <!-- Populated dynamically -->
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
     <script>
         const currentUserRole = "<%= typeof userRole !== 'undefined' ? userRole : 'viewer' %>";
+        let allDocuments = [];
+        const ITEMS_PER_PAGE = 10;
+        let currentPage = 1;
 
+        // ─── Utility Helpers ─────────────────────────────────────
+        function getDeptClass(dept) {
+            const map = {
+                'Finance': 'dept-finance', 'HR': 'dept-hr', 'Human Resources': 'dept-hr',
+                'Legal': 'dept-legal', 'IT': 'dept-it', 'Marketing': 'dept-marketing',
+                'Operations': 'dept-operations', 'Sales': 'dept-sales',
+                'Audit': 'dept-audit', 'General': 'dept-general'
+            };
+            return map[dept] || 'dept-unknown';
+        }
+
+        function getDeptIcon(dept) {
+            const map = {
+                'Finance': 'bx-dollar-circle', 'HR': 'bx-group', 'Human Resources': 'bx-group',
+                'Legal': 'bx-shield-quarter', 'IT': 'bx-code-alt', 'Marketing': 'bx-megaphone',
+                'Operations': 'bx-wrench', 'Sales': 'bx-trending-up',
+                'Audit': 'bx-search-alt', 'General': 'bx-folder'
+            };
+            return map[dept] || 'bx-folder';
+        }
+
+        function getDocTypeIcon(type) {
+            const map = {
+                'Invoice': 'bx-receipt', 'Contract': 'bx-file', 'Resume': 'bx-id-card',
+                'Report': 'bx-bar-chart-alt-2', 'Memo': 'bx-note', 'Letter': 'bx-envelope',
+                'Policy': 'bx-book-content', 'Receipt': 'bx-receipt', 'Proposal': 'bx-bulb',
+                'Manual': 'bx-book-open', 'Spreadsheet': 'bx-spreadsheet',
+                'Presentation': 'bx-slideshow', 'Certificate': 'bx-certification',
+                'Form': 'bx-list-check', 'Other': 'bx-file'
+            };
+            return map[type] || 'bx-file';
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class='bx ${isError ? 'bx-error-circle' : 'bx-check-circle'}'></i> ${message}`;
+            toast.className = isError ? 'toast error show' : 'toast show';
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // ─── Fetch & Render ──────────────────────────────────────
         async function fetchDocuments() {
             try {
                 const response = await fetch("/api/documents?all=true");
-                const documents = await response.json();
-
-                const tbody = document.getElementById("docs-table-body");
-                tbody.innerHTML = "";
-
-                if (documents.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No documents found.</td></tr>`;
-                    return;
-                }
-
-                documents.forEach(doc => {
-                    const ext = (doc.fileType || "unknown").toLowerCase();
-                    let iconClass = "icon-doc";
-                    let iconBx = "bxs-file-doc";
-                    if (ext === "pdf") { iconClass = "icon-pdf"; iconBx = "bxs-file-pdf"; }
-                    else if (["jpg", "jpeg", "png"].includes(ext)) { iconClass = "icon-img"; iconBx = "bxs-image"; }
-                    else if (["xls", "xlsx"].includes(ext)) { iconClass = "icon-xls"; iconBx = "bxs-spreadsheet"; }
-
-                    let statusClass = "status-pending";
-                    let statusIcon = "bx-time-five";
-                    let statusText = doc.status || "Pending";
-                    if (doc.status === "verified" || doc.status === "approved" || doc.status === "success") {
-                        statusClass = "status-verified";
-                        statusIcon = "bx-check-circle";
-                    } else if (doc.status === "rejected" || doc.status === "failed") {
-                        statusClass = "status-rejected";
-                        statusIcon = "bx-x-circle";
-                    }
-
-                    const dateStr = new Date(doc.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>
-                            <div class="doc-info">
-                                <div class="doc-icon ${iconClass}"><i class='bx ${iconBx}'></i></div>
-                                <div>
-                                    <div class="doc-name">${doc.fileName}</div>
-                                    <div class="doc-meta">
-                                        <span>Unknown Size</span>
-                                        <span style="color: rgba(255,255,255,0.2)">|</span>
-                                        <span>${(doc.fileType || "unknown").toUpperCase()}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span style="color: var(--text-muted);"><i class='bx bx-folder' style="margin-right: 5px;"></i>General</span></td>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(user.username) %>&background=6366f1&color=fff" alt="" style="width: 1.5rem; height: 1.5rem; border-radius: 50%;">
-                                <%= user.username %>
-                            </div>
-                        </td>
-                        <td>${dateStr}</td>
-                        <td><span class="status-badge ${statusClass}"><i class='bx ${statusIcon}'></i> <span style="text-transform:capitalize;">${statusText}</span></span></td>
-                        <td>
-                            <div class="action-btns" style="justify-content: flex-end;">
-                                <button class="action-btn btn-view" title="View" onclick="viewDocument('${doc._id}')"><i class='bx bx-show'></i></button>
-                                <button class="action-btn btn-download" title="Download" onclick="downloadDocument('${doc._id}')"><i class='bx bx-download'></i></button>
-                                ${['admin', 'generalManager'].includes(currentUserRole) ? 
-                                `<button class="action-btn btn-delete" title="Delete" onclick="deleteDocument('${doc._id}')"><i class='bx bx-trash'></i></button>` : ''}
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+                allDocuments = await response.json();
+                currentPage = 1;
+                renderDocuments();
             } catch (err) {
                 console.error("Failed to load documents", err);
+                showToast("Failed to load documents", true);
             }
         }
 
+        function getFilteredDocuments() {
+            let docs = [...allDocuments];
+            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+            const deptVal = document.getElementById('filterDepartment').value;
+            const statusVal = document.getElementById('filterStatus').value;
+            const typeVal = document.getElementById('filterType').value;
+
+            if (searchVal) {
+                docs = docs.filter(d =>
+                    (d.fileName || '').toLowerCase().includes(searchVal) ||
+                    (d.documentType || '').toLowerCase().includes(searchVal) ||
+                    (d.department || '').toLowerCase().includes(searchVal) ||
+                    (d.keywords || []).some(k => k.toLowerCase().includes(searchVal))
+                );
+            }
+            if (deptVal) docs = docs.filter(d => d.department === deptVal);
+            if (statusVal) docs = docs.filter(d => d.status === statusVal);
+            if (typeVal) docs = docs.filter(d => (d.fileType || '').toLowerCase() === typeVal);
+
+            return docs;
+        }
+
+        function renderDocuments() {
+            const filtered = getFilteredDocuments();
+            const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const pageDocs = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+            const tbody = document.getElementById("docs-table-body");
+            tbody.innerHTML = "";
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 3rem; color: var(--text-muted);">
+                    <i class='bx bx-file-find' style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem; opacity: 0.4;"></i>
+                    No documents found.
+                </td></tr>`;
+                document.getElementById('pageInfo').textContent = 'No results';
+                document.getElementById('pageControls').innerHTML = '';
+                return;
+            }
+
+            pageDocs.forEach((doc, idx) => {
+                const ext = (doc.fileType || "unknown").toLowerCase();
+                let iconClass = "icon-doc", iconBx = "bxs-file-doc";
+                if (ext === "pdf") { iconClass = "icon-pdf"; iconBx = "bxs-file-pdf"; }
+                else if (["jpg", "jpeg", "png"].includes(ext)) { iconClass = "icon-img"; iconBx = "bxs-image"; }
+                else if (["xls", "xlsx"].includes(ext)) { iconClass = "icon-xls"; iconBx = "bxs-spreadsheet"; }
+                else if (["txt", "csv", "log"].includes(ext)) { iconClass = "icon-doc"; iconBx = "bxs-file-txt"; }
+
+                const isProcessing = doc.status === "processing";
+                let statusClass = "status-pending", statusIcon = "bx-time-five", statusText = doc.status || "Pending";
+                if (isProcessing) {
+                    statusClass = "status-processing ai-analyzing"; statusIcon = "bx-loader-alt bx-spin"; statusText = "Analyzing...";
+                } else if (["approved", "verified"].includes(doc.status)) {
+                    statusClass = "status-verified"; statusIcon = "bx-check-circle";
+                } else if (["rejected", "failed"].includes(doc.status)) {
+                    statusClass = "status-rejected"; statusIcon = "bx-x-circle";
+                }
+
+                const dateStr = new Date(doc.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                const dept = doc.department || (isProcessing ? '' : 'General');
+                const docType = doc.documentType || (isProcessing ? '' : 'Unknown');
+                const deptClass = getDeptClass(dept);
+                const routedToName = doc.routedTo ? (doc.routedTo.username || 'Unknown') : (isProcessing ? '...' : 'Admin');
+
+                const tr = document.createElement("tr");
+                tr.style.animation = `fadeIn 0.3s ease ${idx * 0.05}s backwards`;
+                tr.innerHTML = `
+                    <td>
+                        <div class="doc-info">
+                            <div class="doc-icon ${iconClass}"><i class='bx ${iconBx}'></i></div>
+                            <div>
+                                <div class="doc-name" title="${doc.fileName}">${doc.fileName}</div>
+                                <div class="doc-meta">
+                                    <span>${(doc.fileType || "unknown").toUpperCase()}</span>
+                                    <span style="color: rgba(255,255,255,0.15)">|</span>
+                                    <span>${dateStr}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        ${isProcessing
+                            ? `<div class="ai-analyzing-text"><i class='bx bx-loader-alt bx-spin'></i> Analyzing...</div>`
+                            : `<div style="display:flex;align-items:center;gap:0.4rem;">
+                                <i class='bx ${getDocTypeIcon(docType)}' style="font-size:1rem;color:var(--text-muted)"></i>
+                                <span style="font-size:0.85rem;font-weight:500;">${docType}</span>
+                              </div>`
+                        }
+                    </td>
+                    <td>
+                        ${isProcessing
+                            ? `<div class="ai-analyzing-text"><i class='bx bx-loader-alt bx-spin'></i> Detecting...</div>`
+                            : `<span class="dept-badge ${deptClass}"><i class='bx ${getDeptIcon(dept)}'></i> ${dept}</span>`
+                        }
+                    </td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            ${isProcessing
+                                ? `<span style="font-size:0.8rem;color:var(--text-muted);">Routing...</span>`
+                                : `<span style="font-size:0.85rem;">${routedToName}</span>`
+                            }
+                        </div>
+                    </td>
+                    <td><span class="status-badge ${statusClass}"><i class='bx ${statusIcon}'></i> <span style="text-transform:capitalize;">${statusText}</span></span></td>
+                    <td>
+                        <div class="action-btns" style="justify-content: flex-end;">
+                            <button class="action-btn btn-ai" title="AI Analysis" onclick="openAnalysisPanel('${doc._id}')"><i class='bx bx-brain'></i></button>
+                            <button class="action-btn" title="Re-analyze" style="color:var(--info-color)" onclick="reanalyzeSingle('${doc._id}')"><i class='bx bx-refresh'></i></button>
+                            <button class="action-btn btn-view" title="View" onclick="viewDocument('${doc._id}')"><i class='bx bx-show'></i></button>
+                            <button class="action-btn btn-download" title="Download" onclick="downloadDocument('${doc._id}')"><i class='bx bx-download'></i></button>
+                            ${['admin', 'generalManager'].includes(currentUserRole) ?
+                            `<button class="action-btn btn-delete" title="Delete" onclick="deleteDocument('${doc._id}')"><i class='bx bx-trash'></i></button>` : ''}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Pagination
+            const pageInfo = document.getElementById('pageInfo');
+            const endItem = Math.min(start + ITEMS_PER_PAGE, filtered.length);
+            pageInfo.innerHTML = `Showing <span style="color:var(--text-main);font-weight:500">${start + 1}</span> to <span style="color:var(--text-main);font-weight:500">${endItem}</span> of <span style="color:var(--text-main);font-weight:500">${filtered.length}</span> documents`;
+
+            const controls = document.getElementById('pageControls');
+            controls.innerHTML = '';
+            if (totalPages > 1) {
+                controls.innerHTML += `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})"><i class='bx bx-chevron-left'></i> Prev</button>`;
+                for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+                    controls.innerHTML += `<button class="page-btn ${currentPage === i ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+                }
+                if (totalPages > 5) {
+                    controls.innerHTML += `<span style="color:var(--text-muted);padding:0.5rem;">...</span>`;
+                    controls.innerHTML += `<button class="page-btn ${currentPage === totalPages ? 'active' : ''}" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+                }
+                controls.innerHTML += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">Next <i class='bx bx-chevron-right'></i></button>`;
+            }
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderDocuments();
+        }
+
+        // ─── AI Analysis Panel ───────────────────────────────────
+        async function openAnalysisPanel(docId) {
+            const overlay = document.getElementById('analysisOverlay');
+            const panel = document.getElementById('analysisPanel');
+            const body = document.getElementById('panelBody');
+
+            overlay.classList.add('active');
+            panel.classList.add('active');
+
+            // Show loading skeleton
+            body.innerHTML = `
+                <div class="analysis-card skeleton-row">
+                    <div class="skeleton-bar" style="width:40%"></div>
+                    <div class="skeleton-bar" style="width:70%;height:20px;margin-top:8px"></div>
+                </div>
+                <div class="analysis-card skeleton-row">
+                    <div class="skeleton-bar" style="width:35%"></div>
+                    <div class="skeleton-bar" style="width:50%;height:20px;margin-top:8px"></div>
+                </div>
+                <div class="analysis-card skeleton-row">
+                    <div class="skeleton-bar" style="width:45%"></div>
+                    <div class="skeleton-bar" style="width:90%;height:14px;margin-top:8px"></div>
+                    <div class="skeleton-bar" style="width:80%;height:14px;margin-top:4px"></div>
+                    <div class="skeleton-bar" style="width:60%;height:14px;margin-top:4px"></div>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`/api/documents/${docId}/analysis`);
+                const data = await res.json();
+
+                if (!data.success) {
+                    body.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-muted);"><i class='bx bx-error-circle' style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Failed to load analysis</div>`;
+                    return;
+                }
+
+                const a = data.analysis;
+                const confPct = Math.round((a.confidence || 0) * 100);
+                const confClass = confPct >= 75 ? 'confidence-high' : confPct >= 45 ? 'confidence-medium' : 'confidence-low';
+                const confLabel = confPct >= 75 ? 'High Confidence' : confPct >= 45 ? 'Medium Confidence' : 'Low Confidence';
+                const deptClass = getDeptClass(a.department);
+
+                body.innerHTML = `
+                    <!-- Document Info -->
+                    <div class="analysis-card">
+                        <div class="card-label"><i class='bx bx-file'></i> Document</div>
+                        <div class="card-value" style="font-size:0.95rem;word-break:break-all;">${a.fileName}</div>
+                        <div style="margin-top:0.35rem;font-size:0.75rem;color:var(--text-muted);">
+                            ${(a.fileType || 'unknown').toUpperCase()} • ${new Date(a.createdAt).toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'})}
+                        </div>
+                    </div>
+
+                    <!-- Document Type -->
+                    <div class="analysis-card">
+                        <div class="card-label"><i class='bx bx-category'></i> Document Type</div>
+                        <div class="card-value" style="display:flex;align-items:center;gap:0.5rem;">
+                            <i class='bx ${getDocTypeIcon(a.documentType)}' style="font-size:1.3rem;color:var(--primary-color)"></i>
+                            ${a.documentType || 'Unknown'}
+                        </div>
+                    </div>
+
+                    <!-- Department -->
+                    <div class="analysis-card">
+                        <div class="card-label"><i class='bx bx-buildings'></i> Related Department</div>
+                        <div style="margin-top:0.25rem;">
+                            <span class="dept-badge ${deptClass}" style="font-size:0.85rem;padding:0.4rem 0.8rem;">
+                                <i class='bx ${getDeptIcon(a.department)}'></i> ${a.department || 'General'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- AI Summary -->
+                    <div class="analysis-card">
+                        <div class="card-label"><i class='bx bx-brain'></i> AI Summary</div>
+                        <div class="card-value-sm">${a.aiSummary || a.summary || 'No summary available.'}</div>
+                    </div>
+
+                    <!-- Confidence Score -->
+                    <div class="analysis-card">
+                        <div class="card-label"><i class='bx bx-target-lock'></i> Classification Confidence</div>
+                        <div class="confidence-container">
+                            <div class="confidence-bar-bg">
+                                <div class="confidence-bar-fill ${confClass}" style="width:${confPct}%"></div>
+                            </div>
+                            <div class="confidence-label">
+                                <span class="confidence-text">${confLabel}</span>
+                                <span class="confidence-pct" style="color: ${confPct >= 75 ? 'var(--success-color)' : confPct >= 45 ? 'var(--warning-color)' : 'var(--danger-color)'}">${confPct}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Keywords -->
+                    <div class="analysis-card">
+                        <div class="card-label"><i class='bx bx-hash'></i> Extracted Keywords</div>
+                        <div class="keywords-container">
+                            ${(a.keywords || []).map(k => `<span class="keyword-pill">${k}</span>`).join('')}
+                            ${(!a.keywords || a.keywords.length === 0) ? '<span style="color:var(--text-muted);font-size:0.8rem;">No keywords extracted</span>' : ''}
+                        </div>
+                    </div>
+
+                    <!-- Routed To -->
+                    <div class="analysis-card">
+                        <div class="card-label"><i class='bx bx-send'></i> Auto-Routed To</div>
+                        ${a.routedTo
+                            ? `<div class="routed-user">
+                                <img class="routed-avatar" src="https://ui-avatars.com/api/?name=${encodeURIComponent(a.routedTo.username)}&background=6366f1&color=fff&size=64" alt="${a.routedTo.username}">
+                                <div class="routed-info">
+                                    <div class="routed-name">${a.routedTo.username}</div>
+                                    <div class="routed-role">${(a.routedTo.role || '').replace(/([A-Z])/g, ' $1').trim()}</div>
+                                </div>
+                              </div>`
+                            : `<div style="color:var(--text-muted);font-size:0.85rem;">Routed to Administrator</div>`
+                        }
+                    </div>
+
+                    <!-- Status -->
+                    <div class="analysis-card">
+                        <div class="card-label"><i class='bx bx-check-shield'></i> Current Status</div>
+                        <div class="card-value" style="text-transform:capitalize;font-size:1rem;">${a.status}</div>
+                    </div>
+                `;
+            } catch (err) {
+                console.error("Analysis fetch error:", err);
+                body.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--danger-color);"><i class='bx bx-error-circle' style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Error loading analysis</div>`;
+            }
+        }
+
+        function closeAnalysisPanel() {
+            document.getElementById('analysisOverlay').classList.remove('active');
+            document.getElementById('analysisPanel').classList.remove('active');
+        }
+
+        // ─── Document Actions ────────────────────────────────────
         async function uploadDocument(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
@@ -768,6 +1268,9 @@
             }
 
             try {
+                const btn = document.getElementById('uploadBtn');
+                if (btn) { btn.disabled = true; btn.innerHTML = `<i class='bx bx-loader-alt bx-spin' style="font-size:1.2rem"></i> Uploading & Analyzing...`; }
+
                 const response = await fetch("/api/documents/upload", {
                     method: "POST",
                     body: formData
@@ -782,20 +1285,23 @@
                     data = { message: text };
                 }
 
-                console.log("Upload response:", response.status, data);
-
                 if (response.ok) {
-                    console.log("Document uploaded")
-                    fetchDocuments(); // refresh list
+                    showToast(`${files.length} document${files.length > 1 ? 's' : ''} uploaded! AI is analyzing...`);
+                    fetchDocuments();
+
+                    // Auto-refresh after a delay to pick up AI analysis results
+                    setTimeout(() => fetchDocuments(), 5000);
+                    setTimeout(() => fetchDocuments(), 12000);
                 } else {
-                    alert("Upload Failed: " + (data.message || "Unknown error"));
+                    showToast("Upload Failed: " + (data.message || "Unknown error"), true);
                 }
             } catch (err) {
                 console.error("Fetch error:", err);
-                alert("Upload Failed: " + err.message);
+                showToast("Upload Failed: " + err.message, true);
             } finally {
-                // Clear the input so the same file can be uploaded again
                 event.target.value = "";
+                const btn = document.getElementById('uploadBtn');
+                if (btn) { btn.disabled = false; btn.innerHTML = `<i class="bx bx-upload" style="font-size:1.2rem"></i> Upload Document`; }
             }
         }
 
@@ -812,27 +1318,87 @@
             try {
                 const response = await fetch(`/api/documents/${id}`, { method: 'DELETE' });
                 if (response.ok) {
-                    fetchDocuments(); // refresh list
+                    showToast("Document deleted successfully");
+                    fetchDocuments();
                 } else {
-                    alert("Failed to delete document");
+                    showToast("Failed to delete document", true);
                 }
             } catch (err) {
                 console.error(err);
-                alert("Error deleting document");
+                showToast("Error deleting document", true);
             }
         }
 
-        // Initialize documents
-        document.addEventListener("DOMContentLoaded", fetchDocuments);
+        // ─── Re-analyze Functions ─────────────────────────────────
+        async function reanalyzeSingle(docId) {
+            try {
+                showToast('Starting AI re-analysis...');
+                const res = await fetch(`/api/documents/${docId}/reanalyze`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Re-analysis started! Refreshing...');
+                    setTimeout(() => fetchDocuments(), 2000);
+                    setTimeout(() => fetchDocuments(), 8000);
+                    setTimeout(() => fetchDocuments(), 15000);
+                } else {
+                    showToast(data.message || 'Re-analysis failed', true);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Error starting re-analysis', true);
+            }
+        }
+
+        async function reanalyzeAllDocs() {
+            if (!confirm('Re-analyze all stuck/unanalyzed documents with AI?')) return;
+            try {
+                const btn = document.getElementById('reanalyzeAllBtn');
+                if (btn) { btn.disabled = true; btn.innerHTML = `<i class='bx bx-loader-alt bx-spin' style="font-size:1.2rem"></i> Analyzing...`; }
+
+                showToast('Starting bulk AI re-analysis...');
+                const res = await fetch('/api/documents/reanalyze', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message);
+                    setTimeout(() => fetchDocuments(), 3000);
+                    setTimeout(() => fetchDocuments(), 10000);
+                    setTimeout(() => fetchDocuments(), 20000);
+                    setTimeout(() => fetchDocuments(), 30000);
+                } else {
+                    showToast(data.message || 'Re-analysis failed', true);
+                }
+
+                if (btn) { btn.disabled = false; btn.innerHTML = `<i class="bx bx-refresh" style="font-size:1.2rem"></i> Re-analyze All`; }
+            } catch (err) {
+                console.error(err);
+                showToast('Error starting bulk re-analysis', true);
+                const btn = document.getElementById('reanalyzeAllBtn');
+                if (btn) { btn.disabled = false; btn.innerHTML = `<i class="bx bx-refresh" style="font-size:1.2rem"></i> Re-analyze All`; }
+            }
+        }
+
+        // ─── Filter & Search Event Listeners ─────────────────────
+        document.getElementById('searchInput').addEventListener('input', () => { currentPage = 1; renderDocuments(); });
+        document.getElementById('filterDepartment').addEventListener('change', () => { currentPage = 1; renderDocuments(); });
+        document.getElementById('filterStatus').addEventListener('change', () => { currentPage = 1; renderDocuments(); });
+        document.getElementById('filterType').addEventListener('change', () => { currentPage = 1; renderDocuments(); });
+
+        // Keyboard shortcut: Escape closes panel
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeAnalysisPanel();
+        });
 
         // Search UI effects
-        const searchInput = document.querySelector('.search-container input');
+        const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('focus', () => {
             document.querySelector('.search-container i').style.color = 'var(--primary-color)';
         });
         searchInput.addEventListener('blur', () => {
             document.querySelector('.search-container i').style.color = 'var(--text-muted)';
         });
+
+        // Initialize documents
+        document.addEventListener("DOMContentLoaded", fetchDocuments);
     </script>
 </body>
 

@@ -37,6 +37,31 @@ const documentSchema = new mongoose.Schema(
       default: []
     },
 
+    documentType: {
+      type: String,
+      default: ""
+    },
+
+    department: {
+      type: String,
+      default: ""
+    },
+
+    aiSummary: {
+      type: String,
+      default: ""
+    },
+
+    routedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    },
+
+    confidence: {
+      type: Number,
+      default: 0
+    },
+
     status: {
       type: String,
       enum: ["pending", "processing", "review", "approved", "rejected", "changes_requested", "archived"],

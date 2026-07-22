@@ -2,15 +2,42 @@ const mongoose = require("mongoose");
 const Approval = require("../models/approval.model");
 const Document = require("../models/document.model");
 const Activity = require("../models/activity.model");
+const { getRoleForDepartment, DEPARTMENT_ROLE_MAP } = require("../services/ai.service");
 
 // Fetch pending approvals
+// Department managers only see documents routed to their department
 exports.getPendingApprovals = async (req, res) => {
   try {
-    const pendingDocs = await Document.find({ status: "pending" })
+    const userRole = req.userRole || req.user.role;
+    const userId = req.user.id;
+
+    let query = { status: "pending" };
+
+    // If user is not admin, filter to show only documents routed to them
+    if (userRole !== "admin") {
+      // Find departments this role manages
+      const managedDepts = Object.entries(DEPARTMENT_ROLE_MAP)
+        .filter(([, role]) => role === userRole)
+        .map(([dept]) => dept);
+
+      if (managedDepts.length > 0) {
+        // Show docs routed to this user OR docs in their managed departments
+        query.$or = [
+          { routedTo: new mongoose.Types.ObjectId(userId) },
+          { department: { $in: managedDepts } }
+        ];
+      } else {
+        // General manager or roles not in the map — show docs routed to them
+        query.routedTo = new mongoose.Types.ObjectId(userId);
+      }
+    }
+
+    const pendingDocs = await Document.find(query)
       .populate("userId", "username email")
+      .populate("routedTo", "username email role")
       .sort({ createdAt: -1 });
 
-    // Format the response to match the frontend expectations
+    // Format the response to include AI analysis fields
     const documents = pendingDocs.map(doc => ({
         _id: doc._id,
         fileName: doc.fileName,
@@ -20,6 +47,16 @@ exports.getPendingApprovals = async (req, res) => {
         status: doc.status,
         summary: doc.summary,
         keywords: doc.keywords,
+        documentType: doc.documentType || "Unknown",
+        department: doc.department || "General",
+        aiSummary: doc.aiSummary || doc.summary || "",
+        confidence: doc.confidence || 0,
+        routedTo: doc.routedTo ? {
+          _id: doc.routedTo._id,
+          username: doc.routedTo.username,
+          email: doc.routedTo.email,
+          role: doc.routedTo.role
+        } : null
     }));
 
     res.json({ success: true, documents });
