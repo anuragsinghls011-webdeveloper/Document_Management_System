@@ -966,10 +966,24 @@
             setTimeout(() => toast.classList.remove('show'), 3500);
         }
 
-        // ─── Fetch & Render ──────────────────────────────────────
+        let searchTimeout;
+
         async function fetchDocuments() {
             try {
-                const response = await fetch("/api/documents?all=true");
+                const searchVal = document.getElementById('searchInput').value.trim();
+                const deptVal = document.getElementById('filterDepartment').value;
+                const statusVal = document.getElementById('filterStatus').value;
+                const typeVal = document.getElementById('filterType').value;
+                
+                const params = new URLSearchParams();
+                if (searchVal) params.append('q', searchVal);
+                if (deptVal) params.append('department', deptVal);
+                if (statusVal) params.append('status', statusVal);
+                if (typeVal) params.append('type', typeVal);
+                
+                const url = params.toString() ? `/api/documents/search?${params.toString()}` : `/api/documents?all=true`;
+                
+                const response = await fetch(url);
                 allDocuments = await response.json();
                 currentPage = 1;
                 renderDocuments();
@@ -980,25 +994,7 @@
         }
 
         function getFilteredDocuments() {
-            let docs = [...allDocuments];
-            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
-            const deptVal = document.getElementById('filterDepartment').value;
-            const statusVal = document.getElementById('filterStatus').value;
-            const typeVal = document.getElementById('filterType').value;
-
-            if (searchVal) {
-                docs = docs.filter(d =>
-                    (d.fileName || '').toLowerCase().includes(searchVal) ||
-                    (d.documentType || '').toLowerCase().includes(searchVal) ||
-                    (d.department || '').toLowerCase().includes(searchVal) ||
-                    (d.keywords || []).some(k => k.toLowerCase().includes(searchVal))
-                );
-            }
-            if (deptVal) docs = docs.filter(d => d.department === deptVal);
-            if (statusVal) docs = docs.filter(d => d.status === statusVal);
-            if (typeVal) docs = docs.filter(d => (d.fileType || '').toLowerCase() === typeVal);
-
-            return docs;
+            return allDocuments;
         }
 
         function renderDocuments() {
@@ -1378,10 +1374,15 @@
         }
 
         // ─── Filter & Search Event Listeners ─────────────────────
-        document.getElementById('searchInput').addEventListener('input', () => { currentPage = 1; renderDocuments(); });
-        document.getElementById('filterDepartment').addEventListener('change', () => { currentPage = 1; renderDocuments(); });
-        document.getElementById('filterStatus').addEventListener('change', () => { currentPage = 1; renderDocuments(); });
-        document.getElementById('filterType').addEventListener('change', () => { currentPage = 1; renderDocuments(); });
+        document.getElementById('searchInput').addEventListener('input', () => { 
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fetchDocuments();
+            }, 300);
+        });
+        document.getElementById('filterDepartment').addEventListener('change', fetchDocuments);
+        document.getElementById('filterStatus').addEventListener('change', fetchDocuments);
+        document.getElementById('filterType').addEventListener('change', fetchDocuments);
 
         // Keyboard shortcut: Escape closes panel
         document.addEventListener('keydown', (e) => {

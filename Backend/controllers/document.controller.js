@@ -296,27 +296,33 @@ exports.search = async (req, res) => {
 
     const query = isAdmin ? {} : { userId };
 
-
     if (q && q.trim() !== "") {
-      query.fileName = { $regex: escapeRegex(q), $options: "i" };
+      const qRegex = new RegExp(escapeRegex(q.trim()), "i");
+      query.$or = [
+        { fileName: qRegex },
+        { documentType: qRegex },
+        { department: qRegex },
+        { keywords: qRegex }
+      ];
     }
-
 
     const normalizedStatus = normalizeStatus(status);
     if (normalizedStatus) {
       query.status = normalizedStatus;
     }
 
-
     if (type && type !== "all") {
-      query.fileType = { $regex: new RegExp(`^${escapeRegex(type)}$`, "i") };
+      if (type.toLowerCase() === 'jpg') {
+        query.fileType = { $regex: new RegExp(`^(jpg|jpeg)$`, "i") };
+      } else {
+        query.fileType = { $regex: new RegExp(`^${escapeRegex(type)}$`, "i") };
+      }
     }
 
     // Department filter
     if (department && department !== "all" && department !== "") {
       query.department = department;
     }
-
 
     if (date) {
       const start = new Date(date);
