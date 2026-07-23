@@ -603,6 +603,19 @@
             animation-delay: 0.5s;
         }
 
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+        .mobile-menu-btn:hover { background: rgba(255,255,255,0.1); }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .charts-grid {
@@ -611,29 +624,20 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .header-actions .search-bar {
-                display: none;
-                /* Hide on mobile for simplicity */
-            }
+            .mobile-menu-btn { display: block; }
+            .sidebar { transform: translateX(-100%); box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; width: 100%; padding: 1rem; }
+            .header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .header-title { display: flex; align-items: center; gap: 1rem; width: 100%; }
+            .header-title-text h1 { font-size: 1.5rem; }
+            .header-actions { width: 100%; flex-wrap: wrap; justify-content: flex-start; gap: 1rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .header-actions .search-bar { width: 100%; }
         }
 
         @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -680,8 +684,11 @@
         <!-- Header -->
         <header class="header">
             <div class="header-title">
-                <h1>Overview Analytics</h1>
-                <p>Welcome back! Here's what's happening with your documents today.</p>
+                <button id="mobileMenuBtn" class="mobile-menu-btn"><i class='bx bx-menu'></i></button>
+                <div class="header-title-text">
+                    <h1>Overview Analytics</h1>
+                    <p>Welcome back! Here's what's happening with your documents today.</p>
+                </div>
             </div>
             <div class="header-actions">
                 <div class="search-bar">
@@ -1036,6 +1043,23 @@
             nextBtn.onclick = () => { if (currentPage < totalPages) renderTablePage(currentPage + 1); };
             controls.appendChild(nextBtn);
         }
+
+        // Mobile Sidebar Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.querySelector('.sidebar');
+        if (mobileMenuBtn && sidebar) {
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('open');
+            });
+        }
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && sidebar && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
 
         document.addEventListener("DOMContentLoaded", loadDashboardData);
     </script>

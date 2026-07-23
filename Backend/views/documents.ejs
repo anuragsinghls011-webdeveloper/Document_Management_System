@@ -760,6 +760,19 @@
             to { opacity: 1; }
         }
 
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+        .mobile-menu-btn:hover { background: rgba(255,255,255,0.1); }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .toolbar {
@@ -771,8 +784,14 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; width: 100%; }
+            .mobile-menu-btn { display: block; }
+            .sidebar { transform: translateX(-100%); box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; width: 100%; padding: 1rem; }
+            .header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .header-title { display: flex; align-items: center; gap: 1rem; width: 100%; }
+            .header-title-text h1 { font-size: 1.5rem; }
+            .header-actions { width: 100%; flex-wrap: wrap; justify-content: flex-start; gap: 1rem; }
             table th:nth-child(3), table td:nth-child(3),
             table th:nth-child(4), table td:nth-child(4) { display: none; }
             .analysis-panel { width: 100vw; max-width: 100vw; }
@@ -816,8 +835,11 @@
         <!-- Header -->
         <header class="header">
             <div class="header-title">
-                <h1>Document Repository</h1>
-                <p>AI-powered analysis, classification, and automatic department routing.</p>
+                <button id="mobileMenuBtn" class="mobile-menu-btn"><i class='bx bx-menu'></i></button>
+                <div class="header-title-text">
+                    <h1>Document Repository</h1>
+                    <p>AI-powered analysis, classification, and automatic department routing.</p>
+                </div>
             </div>
             <div class="header-actions">
                 <% if (typeof userRole !== 'undefined' && ['admin', 'editor', 'financeManager', 'hrManager', 'generalManager'].includes(userRole)) { %>
@@ -1396,6 +1418,23 @@
         });
         searchInput.addEventListener('blur', () => {
             document.querySelector('.search-container i').style.color = 'var(--text-muted)';
+        });
+
+        // Mobile Sidebar Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.querySelector('.sidebar');
+        if (mobileMenuBtn && sidebar) {
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('open');
+            });
+        }
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && sidebar && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
         });
 
         // Initialize documents

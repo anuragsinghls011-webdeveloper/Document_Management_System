@@ -358,6 +358,31 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+        .mobile-menu-btn:hover { background: rgba(255,255,255,0.1); }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: block; }
+            .sidebar { transform: translateX(-100%); box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; width: 100%; padding: 1rem; }
+            .header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .header-title { display: flex; align-items: center; gap: 1rem; width: 100%; }
+            .header-title-text h1 { font-size: 1.5rem; }
+            .header-actions { width: 100%; justify-content: flex-start; }
+            .approvals-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -385,8 +410,11 @@
     <main class="main-content">
         <div class="header">
             <div class="header-title">
-                <h1>Pending Approvals</h1>
-                <p>Review and manage documents waiting for your approval.</p>
+                <button id="mobileMenuBtn" class="mobile-menu-btn"><i class='bx bx-menu'></i></button>
+                <div class="header-title-text">
+                    <h1>Pending Approvals</h1>
+                    <p>Review and manage documents waiting for your approval.</p>
+                </div>
             </div>
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="loadApprovals()" style="width: auto; padding: 0.6rem 1.2rem;">
@@ -574,6 +602,23 @@
         function reviewDocument(id) {
             window.location.href = `/admin/pending-docs?id=${id}`;
         }
+
+        // Mobile Sidebar Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.querySelector('.sidebar');
+        if (mobileMenuBtn && sidebar) {
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('open');
+            });
+        }
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && sidebar && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
     </script>
 </body>
 </html>
