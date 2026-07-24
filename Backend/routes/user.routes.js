@@ -8,6 +8,7 @@ const jwt=require("jsonwebtoken");
 const rateLimit = require("express-rate-limit");
 const crypto = require("crypto");
 const { sendEmail } = require("../utils/email");
+const auth = require("../middlewares/auth.middleware");
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -315,5 +316,69 @@ router.post("/reset-password/:token", async (req, res) => {
   }
 });
 
+// --- Settings Routes ---
+router.put(
+  "/api/settings/profile",
+  auth,
+  body("username").optional().trim().isLength({ min: 3 }),
+  body("email").optional().trim().isEmail(),
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-module.exports=router;
+      const { username, email } = req.body;
+      const user = await User.findById(req.user._id);
+
+      if (username) {
+        const existingUsername = await User.findOne({ username, _id: { $ne: user._id } });
+        if (existingUsername) return res.status(400).json({ message: "Username already taken" });
+        user.username = username;
+      }
+      
+      if (email) {
+        const existingEmail = await User.findOne({ email, _id: { $ne: user._id } });
+        if (existingEmail) return res.status(400).json({ message: "Email already taken" });
+        user.email = email;
+      }
+
+      await user.save();
+      res.json({ message: "Profile updated successfully", user: { username: user.username, email: user.email } });
+    } catch (error) {
+      console.error("Profile update error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+);
+
+router.put(
+  "/api/settings/password",
+  auth,
+  body("currentPassword").notEmpty(),
+  body("newPassword").isLength({ min: 8 })
+    .matches(/[A-Z]/)
+    .matches(/[a-z]/)
+    .matches(/[0-9]/),
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array(), message: "Invalid new password format" });
+
+      const { currentPassword, newPassword } = req.body;
+      const user = await User.findById(req.user._id);
+
+      const isValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isValid) return res.status(400).json({ message: "Incorrect current password" });
+
+      user.password = await bcrypt.hash(newPassword, 10);
+      await user.save();
+
+      res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      console.error("Password update error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+);
+
+module.exports = router;

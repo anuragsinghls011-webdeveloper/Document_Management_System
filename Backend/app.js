@@ -68,6 +68,7 @@ app.use("/dashboard", dashboardRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/documents", documentsRoute);
 app.get("/analytics", auth, (req, res) => res.render("analytics"));
+app.get("/settings", auth, (req, res) => res.render("setting", { user: req.user }));
 app.get("/approvals", auth, roleAuth(["admin", "GM"]), (req, res) => res.render("approvals"));
 app.use("/api/approvals", approvalsApiRoutes);
 app.use("/api/analytics", analyticsRoutes);
