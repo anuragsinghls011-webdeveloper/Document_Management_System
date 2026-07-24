@@ -4,14 +4,14 @@
 */
 
 :root {
-  --bg: #05070a;
-  --bg-2: #0b1018;
-  --bg-3: #111827;
+  --bg: #09090b;
+  --bg-2: #18181b;
+  --bg-3: #27272a;
   --surface: rgba(255, 255, 255, 0.04);
-  --surface-strong: rgba(14, 19, 28, 0.92);
+  --surface-strong: rgba(24, 24, 27, 0.92);
   --surface-soft: rgba(255, 255, 255, 0.025);
   --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(79, 139, 255, 0.24);
+  --border-strong: rgba(255, 255, 255, 0.24);
   --text: #ffffff;
   --muted: #b6bcc8;
   --muted-2: #8c94a3;
@@ -40,8 +40,8 @@ body {
   color: var(--text);
   font-family: Inter, Geist, "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background:
-    radial-gradient(1100px 620px at 12% -12%, rgba(79, 139, 255, 0.14), transparent 60%),
-    radial-gradient(1000px 620px at 88% 6%, rgba(138, 92, 255, 0.12), transparent 64%),
+    radial-gradient(1100px 620px at 12% -12%, rgba(255, 255, 255, 0.03), transparent 60%),
+    radial-gradient(1000px 620px at 88% 6%, rgba(255, 255, 255, 0.04), transparent 64%),
     linear-gradient(135deg, var(--bg), var(--bg-2) 46%, var(--bg-3));
   overflow-x: hidden;
   opacity: 0;
