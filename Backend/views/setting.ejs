@@ -263,7 +263,7 @@
                     </div>
                     <div class="form-group">
                         <label>Role</label>
-                        <input type="text" class="form-control" value="<%= user.role.toUpperCase() %>" disabled style="opacity: 0.6; cursor: not-allowed;">
+                        <input type="text" class="form-control" value="<%= (user && user.role) ? user.role.toUpperCase() : 'USER' %>" disabled style="opacity: 0.6; cursor: not-allowed;">
                     </div>
                     <button type="submit" class="btn-primary">
                         <i class='bx bx-save'></i> Save Profile
