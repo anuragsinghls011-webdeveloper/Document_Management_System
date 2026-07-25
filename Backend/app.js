@@ -113,6 +113,30 @@ if (require.main === module) {
         reanalyzeStuckDocuments().catch(err =>
           console.error("Startup reanalyze failed:", err)
         );
+
+        // Start email watcher if configured (EMAIL_PROVIDER env var)
+        // Runs in background — does not block server startup.
+        // If EMAIL_PROVIDER is empty/unset, this is a no-op.
+        if (process.env.EMAIL_PROVIDER) {
+          const emailWatcher = require("./services/emailWatcher");
+          emailWatcher.start().catch(err =>
+            console.error("Email watcher startup failed:", err.message)
+          );
+
+          // Graceful shutdown: stop the email watcher before the process exits
+          // so we don't leave dangling IMAP connections or half-processed emails.
+          const shutdown = async (signal) => {
+            console.log(`\n${signal} received — shutting down email watcher...`);
+            try {
+              await emailWatcher.stop();
+            } catch (err) {
+              console.error("Email watcher shutdown error:", err.message);
+            }
+            process.exit(0);
+          };
+          process.on("SIGTERM", () => shutdown("SIGTERM"));
+          process.on("SIGINT", () => shutdown("SIGINT"));
+        }
       });
     })
     .catch((error) => {
@@ -122,3 +146,4 @@ if (require.main === module) {
 }
 
 module.exports = app;
+

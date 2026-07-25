@@ -23,14 +23,21 @@
     "express-rate-limit": "^8.6.0",
     "express-validator": "^7.3.1",
     "form-data": "^4.0.6",
+    "googleapis": "^173.0.0",
     "helmet": "^8.3.0",
+    "imapflow": "^1.5.0",
     "jsonwebtoken": "^9.0.3",
+    "mailparser": "^3.9.14",
     "mongoose": "^9.0.2",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "nodemailer": "^9.0.3",
     "nodemon": "^3.1.11",
     "pdf-parse": "^1.1.1",
-    "tesseract.js": "^7.0.0"
+    "tesseract.js": "^7.0.0",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }

@@ -556,3 +556,7 @@ async function reanalyzeStuckDocuments() {
 // Export for use in app.js startup
 exports.reanalyzeStuckDocuments = reanalyzeStuckDocuments;
 
+// Export for use by email ingestion service — allows email-sourced documents
+// to flow through the same AI enrichment pipeline as manually uploaded ones.
+exports.queueDocumentEnrichment = queueDocumentEnrichment;
+
