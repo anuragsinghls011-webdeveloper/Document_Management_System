@@ -17,6 +17,11 @@ const documentSchema = new mongoose.Schema(
       type: String
     },
 
+    fileHash: {
+      type: String,
+      sparse: true
+    },
+
     filePath: {
       type: String,
       required: true
@@ -99,5 +104,6 @@ documentSchema.index({
 
 documentSchema.index({ userId: 1, createdAt: -1 });
 documentSchema.index({ userId: 1, status: 1, createdAt: -1 });
+documentSchema.index({ fileHash: 1 });
 
 module.exports = mongoose.model("Document", documentSchema);

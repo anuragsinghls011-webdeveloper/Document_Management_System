@@ -340,7 +340,7 @@ async function saveAttachment(buffer, originalName, mimeType) {
  * @param {Date} params.receivedAt - When the email was received
  * @returns {Promise<Object>} The created Document record
  */
-async function ingestAttachment({ filePath, originalName, sender, subject, receivedAt }) {
+async function ingestAttachment({ filePath, originalName, sender, subject, receivedAt, fileHash }) {
   const botUser = await getOrCreateBotUser();
 
   const fileType = path.extname(originalName).replace(/^\./, '').toLowerCase() || 'unknown';
@@ -350,6 +350,7 @@ async function ingestAttachment({ filePath, originalName, sender, subject, recei
     userId: botUser._id,
     fileName: originalName,
     fileType,
+    fileHash,
     filePath,
     extractedText: '',
     summary: '',
@@ -464,6 +465,26 @@ async function processEmail(email) {
         continue;
       }
 
+      // Check for duplicate file content using SHA-256 hash
+      const fileHash = crypto.createHash('sha256').update(attachment.content).digest('hex');
+      const existingDoc = await Document.findOne({ fileHash });
+
+      if (existingDoc) {
+        console.warn(`${logPrefix} Skipping attachment "${resolvedName}" — duplicate file detected (hash match)`);
+        
+        const botUser = await getOrCreateBotUser();
+        await Activity.create({
+          user: botUser._id,
+          action: 'Email ingestion: duplicate blocked',
+          entityType: 'Document',
+          entityName: resolvedName,
+          comment: `From: ${(email.sender || 'unknown').substring(0, 200)} | Blocked identical file: ${existingDoc.fileName}`
+        });
+
+        result.skipped++;
+        continue;
+      }
+
       // Save to disk
       const saved = await saveAttachment(attachment.content, attachment.filename, attachment.mimeType);
 
@@ -474,6 +495,7 @@ async function processEmail(email) {
         sender: email.sender,
         subject: email.subject,
         receivedAt: email.receivedAt,
+        fileHash,
       });
 
       result.documentIds.push(doc._id.toString());
