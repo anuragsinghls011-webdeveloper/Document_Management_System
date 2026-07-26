@@ -90,6 +90,46 @@
             pointer-events: none;
             /* Let clicks pass through */
         }
+        .underline-animation {
+            position: relative;
+            display: inline-block;
+        }
+        /* .underline-animation a::before {
+            content: '';
+            position: absolute;
+            bottom: 1.8px;
+            width: 0%;
+            height: 2px;
+            background-color: #fff;
+            
+
+        }
+
+        .underline-animation a:hover::before {
+            width: 100%;
+            
+            transition: width 0.4s ease-in-out ;
+            
+
+        } */
+         .underline-animation a::before {
+            content: '';
+            position: absolute;
+            bottom: 1.8px;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(to left, #fff 50%, transparent 50%);
+            
+
+        }
+
+        .underline-animation a:hover::before {
+            width: 100%;
+            
+            transition: width 0.6s ease-in-out ;
+            
+
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -108,21 +148,26 @@
                     </a>
 
                     <!-- Desktop Menu -->
-                    <div class="hidden md:flex space-x-6">
-                        <a href="#features"
-                            class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Dashboard</a>
-                        <a href="#pricing"
-                            class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Analytics</a>
-                        <a href="#compare"
-                            class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Workflows</a>
-                        <a href="#" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">About
-                            Us</a>
+                    <div class="hidden md:flex space-x-6 ">
+                        <div class="underline-animation-dash underline-animation"> <a href="#features"
+                                class="text-sm font-medium text-zinc-400 hover:text-white transition-colors myclass">Dashboard</a>
+                        </div>
+                        <div class="underline-animation-ana underline-animation"><a href="#pricing"
+                                class="text-sm font-medium text-zinc-400 hover:text-white transition-colors myclass">Analytics</a>
+                        </div>
+                        <div class="underline-animation-work underline-animation"> <a href="#compare"
+                                class="text-sm font-medium text-zinc-400 hover:text-white transition-colors myclass">Workflows</a>
+                        </div>
+                        <div class="underline-animation-about underline-animation"> <a href="#"
+                                class="text-sm font-medium text-zinc-400 hover:text-white transition-colors myclass">AboutUs</a>
+                            </div>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="flex items-center space-x-4">
-                    <button class="hidden md:block p-2 text-zinc-400 hover:text-white transition-colors">
+                    <button type="button" title="Search"
+                        class="hidden md:block p-2 text-zinc-400 hover:text-white transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -154,12 +199,11 @@
             <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
                 <a href="/register"
                     class="bg-zinc-100 text-zinc-950 px-8 py-4 text-sm font-semibold rounded hover:bg-white transition-colors flex items-center justify-center gap-2">
-                    Let's Start
-                </a>
-                <a href="/login"
-                    class="border-thin px-8 py-4 text-sm font-semibold rounded hover:bg-zinc-900 transition-colors flex items-center justify-center gap-2">
-                    Explore the Vault <span class="font-mono text-xs ml-2">↓</span>
-                </a>
+                    Let`s Drive in..
+                    <a href="/login"
+                        class="border-thin px-8 py-4 text-sm font-semibold rounded hover:bg-zinc-900 transition-colors flex items-center justify-center gap-2">
+                        Explore the Vault <span class="font-mono text-xs ml-2">↓</span>
+                    </a>
             </div>
         </section>
 
