@@ -24,9 +24,11 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user"
-    }
+      enum: ["user", "admin", "editor", "viewer", "financeManager", "hrManager", "auditManager", "generalManager"],
+      default: "viewer"
+    },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date
   },
   { timestamps: true }
 );
@@ -34,4 +36,4 @@ const userSchema = new mongoose.Schema(
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 module.exports = User;
-module.exports.user = User;
+

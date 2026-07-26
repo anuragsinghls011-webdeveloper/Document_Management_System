@@ -1,3 +1,5 @@
+// NOTE: register() and login() in this file are NOT currently used.
+// Auth is handled inline in routes/user.routes.js. Only logout() and me() may be useful.
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");

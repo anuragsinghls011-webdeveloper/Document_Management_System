@@ -4,31 +4,75 @@ const morgan = require('morgan');
 const connectDB = require('./config/db');
 const cookieParser = require("cookie-parser");
 const path = require("path");
+const helmet = require("helmet");
 
 const userRouter = require("./routes/user.routes");
 const adminRoutes = require("./routes/admin.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const documentRoutes = require("./routes/document.routes");
 const activityRoutes = require("./routes/activity.routes");
+const documentsRoute = require('./routes/documents.routes');
+const workflowsRoute = require('./routes/workflows.routes');
+const analyticsRoutes = require('./routes/analytics.routes');
+const approvalsApiRoutes = require('./routes/approvals.routes');
 const auth = require("./middlewares/auth.middleware");
 const adminOnly = require("./middlewares/admin.middleware");
+const roleAuth = require("./middlewares/role.middleware");
+
+const cors = require("cors");
+const mongoSanitize = require("express-mongo-sanitize");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
+const isProduction = process.env.NODE_ENV === "production";
+
+function validateConfig() {
+  const required = ["MONGO_URI", "JWT_SECRET"];
+  const missing = required.filter((key) => !process.env[key]);
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(", ")}`);
+  }
+}
 
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.set("trust proxy", isProduction ? 1 : 0);
+
+// Global Security Middleware
+app.use(cors());
+app.use(mongoSanitize());
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many requests from this IP, please try again later." }
+});
+app.use(globalLimiter);
 
 app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 app.use(cookieParser());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/assets", express.static(path.join(__dirname, "public")));
 
 app.use("/", userRouter);
 app.get("/dashboard", auth, (req, res) => res.render("dashboard"));
-app.get("/admin/pending-docs", auth, adminOnly, (req, res) => res.render("admin.dashboard"));
+app.get("/admin/dashboard", auth, adminOnly, (req, res) => res.render("admin.dashboard"));
+app.get("/admin/pending-docs", auth, adminOnly, (req, res) => res.render("admin/pending-docs"));
 app.use("/dashboard", dashboardRoutes);
-app.use("/documents", documentRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/documents", documentsRoute);
+app.get("/analytics", auth, (req, res) => res.render("analytics"));
+app.get("/settings", auth, (req, res) => res.render("setting", { user: req.user }));
+app.get("/approvals", auth, roleAuth(["admin", "GM"]), (req, res) => res.render("approvals"));
+app.use("/api/approvals", approvalsApiRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/", workflowsRoute); // workflows APIs and view
 app.use("/", activityRoutes);
 app.use("/admin", adminRoutes);
 
@@ -36,12 +80,70 @@ app.get('/', (req, res) => {
   res.render('home');
 });
 
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
+
+app.use((err, req, res, next) => {
+  if (err && err.name === "MulterError") {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(413).json({ message: "Each file must be 10MB or smaller" });
+    }
+
+    if (err.code === "LIMIT_FILE_COUNT" || err.code === "LIMIT_UNEXPECTED_FILE") {
+      return res.status(400).json({ message: "Unsupported file type or too many files uploaded" });
+    }
+  }
+
+  console.error("UNHANDLED ERROR", err);
+  res.status(err.status || 500).json({ message: err.message || "Internal server error" });
+});
+
 const PORT = process.env.PORT || 3000;
 if (require.main === module) {
-  connectDB();
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+  validateConfig();
+
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+
+        // Auto-fix stuck documents on startup
+        const { reanalyzeStuckDocuments } = require("./controllers/document.controller");
+        reanalyzeStuckDocuments().catch(err =>
+          console.error("Startup reanalyze failed:", err)
+        );
+
+        // Start email watcher if configured (EMAIL_PROVIDER env var)
+        // Runs in background — does not block server startup.
+        // If EMAIL_PROVIDER is empty/unset, this is a no-op.
+        if (process.env.EMAIL_PROVIDER) {
+          const emailWatcher = require("./services/emailWatcher");
+          emailWatcher.start().catch(err =>
+            console.error("Email watcher startup failed:", err.message)
+          );
+
+          // Graceful shutdown: stop the email watcher before the process exits
+          // so we don't leave dangling IMAP connections or half-processed emails.
+          const shutdown = async (signal) => {
+            console.log(`\n${signal} received — shutting down email watcher...`);
+            try {
+              await emailWatcher.stop();
+            } catch (err) {
+              console.error("Email watcher shutdown error:", err.message);
+            }
+            process.exit(0);
+          };
+          process.on("SIGTERM", () => shutdown("SIGTERM"));
+          process.on("SIGINT", () => shutdown("SIGINT"));
+        }
+      });
+    })
+    .catch((error) => {
+      console.error("Failed to start server:", error.message);
+      process.exit(1);
+    });
 }
 
 module.exports = app;
+

@@ -1,5 +1,10 @@
+const mongoose = require("mongoose");
 const Document = require("../models/document.model");
 const Activity = require("../models/activity.model");
+
+function isValidDocumentId(id) {
+  return mongoose.isValidObjectId(id);
+}
 
 //  Fetch pending documents
 exports.pendingDocs = async (req, res) => {
@@ -8,7 +13,25 @@ exports.pendingDocs = async (req, res) => {
       .populate("userId", "username email")
       .sort({ createdAt: -1 });
 
-    res.json({ success: true, documents: pendingDocs });
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const approvedToday = await Document.countDocuments({
+      status: "approved",
+      updatedAt: { $gte: startOfToday }
+    });
+
+    const rejectedToday = await Document.countDocuments({
+      status: "rejected",
+      updatedAt: { $gte: startOfToday }
+    });
+
+    res.json({ 
+      success: true, 
+      documents: pendingDocs,
+      approvedToday,
+      rejectedToday
+    });
   } catch (error) {
     console.error("PENDING DOCS ERROR:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -18,6 +41,10 @@ exports.pendingDocs = async (req, res) => {
 //  Fetch single document
 exports.getDocument = async (req, res) => {
   try {
+    if (!isValidDocumentId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid document id" });
+    }
+
     const doc = await Document.findById(req.params.id).populate("userId", "username email");
 
     if (!doc) {
@@ -31,9 +58,13 @@ exports.getDocument = async (req, res) => {
   }
 };
 
-//  Approve
+//  Approve document
 exports.approveDoc = async (req, res) => {
   try {
+    if (!isValidDocumentId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid document id" });
+    }
+
     const doc = await Document.findById(req.params.id);
 
     if (!doc) {
@@ -59,11 +90,16 @@ exports.approveDoc = async (req, res) => {
   }
 };
 
-//  Reject
+//  Reject document
 exports.rejectDoc = async (req, res) => {
   try {
     const { reason, comment } = req.body;
     const rejectionReason = reason || comment || "";
+
+    if (!isValidDocumentId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid document id" });
+    }
+
     const doc = await Document.findById(req.params.id);
 
     if (!doc) {
@@ -89,13 +125,18 @@ exports.rejectDoc = async (req, res) => {
   }
 };
 
-//  Request changes
+//  Request document changes
 exports.requestChanges = async (req, res) => {
   try {
     const { comment } = req.body;
+    const reviewComment = comment ? comment.trim() : "";
+
+    if (!isValidDocumentId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid document id" });
+    }
 
     //  Comment mandatory
-    if (!comment || comment.trim() === "") {
+    if (!reviewComment) {
       return res.status(400).json({
         success: false,
         message: "Comment is required when requesting changes"
@@ -114,14 +155,15 @@ exports.requestChanges = async (req, res) => {
 
     //  Update status
     doc.status = "changes_requested";
-    doc.reviewComment = comment.trim();
+    doc.reviewComment = reviewComment;
     await doc.save();
+
     await Activity.create({
       user: req.user.id,
       action: "Requested changes",
       entityType: "Document",
       entityName: doc.fileName,
-      comment: comment.trim()
+      comment: reviewComment
     });
 
     return res.json({

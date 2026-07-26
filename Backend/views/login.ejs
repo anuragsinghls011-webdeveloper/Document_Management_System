@@ -1,188 +1,414 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Login Page</title>
+    <title>IDMS - The Intelligent Archive | Sign In</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        base: '#09090b',
+                        surface: '#18181b',
+                        border: '#27272a',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            background-color: #09090b;
+            color: #ffffff;
+            overflow-x: hidden;
         }
 
-        .background-animation {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .background-animation span {
-            width: 20vmin;
-            height: 20vmin;
-            border-radius: 4vmin;
-            backface-visibility: hidden;
-            position: absolute;
-            animation: move linear infinite;
-            background: rgba(255, 255, 255, 0.1);
+        ::-webkit-scrollbar-track {
+            background: #09090b;
         }
 
-        .background-animation span:nth-child(0) {
-            color: #84a98c;
-            top: 68%;
-            left: 77%;
-            animation-duration: 35s;
-            animation-delay: -2s;
-            transform-origin: -15vw -1vh;
-            box-shadow: -40vmin 0 5.1119958913vmin currentColor;
-        }
-        .background-animation span:nth-child(1) {
-            color: #cad2c5;
-            top: 81%;
-            left: 88%;
-            animation-duration: 25s;
-            animation-delay: -11s;
-            transform-origin: -11vw 24vh;
-            box-shadow: 40vmin 0 5.897391942vmin currentColor;
-        }
-        .background-animation span:nth-child(2) {
-            color: #84a98c;
-            top: 52%;
-            left: 77%;
-            animation-duration: 47s;
-            animation-delay: -18s;
-            transform-origin: 11vw 12vh;
-            box-shadow: -40vmin 0 5.4801331189vmin currentColor;
-        }
-        .background-animation span:nth-child(3) {
-            color: #84a98c;
-            top: 51%;
-            left: 21%;
-            animation-duration: 24s;
-            animation-delay: -32s;
-            transform-origin: -16vw -1vh;
-            box-shadow: 40vmin 0 5.467475137vmin currentColor;
-        }
-        .background-animation span:nth-child(4) {
-            color: #52796f;
-            top: 38%;
-            left: 81%;
-            animation-duration: 42s;
-            animation-delay: -25s;
-            transform-origin: -15vw 12vh;
-            box-shadow: 40vmin 0 5.867916964vmin currentColor;
-        }
-        .background-animation span:nth-child(5) {
-            color: #cad2c5;
-            top: 54%;
-            left: 95%;
-            animation-duration: 26s;
-            animation-delay: -21s;
-            transform-origin: -11vw 19vh;
-            box-shadow: -40vmin 0 5.4419953256vmin currentColor;
-        }
-        .background-animation span:nth-child(6) {
-            color: #52796f;
-            top: 73%;
-            left: 7%;
-            animation-duration: 47s;
-            animation-delay: -26s;
-            transform-origin: -17vw -11vh;
-            box-shadow: -40vmin 0 5.1762283944vmin currentColor;
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
         }
 
-        @keyframes move {
-            100% {
-                transform: translate3d(0, 0, 1px) rotate(360deg);
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+
+        /* Input autofill styling for dark mode */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px #18181b inset !important;
+            -webkit-text-fill-color: white !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Standardize select dropdown background in some browsers */
+        select option {
+            background-color: #18181b;
+            color: #ffffff;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
-    <div class="background-animation">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
 
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-md">
-            <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-white/20">
-                <div class="text-center">
-                    <h1 class="text-3xl font-bold tracking-tight">Welcome Back</h1>
-                    <p class="text-gray-300 mt-2">Sign in to continue your journey.</p>
-                </div>
+<body class="font-sans antialiased min-h-screen flex flex-col relative selection:bg-white selection:text-black">
 
-                <!-- Flash Messages -->
-                
+    <!-- Canvas Background -->
+    <canvas id="particleCanvas" class="fixed inset-0 z-0 pointer-events-none opacity-60"></canvas>
 
-                <form class="space-y-6" action="/login" method="POST">
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-300">Email Address</label>
-                        <div class="mt-1">
-                            <input id="email" name="email" type="email" autocomplete="email" required
-                                class="w-full bg-white/10 border border-white/20 rounded-lg py-3 px-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-300">
-                        </div>
-                    </div>
+    <!-- Top Navigation -->
+    <nav
+        class="relative z-50 w-full flex items-center justify-between px-6 py-5 border-b border-white/5 backdrop-blur-sm">
+        <div class="flex items-center gap-10">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    class="text-white group-hover:scale-105 transition-transform">
+                    <rect x="12" y="2" width="14" height="14" transform="rotate(45 12 2)" stroke="currentColor"
+                        stroke-width="1.5" />
+                    <rect x="12" y="8" width="5.5" height="5.5" transform="rotate(45 12 8)" fill="currentColor" />
+                </svg>
+                <span class="font-mono text-lg tracking-widest text-white">IDMS</span>
+            </a>
 
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
-                            <a href="#" class="text-sm text-green-400 hover:text-green-300 transition duration-300">Forgot password?</a>
-                        </div>
-                        <div class="mt-1">
-                            <input id="password" name="password" type="password" autocomplete="current-password" required
-                                class="w-full bg-white/10 border border-white/20 rounded-lg py-3 px-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-300">
-                        </div>
-                    </div>
-
-                    <div>
-                        <button type="submit"
-                          class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transform hover:scale-105 transition duration-300">
-                            Sign In
-                        </button>
-                    </div>
-                </form>
-
-                <div class="flex items-center justify-center space-x-2">
-                    <span class="h-px w-16 bg-gray-500"></span>
-                    <span class="text-gray-400 font-normal">or continue with</span>
-                    <span class="h-px w-16 bg-gray-500"></span>
-                </div>
-
-                <div class="flex justify-center space-x-4">
-                    <button class="flex items-center justify-center w-12 h-12 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition duration-300 transform hover:scale-110">
-                        <svg class="w-6 h-6" viewBox="0 0 48 48">
-                            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C42.021,35.596,44,30.138,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                        </svg>
-                    </button>
-                    <button class="flex items-center justify-center w-12 h-12 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition duration-300 transform hover:scale-110">
-                        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.378.203 2.398.1 2.65.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                     <button class="flex items-center justify-center w-12 h-12 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition duration-300 transform hover:scale-110">
-                        <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
-                        </svg>
-                    </button>
-                </div>
-                
-                <p class="text-center text-gray-400 text-sm">
-                    Don't have an account? 
-                    <a href="/register" class="font-medium text-green-400 hover:text-green-300 transition duration-300">Sign up</a>
-                </p>
+            <!-- Links -->
+            <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+                <a href="/dashboard" class="hover:text-white transition-colors">Dashboard</a>
+                <a href="Analytics" class="hover:text-white transition-colors">Analytics</a>
+                <a href="Workflows" class="hover:text-white transition-colors">Workflows</a>
+                <a href="AboutUs" class="hover:text-white transition-colors">About Us</a>
             </div>
         </div>
-    </div>
+
+        <div class="flex items-center gap-6">
+            <button class="text-gray-400 hover:text-white transition-colors">
+                <i class="ph ph-magnifying-glass text-xl"></i>
+            </button>
+            <a href="/register" class="text-sm text-gray-300 hover:text-white transition-colors">Register</a>
+            <a href="/login"
+                class="bg-white text-black px-5 py-2 rounded text-sm font-medium hover:bg-gray-200 transition-colors">Sign
+                in</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-grow flex items-center justify-center px-4 py-12">
+        <div class="w-full max-w-md">
+
+            <!-- Typography Header -->
+            <div class="text-center mb-10 animate-fade-in">
+                <p class="font-mono text-[10px] tracking-[0.3em] text-gray-500 uppercase mb-4">The Intelligent Archive
+                </p>
+                <h1 class="text-4xl md:text-5xl font-serif text-white mb-2">Welcome <span
+                        class="italic text-gray-300">Back</span></h1>
+                <p class="text-sm text-gray-400 font-light mt-4 px-4">
+                    Authenticate to access your intelligent archive and continue building your knowledge graph.
+                </p>
+            </div>
+
+            <!-- Login Form -->
+            <div
+                class="bg-surface/80 backdrop-blur-xl border border-white/5 rounded-xl p-8 shadow-2xl animate-fade-in delay-100">
+
+                <!-- Global Error / Success Messages -->
+                <div id="formMessage"
+                    class="hidden mb-6 p-4 rounded text-sm flex items-start gap-3 border transition-all duration-300">
+                    <i id="formMessageIcon" class="ph text-lg mt-0.5"></i>
+                    <div id="formMessageText"></div>
+                </div>
+
+                <form id="loginForm" class="space-y-5" novalidate>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email"
+                            class="block text-xs font-mono text-gray-400 uppercase tracking-wider mb-2">Work
+                            Email</label>
+                        <input type="email" id="email" name="email" required
+                            class="w-full px-4 py-3 bg-base border border-border rounded text-sm text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all placeholder-gray-600"
+                            placeholder="Email">
+                        <p class="hidden text-red-400 text-xs mt-1 font-light" id="emailError">Please enter a valid
+                            email address</p>
+                    </div>
+
+                    <!-- Role Based Access Selection Removed -->
+
+                    <!-- Password -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="password"
+                                class="block text-xs font-mono text-gray-400 uppercase tracking-wider">Password</label>
+                            <a href="/forgot-password"
+                                class="text-xs text-gray-500 hover:text-white transition-colors">Forgot
+                                password?</a>
+                        </div>
+                        <div class="relative">
+                            <input type="password" id="password" name="password" required
+                                class="w-full px-4 py-3 bg-base border border-border rounded text-sm text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all placeholder-gray-600 pr-10"
+                                placeholder="••••••••">
+                            <button type="button" id="togglePassword"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-white transition-colors focus:outline-none">
+                                <i class="ph ph-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                        <p class="hidden text-red-400 text-xs mt-1 font-light" id="passwordError">Please enter your
+                            password</p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submitBtn"
+                        class="w-full mt-8 bg-white text-black font-medium py-3 px-4 rounded transition-all duration-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base focus:ring-white flex justify-center items-center gap-2">
+                        <span>Login</span>
+                        <i class="ph ph-sign-in"></i>
+                    </button>
+
+                    <!-- Footer Link -->
+                    <p class="text-center text-xs text-gray-600 mt-6 font-light">
+                        Don't have an account? <a href="#"
+                            class="text-gray-400 hover:text-white underline decoration-gray-600 underline-offset-2 transition-colors">Register
+                            here</a>.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            /* -----------------------------------------------------------
+               1. Particle Canvas Background Animation
+            ----------------------------------------------------------- */
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+
+            let particles = [];
+            const particleCount = 70;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 3 + 1;
+                    this.speedX = Math.random() * 0.4 - 0.2;
+                    this.speedY = Math.random() * -0.5 - 0.1;
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                }
+
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+
+                    if (this.y < 0) this.y = canvas.height;
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.x > canvas.width) this.x = 0;
+                }
+
+                draw() {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.fillRect(this.x, this.y, this.size, this.size);
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                requestAnimationFrame(animateParticles);
+            }
+
+            initParticles();
+            animateParticles();
+
+            /* -----------------------------------------------------------
+               2. Form Logic & Validation
+            ----------------------------------------------------------- */
+            const form = document.getElementById('loginForm');
+            const passwordInput = document.getElementById('password');
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            const submitBtn = document.getElementById('submitBtn');
+            const formMessage = document.getElementById('formMessage');
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            let isPasswordVisible = false;
+
+            // Toggle Password
+            togglePasswordBtn.addEventListener('click', () => {
+                isPasswordVisible = !isPasswordVisible;
+                passwordInput.type = isPasswordVisible ? 'text' : 'password';
+                eyeIcon.className = isPasswordVisible ? 'ph ph-eye-slash' : 'ph ph-eye';
+            });
+
+            // Toggle Error UI
+            function toggleError(inputId, errorId, isValid) {
+                const input = document.getElementById(inputId);
+                const error = document.getElementById(errorId);
+                if (!isValid) {
+                    input.classList.add('border-red-500/50', 'focus:border-red-500', 'focus:ring-red-500');
+                    input.classList.remove('border-border', 'focus:border-white', 'focus:ring-white');
+                    error.classList.remove('hidden');
+                } else {
+                    input.classList.remove('border-red-500/50', 'focus:border-red-500', 'focus:ring-red-500');
+                    input.classList.add('border-border', 'focus:border-white', 'focus:ring-white');
+                    error.classList.add('hidden');
+                }
+            }
+
+            // Submit Handler
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                formMessage.classList.add('hidden');
+
+                const email = document.getElementById('email').value.trim();
+                const pwd = passwordInput.value;
+
+                let isValid = true;
+
+                const isEmailValid = emailRegex.test(email);
+                toggleError('email', 'emailError', isEmailValid);
+                if (!isEmailValid) isValid = false;
+
+                const isPwdValid = pwd.length > 0;
+                toggleError('password', 'passwordError', isPwdValid);
+                if (!isPwdValid) isValid = false;
+
+                if (isValid) {
+                    // Simulate Loading
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+                    submitBtn.innerHTML = `<i class="ph ph-spinner animate-spin text-xl"></i> Authenticating...`;
+
+                    fetch('/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password: pwd })
+                    })
+                        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, data })))
+                        .then(({ status, ok, data }) => {
+                            if (ok) {
+                                form.classList.add('hidden');
+                                formMessage.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                                formMessage.classList.add('bg-white/5', 'text-white', 'border-white/10', 'p-6', 'flex-col', 'items-center', 'text-center', 'animate-fade-in');
+
+                                const userRole = data.role || "User";
+                                const displayRole = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+                                document.getElementById('formMessageIcon').className = 'ph-light ph-check-circle text-4xl text-white mb-2';
+                                document.getElementById('formMessageText').innerHTML = `
+                                <h3 class="text-xl font-serif mb-2">Authentication Successful, ${data.username || displayRole}</h3>
+                                <p class="text-sm text-gray-400 font-light mb-6">Welcome back to the Vault. Redirecting to your dashboard...</p>
+                            `;
+                                setTimeout(() => {
+                                    window.location.href = data.redirect || '/dashboard';
+                                }, 1000);
+                            } else {
+                                submitBtn.disabled = false;
+                                submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                                submitBtn.innerHTML = `<span>Login</span><i class="ph ph-sign-in"></i>`;
+
+                                formMessage.classList.remove('hidden', 'bg-white/5', 'text-white', 'border-white/10', 'flex-col', 'items-center', 'text-center');
+                                formMessage.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                                document.getElementById('formMessageIcon').className = 'ph-fill ph-warning-circle text-lg mt-0.5 text-red-400';
+                                document.getElementById('formMessageText').innerHTML = data.message || "Invalid login credentials.";
+                            }
+                        })
+                        .catch(error => {
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                            submitBtn.innerHTML = `<span>Login</span><i class="ph ph-sign-in"></i>`;
+
+                            formMessage.classList.remove('hidden', 'bg-white/5', 'text-white', 'border-white/10', 'flex-col', 'items-center', 'text-center');
+                            formMessage.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                            document.getElementById('formMessageIcon').className = 'ph-fill ph-warning-circle text-lg mt-0.5 text-red-400';
+                            document.getElementById('formMessageText').innerHTML = "Network error. Please try again.";
+                        });
+                } else {
+                    // Error State
+                    formMessage.classList.remove('hidden', 'bg-white/5', 'text-white', 'border-white/10', 'flex-col', 'items-center', 'text-center');
+                    formMessage.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500/20');
+                    document.getElementById('formMessageIcon').className = 'ph-fill ph-warning-circle text-lg mt-0.5 text-red-400';
+                    document.getElementById('formMessageText').innerHTML = `Please enter valid login credentials.`;
+                }
+            });
+        });
+    </script>
 </body>
-<script></script>
+
 </html>
