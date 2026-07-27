@@ -15,6 +15,7 @@ const documentsRoute = require('./routes/documents.routes');
 const workflowsRoute = require('./routes/workflows.routes');
 const analyticsRoutes = require('./routes/analytics.routes');
 const approvalsApiRoutes = require('./routes/approvals.routes');
+const workflowApiRoutes = require('./src/routes/workflowRoutes');
 const auth = require("./middlewares/auth.middleware");
 const adminOnly = require("./middlewares/admin.middleware");
 const roleAuth = require("./middlewares/role.middleware");
@@ -71,6 +72,7 @@ app.get("/analytics", auth, (req, res) => res.render("analytics"));
 app.get("/settings", auth, (req, res) => res.render("setting", { user: req.user }));
 app.get("/approvals", auth, roleAuth(["admin", "GM"]), (req, res) => res.render("approvals"));
 app.use("/api/approvals", approvalsApiRoutes);
+app.use("/api/workflow", workflowApiRoutes); // Workflow approval engine routes
 app.use("/api/analytics", analyticsRoutes);
 app.use("/", workflowsRoute); // workflows APIs and view
 app.use("/", activityRoutes);
@@ -113,6 +115,23 @@ if (require.main === module) {
         reanalyzeStuckDocuments().catch(err =>
           console.error("Startup reanalyze failed:", err)
         );
+
+        // Start BullMQ workflow workers if Redis is configured.
+        // Workers run in-process for simplicity. For production scale,
+        // consider running them as separate Node.js processes.
+        if (process.env.REDIS_HOST) {
+          try {
+            const { startRoutingWorker } = require('./src/workers/routingWorker');
+            const { startEscalationWorker } = require('./src/workers/escalationWorker');
+            startRoutingWorker();
+            startEscalationWorker();
+            console.log('Workflow engine workers started (routing + escalation)');
+          } catch (err) {
+            console.error('Failed to start workflow workers:', err.message);
+          }
+        } else {
+          console.log('REDIS_HOST not set — workflow engine workers not started');
+        }
 
         // Start email watcher if configured (EMAIL_PROVIDER env var)
         // Runs in background — does not block server startup.

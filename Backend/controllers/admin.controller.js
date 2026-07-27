@@ -6,7 +6,7 @@ function isValidDocumentId(id) {
   return mongoose.isValidObjectId(id);
 }
 
-// Fetch pending documents
+//  Fetch pending documents
 exports.pendingDocs = async (req, res) => {
   try {
     const pendingDocs = await Document.find({ status: "pending" })
@@ -38,7 +38,7 @@ exports.pendingDocs = async (req, res) => {
   }
 };
 
-// Fetch single document
+//  Fetch single document
 exports.getDocument = async (req, res) => {
   try {
     if (!isValidDocumentId(req.params.id)) {
@@ -58,7 +58,7 @@ exports.getDocument = async (req, res) => {
   }
 };
 
-// Approve document
+//  Approve document
 exports.approveDoc = async (req, res) => {
   try {
     if (!isValidDocumentId(req.params.id)) {
@@ -90,7 +90,7 @@ exports.approveDoc = async (req, res) => {
   }
 };
 
-// Reject document
+//  Reject document
 exports.rejectDoc = async (req, res) => {
   try {
     const { reason, comment } = req.body;
@@ -125,7 +125,7 @@ exports.rejectDoc = async (req, res) => {
   }
 };
 
-// Request document changes
+//  Request document changes
 exports.requestChanges = async (req, res) => {
   try {
     const { comment } = req.body;
@@ -135,6 +135,7 @@ exports.requestChanges = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid document id" });
     }
 
+    //  Comment mandatory
     if (!reviewComment) {
       return res.status(400).json({
         success: false,
@@ -142,6 +143,7 @@ exports.requestChanges = async (req, res) => {
       });
     }
 
+    //  Find document
     const doc = await Document.findById(req.params.id);
 
     if (!doc) {
@@ -151,6 +153,7 @@ exports.requestChanges = async (req, res) => {
       });
     }
 
+    //  Update status
     doc.status = "changes_requested";
     doc.reviewComment = reviewComment;
     await doc.save();

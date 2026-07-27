@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const path = require("path");
+const crypto = require("crypto");
+const fs = require("fs");
 const Document = require("../models/document.model");
 const Approval = require("../models/approval.model");
 const Activity = require("../models/activity.model");
@@ -164,10 +166,33 @@ exports.upload = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.user.id);
 
     for (const file of req.files) {
+      // Calculate file hash
+      const fileBuffer = fs.readFileSync(file.path);
+      const fileHash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+
+      // Check for duplicate
+      const existingDoc = await Document.findOne({ fileHash });
+      if (existingDoc) {
+        console.warn(`Skipping duplicate upload "${file.originalname}" (hash match)`);
+        
+        await Activity.create({
+          user: req.user.id,
+          action: "Manual upload: duplicate blocked",
+          entityType: "Document",
+          entityName: file.originalname,
+          comment: `Blocked identical file: ${existingDoc.fileName}`
+        });
+
+        // Remove the duplicate uploaded file
+        fs.unlinkSync(file.path);
+        continue;
+      }
+
       const doc = await Document.create({
         userId,
         fileName: file.originalname,
         fileType: path.extname(file.originalname).replace(/^\./, "") || "unknown",
+        fileHash,
         filePath: `uploads/${file.filename}`,
         extractedText: "",
         summary: "",
