@@ -34,6 +34,7 @@
                 }
             }
         }
+       
     </script>
     <style>
         body {
@@ -90,10 +91,12 @@
             pointer-events: none;
             /* Let clicks pass through */
         }
+
         .underline-animation {
             position: relative;
             display: inline-block;
         }
+
         /* .underline-animation a::before {
             content: '';
             position: absolute;
@@ -112,23 +115,55 @@
             
 
         } */
-         .underline-animation a::before {
+        .underline-animation a::before {
             content: '';
             position: absolute;
             bottom: 1.8px;
             width: 0%;
             height: 2px;
             background: linear-gradient(to left, #fff 50%, transparent 50%);
-            
+
 
         }
 
         .underline-animation a:hover::before {
             width: 100%;
-            
-            transition: width 0.6s ease-in-out ;
-            
+            transition: width 0.6s ease-in-out;
+        }
 
+        .search-box {
+            display: inline-flex;
+        }
+
+        .inner-search-box {
+            display: inline-flex;
+            width: 20vw;
+        }
+        .w-5{
+            height: 20px;
+            width: 20px;
+            position: absolute;
+            transform: translate(1140%,25%);
+        }
+      
+        
+        #input-search-haeder {
+
+            text-align: left;
+            border: none;
+            outline: none;
+            border-radius: 25px;
+            border-bottom: 2px solid #b5b1b1;
+            padding: 4px;
+            padding-left: 10px;
+            margin: auto;
+            width: 100%;
+            font-size: 14px;
+            color: #bdb6b6;
+            background-color: transparent;
+        }
+        .search-icon{
+            color: #bdb6b6;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -160,19 +195,27 @@
                         </div>
                         <div class="underline-animation-about underline-animation"> <a href="#"
                                 class="text-sm font-medium text-zinc-400 hover:text-white transition-colors myclass">AboutUs</a>
-                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex items-center space-x-4">
-                    <button type="button" title="Search"
+                <div class="flex items-center space-x-4 search-box">
+                    <div class="inner-search-box"> 
+                        <input type="search" placeholder=" Search..." id="input-search-haeder">
+                        <!-- <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" class="search-icon"></path>
+                        </svg> -->
+                    </div>
+
+
+                    <!-- <button type="button" title="Search"
                         class="hidden md:block p-2 text-zinc-400 hover:text-white transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
-                    </button>
+                    </button> -->
                     <a href="/login" class="text-sm font-medium text-zinc-300 hover:text-white hidden sm:block">Sign
                         in</a>
                     <a href="/register"
