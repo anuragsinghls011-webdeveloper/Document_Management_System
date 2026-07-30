@@ -1,3 +1,5 @@
+const logger = require("../config/logger").createChildLogger("RoleAuth");
+
 module.exports = (allowedRoles) => {
   return (req, res, next) => {
     try {
@@ -11,7 +13,7 @@ module.exports = (allowedRoles) => {
 
       next();
     } catch (error) {
-      console.error("ROLE AUTH ERROR", error);
+      logger.error("Role auth error", { error: error.message });
       return res.status(500).json({ message: "Failed to verify access" });
     }
   };

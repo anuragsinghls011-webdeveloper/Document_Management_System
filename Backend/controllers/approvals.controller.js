@@ -3,6 +3,7 @@ const Approval = require("../models/approval.model");
 const Document = require("../models/document.model");
 const Activity = require("../models/activity.model");
 const { getRoleForDepartment, DEPARTMENT_ROLE_MAP } = require("../services/ai.service");
+const logger = require("../config/logger").createChildLogger("ApprovalsController");
 
 // Fetch pending approvals
 // Department managers only see documents routed to their department
@@ -61,7 +62,7 @@ exports.getPendingApprovals = async (req, res) => {
 
     res.json({ success: true, documents });
   } catch (error) {
-    console.error("GET PENDING APPROVALS ERROR:", error);
+    logger.error("Get pending approvals error", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -137,7 +138,7 @@ exports.makeDecision = async (req, res) => {
 
     res.json({ success: true, status: statusString });
   } catch (error) {
-    console.error("MAKE DECISION ERROR:", error);
+    logger.error("Make decision error", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };

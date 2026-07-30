@@ -8,6 +8,7 @@ const Activity = require("../models/activity.model");
 const User = require("../models/user.model");
 const extractText = require("../services/ocr.service");
 const { analyzeDocument, extractKeywords, generateSummary, getRoleForDepartment } = require("../services/ai.service");
+const logger = require("../config/logger").createChildLogger("DocumentController");
 
 const STATUS_ALIASES = {
   pending: "pending",
@@ -30,13 +31,14 @@ function escapeRegex(str) {
 }
 
 // ─── AI-Powered Document Enrichment ─────────────────────────────────────────
+// This function is exported so the BullMQ enrichmentWorker can call it directly.
 async function enrichDocument(docId, filePath, originalName) {
   let text = "";
 
   try {
     text = await extractText(filePath);
   } catch (err) {
-    console.error("Text extraction failed for", originalName, err);
+    logger.error("Text extraction failed", { originalName, error: err.message });
   }
 
   // Run AI analysis (Gemini or fallback)
@@ -44,7 +46,7 @@ async function enrichDocument(docId, filePath, originalName) {
   try {
     analysis = await analyzeDocument(text);
   } catch (err) {
-    console.error("AI analysis failed for", originalName, err);
+    logger.error("AI analysis failed", { originalName, error: err.message });
     analysis = {
       documentType: "Other",
       department: "General",
@@ -67,7 +69,7 @@ async function enrichDocument(docId, filePath, originalName) {
       routedToUser = await User.findOne({ role: "admin" });
     }
   } catch (err) {
-    console.error("Routing lookup failed:", err.message);
+    logger.error("Routing lookup failed", { error: err.message });
   }
 
   // Update document with all AI analysis data
@@ -112,23 +114,45 @@ async function enrichDocument(docId, filePath, originalName) {
       comment: `Type: ${analysis.documentType} | Dept: ${analysis.department} | Routed to: ${routedToName} | Confidence: ${Math.round(analysis.confidence * 100)}%`
     });
 
-    console.log(`✓ AI Analysis Complete: "${originalName}" → Type: ${analysis.documentType}, Dept: ${analysis.department}, Routed to: ${routedToName}`);
+    logger.info(`✓ AI Analysis Complete: "${originalName}" → Type: ${analysis.documentType}, Dept: ${analysis.department}, Routed to: ${routedToName}`);
   }
 }
 
-const enrichmentQueue = [];
-let isProcessingQueue = false;
+// ─── Enrichment Queue (BullMQ with in-process fallback) ─────────────────────
+//
+// When Redis is configured (REDIS_HOST), jobs are pushed to a BullMQ queue
+// that persists in Redis. The enrichmentWorker processes them.
+//
+// When Redis is NOT configured (local dev without Redis), we fall back to
+// sequential in-process execution so the system still works.
 
-async function processEnrichmentQueue() {
-  if (isProcessingQueue) return;
-  isProcessingQueue = true;
+let _bullmqAvailable = false;
+let _enrichmentQueue = null;
 
-  while (enrichmentQueue.length > 0) {
-    const { docId, filePath, originalName } = enrichmentQueue.shift();
+try {
+  if (process.env.REDIS_HOST) {
+    const { enrichmentQueue } = require("../src/config/queue");
+    _enrichmentQueue = enrichmentQueue;
+    _bullmqAvailable = true;
+  }
+} catch (err) {
+  logger.warn("BullMQ enrichment queue not available, using in-process fallback", { error: err.message });
+}
+
+// In-process fallback queue (only used when Redis is not available)
+const _fallbackQueue = [];
+let _isFallbackProcessing = false;
+
+async function processFallbackQueue() {
+  if (_isFallbackProcessing) return;
+  _isFallbackProcessing = true;
+
+  while (_fallbackQueue.length > 0) {
+    const { docId, filePath, originalName } = _fallbackQueue.shift();
     try {
       await enrichDocument(docId, filePath, originalName);
     } catch (err) {
-      console.error("DOCUMENT ENRICHMENT ERROR", err);
+      logger.error("Enrichment failed (fallback queue)", { docId, error: err.message });
       try {
         const updatedDoc = await Document.findByIdAndUpdate(docId, {
           status: "pending",
@@ -143,17 +167,34 @@ async function processEnrichmentQueue() {
           });
         }
       } catch (updateErr) {
-        console.error("FAILED TO MARK DOCUMENT PENDING AFTER ENRICHMENT ERROR", updateErr);
+        logger.error("Failed to mark document pending after enrichment error", { docId, error: updateErr.message });
       }
     }
   }
 
-  isProcessingQueue = false;
+  _isFallbackProcessing = false;
 }
 
 function queueDocumentEnrichment(docId, filePath, originalName) {
-  enrichmentQueue.push({ docId, filePath, originalName });
-  processEnrichmentQueue();
+  if (_bullmqAvailable && _enrichmentQueue) {
+    // Production path: persistent Redis-backed queue
+    _enrichmentQueue.add('enrich-document', {
+      docId: docId.toString(),
+      filePath,
+      originalName
+    }).then(() => {
+      logger.info("Document queued for enrichment (BullMQ)", { docId: docId.toString(), originalName });
+    }).catch(err => {
+      logger.error("Failed to queue enrichment job, falling back to in-process", { docId: docId.toString(), error: err.message });
+      // Fallback: process in-memory if Redis queue fails
+      _fallbackQueue.push({ docId, filePath, originalName });
+      processFallbackQueue();
+    });
+  } else {
+    // Development fallback: in-process sequential queue
+    _fallbackQueue.push({ docId, filePath, originalName });
+    processFallbackQueue();
+  }
 }
 
 
@@ -173,7 +214,7 @@ exports.upload = async (req, res) => {
       // Check for duplicate
       const existingDoc = await Document.findOne({ fileHash });
       if (existingDoc) {
-        console.warn(`Skipping duplicate upload "${file.originalname}" (hash match)`);
+        logger.warn(`Skipping duplicate upload "${file.originalname}" (hash match)`);
         
         await Activity.create({
           user: req.user.id,
@@ -209,13 +250,13 @@ exports.upload = async (req, res) => {
 
       queueDocumentEnrichment(doc._id, file.path, file.originalname);
 
-      console.log("DOCUMENT SAVED ", doc._id);
+      logger.info("Document saved", { docId: doc._id });
     }
 
     res.json({ message: "Uploaded successfully", processing: true });
 
   } catch (err) {
-    console.error("UPLOAD ERROR ", err);
+    logger.error("Upload error", { error: err.message });
     res.status(500).send(err.message);
   }
 };
@@ -233,7 +274,7 @@ exports.getDocuments = async (req, res) => {
 
     res.json(docs);
   } catch (err) {
-    console.error("FETCH DOCS ERROR ", err);
+    logger.error("Fetch docs error", { error: err.message });
     res.status(500).send("Failed to fetch documents");
   }
 };
@@ -251,7 +292,7 @@ exports.myDocuments = async (req, res) => {
 
     res.json(docs);
   } catch (err) {
-    console.error("FETCH DOCS ERROR ", err);
+    logger.error("Fetch my docs error", { error: err.message });
     res.status(500).send("Failed to fetch documents");
   }
 };
@@ -301,7 +342,7 @@ exports.stats = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("STATS ERROR ", err);
+    logger.error("Stats error", { error: err.message });
     res.status(500).send("Stats error");
   }
 };
@@ -368,7 +409,7 @@ exports.search = async (req, res) => {
     res.json(docs);
 
   } catch (err) {
-    console.error("Search error:", err);
+    logger.error("Search error", { error: err.message });
     res.status(500).json([]);
   }
 };
@@ -390,7 +431,7 @@ exports.recent = async (req, res) => {
 
     res.json(data);
   } catch (err) {
-    console.error("Recent error:", err);
+    logger.error("Recent error", { error: err.message });
     res.status(500).json([]);
   }
 };
@@ -415,7 +456,7 @@ exports.deleteDocument = async (req, res) => {
 
     res.json({ message: "Document deleted successfully" });
   } catch (err) {
-    console.error("Delete error:", err);
+    logger.error("Delete error", { error: err.message });
     res.status(500).json({ message: "Failed to delete document" });
   }
 };
@@ -434,7 +475,7 @@ exports.downloadDocument = async (req, res) => {
     const filePath = path.join(__dirname, "..", doc.filePath);
     res.download(filePath, doc.fileName);
   } catch (err) {
-    console.error("Download error:", err);
+    logger.error("Download error", { error: err.message });
     res.status(500).send("Failed to download document");
   }
 };
@@ -453,7 +494,7 @@ exports.viewDocument = async (req, res) => {
     const filePath = path.join(__dirname, "..", doc.filePath);
     res.sendFile(filePath);
   } catch (err) {
-    console.error("View error:", err);
+    logger.error("View error", { error: err.message });
     res.status(500).send("Failed to view document");
   }
 };
@@ -501,7 +542,7 @@ exports.getAnalysis = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error("Analysis fetch error:", err);
+    logger.error("Analysis fetch error", { error: err.message });
     res.status(500).json({ success: false, message: "Failed to fetch analysis" });
   }
 };
@@ -528,7 +569,7 @@ exports.reanalyzeSingle = async (req, res) => {
 
     res.json({ success: true, message: "Re-analysis started" });
   } catch (err) {
-    console.error("Reanalyze error:", err);
+    logger.error("Reanalyze error", { error: err.message });
     res.status(500).json({ success: false, message: "Failed to start re-analysis" });
   }
 };
@@ -539,7 +580,7 @@ exports.reanalyzeAll = async (req, res) => {
     const result = await reanalyzeStuckDocuments();
     res.json({ success: true, message: `Re-analysis queued for ${result} document(s)` });
   } catch (err) {
-    console.error("Reanalyze all error:", err);
+    logger.error("Reanalyze all error", { error: err.message });
     res.status(500).json({ success: false, message: "Failed to start re-analysis" });
   }
 };
@@ -557,11 +598,11 @@ async function reanalyzeStuckDocuments() {
     });
 
     if (stuckDocs.length === 0) {
-      console.log("✓ No stuck documents found.");
+      logger.info("✓ No stuck documents found.");
       return 0;
     }
 
-    console.log(`⚙ Found ${stuckDocs.length} document(s) needing AI analysis. Queuing...`);
+    logger.info(`⚙ Found ${stuckDocs.length} document(s) needing AI analysis. Queuing...`);
 
     for (const doc of stuckDocs) {
       doc.status = "processing";
@@ -573,7 +614,7 @@ async function reanalyzeStuckDocuments() {
 
     return stuckDocs.length;
   } catch (err) {
-    console.error("reanalyzeStuckDocuments error:", err);
+    logger.error("reanalyzeStuckDocuments error", { error: err.message });
     return 0;
   }
 }
@@ -584,4 +625,8 @@ exports.reanalyzeStuckDocuments = reanalyzeStuckDocuments;
 // Export for use by email ingestion service — allows email-sourced documents
 // to flow through the same AI enrichment pipeline as manually uploaded ones.
 exports.queueDocumentEnrichment = queueDocumentEnrichment;
+
+// Export enrichDocument so the BullMQ enrichmentWorker can call it directly.
+exports.enrichDocument = enrichDocument;
+
 

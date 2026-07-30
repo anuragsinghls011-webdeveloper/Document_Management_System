@@ -26,6 +26,9 @@ const mongoose = require('mongoose');
 const Document = require('../../models/document.model');
 const { resolveApprover } = require('../services/approverResolver');
 const { redisConnection, escalationQueue, notifyQueue } = require('../config/queue');
+const { createChildLogger } = require('../../config/logger');
+
+const logger = createChildLogger('EscalationWorker');
 
 /** SLA window in milliseconds. Used for scheduling the next escalation. */
 const ESCALATION_SLA_MS = parseInt(process.env.ESCALATION_SLA_MS, 10) || 48 * 60 * 60 * 1000;
@@ -43,12 +46,12 @@ async function processEscalationJob(job) {
   const { documentId, expectedStep, chainLength } = job.data;
   const logPrefix = `[EscalationWorker][${job.id}][doc:${documentId}]`;
 
-  console.log(`${logPrefix} Checking escalation for step ${expectedStep}`);
+  logger.info(`${logPrefix} Checking escalation for step ${expectedStep}`);
 
   // ── Step 1: Fetch document ────────────────────────────────────────────────
   const doc = await Document.findById(documentId);
   if (!doc) {
-    console.warn(`${logPrefix} Document not found — skipping`);
+    logger.warn(`${logPrefix} Document not found — skipping`);
     return;
   }
 
@@ -56,7 +59,7 @@ async function processEscalationJob(job) {
   // If the document is no longer pending_approval, it was already resolved.
   // No action needed.
   if (doc.status !== 'pending_approval') {
-    console.log(`${logPrefix} Document status is "${doc.status}" (not pending_approval) — stale job, skipping`);
+    logger.info(`${logPrefix} Document status is "${doc.status}" (not pending_approval) — stale job, skipping`);
     return;
   }
 
@@ -64,14 +67,14 @@ async function processEscalationJob(job) {
   // escalation was scheduled (e.g., after a chain advancement). This job
   // is stale.
   if (doc.escalationJobId && doc.escalationJobId !== job.id) {
-    console.log(`${logPrefix} Escalation job ID mismatch (doc has "${doc.escalationJobId}", this is "${job.id}") — stale job, skipping`);
+    logger.info(`${logPrefix} Escalation job ID mismatch (doc has "${doc.escalationJobId}", this is "${job.id}") — stale job, skipping`);
     return;
   }
 
   // If the approval step has already advanced past what this job expected,
   // another action already moved the chain forward.
   if (doc.approvalStep !== expectedStep) {
-    console.log(`${logPrefix} Step mismatch (doc at step ${doc.approvalStep}, expected ${expectedStep}) — stale job, skipping`);
+    logger.info(`${logPrefix} Step mismatch (doc at step ${doc.approvalStep}, expected ${expectedStep}) — stale job, skipping`);
     return;
   }
 
@@ -83,7 +86,7 @@ async function processEscalationJob(job) {
     // ── Case A: Advance to next approver in the chain ───────────────────────
     const nextChainEntry = doc.approvalChain[nextStep];
 
-    console.log(`${logPrefix} SLA expired for step ${expectedStep} (${currentChainEntry.role}). Escalating to step ${nextStep} (${nextChainEntry.role})`);
+    logger.info(`${logPrefix} SLA expired for step ${expectedStep} (${currentChainEntry.role}). Escalating to step ${nextStep} (${nextChainEntry.role})`);
 
     // Atomically update: mark current step as escalated, advance to next
     const updatedDoc = await Document.findOneAndUpdate(
@@ -112,7 +115,7 @@ async function processEscalationJob(job) {
     );
 
     if (!updatedDoc) {
-      console.log(`${logPrefix} Concurrent update detected — another process already handled this`);
+      logger.info(`${logPrefix} Concurrent update detected — another process already handled this`);
       return;
     }
 
@@ -129,7 +132,7 @@ async function processEscalationJob(job) {
         totalSteps: chainLength
       });
     } catch (err) {
-      console.error(`${logPrefix} Failed to queue escalation notification:`, err.message);
+      logger.error(`${logPrefix} Failed to queue escalation notification:`, err.message);
     }
 
     // Schedule next escalation check for the new approver
@@ -151,9 +154,9 @@ async function processEscalationJob(job) {
         escalationJobId: newEscalationJob.id
       });
 
-      console.log(`${logPrefix} Next escalation scheduled (jobId: ${newEscalationJob.id})`);
+      logger.info(`${logPrefix} Next escalation scheduled (jobId: ${newEscalationJob.id})`);
     } catch (err) {
-      console.error(`${logPrefix} Failed to schedule next escalation:`, err.message);
+      logger.error(`${logPrefix} Failed to schedule next escalation:`, err.message);
     }
 
   } else {
@@ -162,7 +165,7 @@ async function processEscalationJob(job) {
     // cannot remain in pending_approval forever — move to needs_review
     // for manual intervention.
 
-    console.log(`${logPrefix} Escalation chain exhausted (last approver: ${currentChainEntry.role}). Moving to needs_review`);
+    logger.info(`${logPrefix} Escalation chain exhausted (last approver: ${currentChainEntry.role}). Moving to needs_review`);
 
     const updatedDoc = await Document.findOneAndUpdate(
       {
@@ -190,7 +193,7 @@ async function processEscalationJob(job) {
     );
 
     if (!updatedDoc) {
-      console.log(`${logPrefix} Concurrent update — another process already handled this`);
+      logger.info(`${logPrefix} Concurrent update — another process already handled this`);
       return;
     }
 
@@ -203,7 +206,7 @@ async function processEscalationJob(job) {
         reason: 'Escalation chain exhausted — all approvers missed SLA'
       });
     } catch (err) {
-      console.error(`${logPrefix} Failed to queue needs_review notification:`, err.message);
+      logger.error(`${logPrefix} Failed to queue needs_review notification:`, err.message);
     }
   }
 }
@@ -220,18 +223,18 @@ function startEscalationWorker() {
   });
 
   worker.on('completed', (job) => {
-    console.log(`[EscalationWorker] Job ${job.id} completed`);
+    logger.info(`[EscalationWorker] Job ${job.id} completed`);
   });
 
   worker.on('failed', (job, err) => {
-    console.error(`[EscalationWorker] Job ${job?.id} failed:`, err.message);
+    logger.error(`[EscalationWorker] Job ${job?.id} failed:`, err.message);
   });
 
   worker.on('error', (err) => {
-    console.error('[EscalationWorker] Worker error:', err.message);
+    logger.error('[EscalationWorker] Worker error:', err.message);
   });
 
-  console.log('[EscalationWorker] Started and listening for jobs');
+  logger.info('[EscalationWorker] Started and listening for jobs');
   return worker;
 }
 

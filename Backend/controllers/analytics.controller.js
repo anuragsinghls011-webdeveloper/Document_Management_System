@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Document = require("../models/document.model");
 const Workflow = require("../models/workflow.model");
 const Activity = require("../models/activity.model");
+const logger = require("../config/logger").createChildLogger("AnalyticsController");
 
 exports.getAnalyticsData = async (req, res) => {
   try {
@@ -168,7 +169,7 @@ exports.getAnalyticsData = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("ANALYTICS STATS ERROR:", error);
+    logger.error("Analytics stats error", { error: error.message });
     res.status(500).json({ message: "Failed to load analytics data" });
   }
 };

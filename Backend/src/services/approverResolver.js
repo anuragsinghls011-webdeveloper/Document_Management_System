@@ -27,6 +27,9 @@
  */
 
 const User = require('../../models/user.model');
+const { createChildLogger } = require('../../config/logger');
+
+const logger = createChildLogger('ApproverResolver');
 
 /**
  * Current resolver strategy. Replaced via `setStrategy()`.
@@ -51,14 +54,14 @@ async function defaultFixedMappingStrategy(role) {
 
   // Fallback: if no user with the requested role exists, fall back to admin.
   // This prevents a broken chain if a role hasn't been assigned to any user yet.
-  console.warn(`[ApproverResolver] No user found with role "${role}", falling back to admin`);
+  logger.warn(`[ApproverResolver] No user found with role "${role}", falling back to admin`);
   const adminUser = await User.findOne({ role: 'admin' }).select('_id').lean();
   if (adminUser) {
     return adminUser._id.toString();
   }
 
   // No users at all — this is a misconfiguration
-  console.error('[ApproverResolver] CRITICAL: No admin user found in the system');
+  logger.error('[ApproverResolver] CRITICAL: No admin user found in the system');
   return null;
 }
 
@@ -71,7 +74,7 @@ async function defaultFixedMappingStrategy(role) {
  */
 async function resolveApprover(role) {
   if (!role || typeof role !== 'string') {
-    console.error('[ApproverResolver] Invalid role provided:', role);
+    logger.error('[ApproverResolver] Invalid role provided:', role);
     return null;
   }
 
@@ -90,7 +93,7 @@ function setStrategy(strategyFn) {
   if (typeof strategyFn !== 'function') {
     throw new Error('setStrategy requires a function argument');
   }
-  console.log('[ApproverResolver] Strategy updated');
+  logger.info('[ApproverResolver] Strategy updated');
   currentStrategy = strategyFn;
 }
 

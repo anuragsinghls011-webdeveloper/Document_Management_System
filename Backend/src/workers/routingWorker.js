@@ -26,6 +26,9 @@ const Document = require('../../models/document.model');
 const { determineRoute } = require('../services/routingEngine');
 const { resolveApprover } = require('../services/approverResolver');
 const { redisConnection, escalationQueue, notifyQueue } = require('../config/queue');
+const { createChildLogger } = require('../../config/logger');
+
+const logger = createChildLogger('RoutingWorker');
 
 /** SLA window in milliseconds. Default: 48 hours. */
 const ESCALATION_SLA_MS = parseInt(process.env.ESCALATION_SLA_MS, 10) || 48 * 60 * 60 * 1000;
@@ -42,12 +45,12 @@ async function processRoutingJob(job) {
   const { documentId, routingVersion } = job.data;
   const logPrefix = `[RoutingWorker][${job.id}][doc:${documentId}]`;
 
-  console.log(`${logPrefix} Processing routing job`);
+  logger.info(`${logPrefix} Processing routing job`);
 
   // ── Step 1: Fetch document ────────────────────────────────────────────────
   const doc = await Document.findById(documentId);
   if (!doc) {
-    console.warn(`${logPrefix} Document not found — skipping`);
+    logger.warn(`${logPrefix} Document not found — skipping`);
     return;
   }
 
@@ -55,7 +58,7 @@ async function processRoutingJob(job) {
   // If the document has already been routed (version incremented), this is
   // a retry of an already-successful job. Skip to avoid duplicates.
   if (doc.routingVersion >= (routingVersion || 1)) {
-    console.log(`${logPrefix} Already routed (version ${doc.routingVersion} >= ${routingVersion}) — skipping`);
+    logger.info(`${logPrefix} Already routed (version ${doc.routingVersion} >= ${routingVersion}) — skipping`);
     return;
   }
 
@@ -63,9 +66,9 @@ async function processRoutingJob(job) {
   let routeResult;
   try {
     routeResult = await determineRoute(doc);
-    console.log(`${logPrefix} Rule matched: "${routeResult.ruleName}" (priority ${routeResult.priority}), chain: [${routeResult.chain.join(' → ')}]`);
+    logger.info(`${logPrefix} Rule matched: "${routeResult.ruleName}" (priority ${routeResult.priority}), chain: [${routeResult.chain.join(' → ')}]`);
   } catch (err) {
-    console.error(`${logPrefix} Rule evaluation failed:`, err.message);
+    logger.error(`${logPrefix} Rule evaluation failed:`, err.message);
     // Route to needs_review so the document isn't left in limbo
     await Document.findByIdAndUpdate(documentId, {
       status: 'needs_review',
@@ -86,7 +89,7 @@ async function processRoutingJob(job) {
   for (const role of routeResult.chain) {
     const userId = await resolveApprover(role);
     if (!userId) {
-      console.error(`${logPrefix} Could not resolve approver for role "${role}" — routing to needs_review`);
+      logger.error(`${logPrefix} Could not resolve approver for role "${role}" — routing to needs_review`);
       await Document.findByIdAndUpdate(documentId, {
         status: 'needs_review',
         $push: {
@@ -139,7 +142,7 @@ async function processRoutingJob(job) {
   );
 
   if (!updatedDoc) {
-    console.log(`${logPrefix} Document was already routed by another worker — skipping`);
+    logger.info(`${logPrefix} Document was already routed by another worker — skipping`);
     return;
   }
 
@@ -156,10 +159,10 @@ async function processRoutingJob(job) {
       step: 0,
       totalSteps: approvalChain.length
     });
-    console.log(`${logPrefix} Notification queued for approver ${firstApprover.userId}`);
+    logger.info(`${logPrefix} Notification queued for approver ${firstApprover.userId}`);
   } catch (err) {
     // Notification failure is non-fatal — the approval still works
-    console.error(`${logPrefix} Failed to queue notification:`, err.message);
+    logger.error(`${logPrefix} Failed to queue notification:`, err.message);
   }
 
   // ── Step 7: Schedule escalation check ─────────────────────────────────────
@@ -183,9 +186,9 @@ async function processRoutingJob(job) {
       escalationJobId: escalationJob.id
     });
 
-    console.log(`${logPrefix} Escalation check scheduled (delay: ${ESCALATION_SLA_MS}ms, jobId: ${escalationJob.id})`);
+    logger.info(`${logPrefix} Escalation check scheduled (delay: ${ESCALATION_SLA_MS}ms, jobId: ${escalationJob.id})`);
   } catch (err) {
-    console.error(`${logPrefix} Failed to schedule escalation:`, err.message);
+    logger.error(`${logPrefix} Failed to schedule escalation:`, err.message);
   }
 }
 
@@ -206,18 +209,18 @@ function startRoutingWorker() {
   });
 
   worker.on('completed', (job) => {
-    console.log(`[RoutingWorker] Job ${job.id} completed`);
+    logger.info(`Job ${job.id} completed`);
   });
 
   worker.on('failed', (job, err) => {
-    console.error(`[RoutingWorker] Job ${job?.id} failed:`, err.message);
+    logger.error(`Job ${job?.id} failed: ${err.message}`);
   });
 
   worker.on('error', (err) => {
-    console.error('[RoutingWorker] Worker error:', err.message);
+    logger.error(`Worker error: ${err.message}`);
   });
 
-  console.log('[RoutingWorker] Started and listening for jobs');
+  logger.info('Routing worker started and listening for jobs');
   return worker;
 }
 

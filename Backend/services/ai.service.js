@@ -1,4 +1,5 @@
 const { GoogleGenAI } = require("@google/genai");
+const logger = require("../config/logger").createChildLogger("AIService");
 
 // ─── Department ↔ Role Mapping ───────────────────────────────────────────────
 const DEPARTMENT_ROLE_MAP = {
@@ -23,7 +24,7 @@ async function analyzeDocument(text) {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey || !text || text.trim().length < 10) {
-    console.log("AI Analysis: skipping (no API key or insufficient text)");
+    logger.info("AI Analysis: skipping (no API key or insufficient text)");
     return fallbackAnalysis(text);
   }
 
@@ -73,7 +74,7 @@ ${text.substring(0, 8000)}
     };
 
   } catch (err) {
-    console.error("AI Analysis Error:", err.message);
+    logger.error("AI analysis error", { error: err.message });
     return fallbackAnalysis(text);
   }
 }

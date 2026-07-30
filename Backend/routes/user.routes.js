@@ -9,6 +9,7 @@ const rateLimit = require("express-rate-limit");
 const crypto = require("crypto");
 const { sendEmail } = require("../utils/email");
 const auth = require("../middlewares/auth.middleware");
+const logger = require("../config/logger").createChildLogger("UserRoutes");
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -115,7 +116,7 @@ router.post(
       }
       return res.redirect("/login");
     } catch (err) {
-      console.log("SAVE ERROR:", err);
+      logger.error("Registration error", { error: err.message });
       if (req.headers['accept']?.includes('application/json')) {
         return res.status(500).json({ message: "Database error occurred" });
       }
@@ -178,7 +179,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     }
     res.redirect("/dashboard");
   } catch (err) {
-    console.log("LOGIN ERROR:", err);
+      logger.error("Login error", { error: err.message });
     if (req.headers['accept']?.includes('application/json')) {
       return res.status(500).json({ message: "Login failed" });
     }
@@ -242,7 +243,7 @@ router.post("/forgot-password", async (req, res) => {
     res.send("An email has been sent to your address with further instructions.");
 
   } catch (err) {
-    console.error("Forgot password error:", err);
+    logger.error("Forgot password error", { error: err.message });
     if (req.headers['accept']?.includes('application/json')) {
       return res.status(500).json({ message: "Error sending reset email." });
     }
@@ -263,7 +264,7 @@ router.get("/reset-password/:token", async (req, res) => {
 
     res.render("reset-password", { token: req.params.token });
   } catch (err) {
-    console.error("Reset password error:", err);
+    logger.error("Reset password GET error", { error: err.message });
     res.status(500).send("Server error");
   }
 });
@@ -345,7 +346,7 @@ router.put(
       await user.save();
       res.json({ message: "Profile updated successfully", user: { username: user.username, email: user.email } });
     } catch (error) {
-      console.error("Profile update error:", error);
+      logger.error("Profile update error", { error: error.message });
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -375,7 +376,7 @@ router.put(
 
       res.json({ message: "Password updated successfully" });
     } catch (error) {
-      console.error("Password update error:", error);
+      logger.error("Password update error", { error: error.message });
       res.status(500).json({ message: "Internal server error" });
     }
   }

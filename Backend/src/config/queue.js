@@ -79,9 +79,28 @@ const notifyQueue = new Queue('notifications', {
   }
 });
 
+/**
+ * Queue for AI document enrichment (OCR + Gemini analysis + classification).
+ * Replaces the old in-memory enrichmentQueue[] array from document.controller.js.
+ * Jobs are persisted in Redis, so no work is lost if the server crashes.
+ */
+const enrichmentQueue = new Queue('document-enrichment', {
+  connection: redisConnection,
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: {
+      type: 'exponential',
+      delay: 5000 // 5s, 10s, 20s — longer delays because OCR/AI can be slow
+    },
+    removeOnComplete: { count: 1000 },
+    removeOnFail: { count: 5000 }
+  }
+});
+
 module.exports = {
   redisConnection,
   routingQueue,
   escalationQueue,
-  notifyQueue
+  notifyQueue,
+  enrichmentQueue
 };

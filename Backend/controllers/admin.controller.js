@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Document = require("../models/document.model");
 const Activity = require("../models/activity.model");
+const logger = require("../config/logger").createChildLogger("AdminController");
 
 function isValidDocumentId(id) {
   return mongoose.isValidObjectId(id);
@@ -33,7 +34,7 @@ exports.pendingDocs = async (req, res) => {
       rejectedToday
     });
   } catch (error) {
-    console.error("PENDING DOCS ERROR:", error);
+    logger.error("Pending docs error", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -53,7 +54,7 @@ exports.getDocument = async (req, res) => {
 
     res.json({ success: true, document: doc });
   } catch (error) {
-    console.error("GET DOCUMENT ERROR:", error);
+    logger.error("Get document error", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -85,7 +86,7 @@ exports.approveDoc = async (req, res) => {
 
     res.json({ success: true, status: doc.status });
   } catch (error) {
-    console.error("APPROVE DOC ERROR:", error);
+    logger.error("Approve doc error", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -120,7 +121,7 @@ exports.rejectDoc = async (req, res) => {
 
     res.json({ success: true, status: doc.status });
   } catch (error) {
-    console.error("REJECT DOC ERROR:", error);
+    logger.error("Reject doc error", { error: error.message });
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -172,7 +173,7 @@ exports.requestChanges = async (req, res) => {
       message: "Changes requested successfully"
     });
   } catch (error) {
-    console.error("REQUEST CHANGES ERROR:", error);
+    logger.error("Request changes error", { error: error.message });
     return res.status(500).json({
       success: false,
       message: "Server error while requesting changes"

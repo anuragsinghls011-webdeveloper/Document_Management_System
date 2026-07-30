@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const logger = require("../config/logger").createChildLogger("Email");
 
 // Create a transporter using ethereal for local development if no SMTP credentials are provided
 const createTransporter = async () => {
@@ -15,9 +16,9 @@ const createTransporter = async () => {
   }
 
   // Fallback to Ethereal Email for testing
-  console.log("No SMTP credentials found in .env. Creating Ethereal test account...");
+  logger.info("No SMTP credentials found in .env. Creating Ethereal test account...");
   const testAccount = await nodemailer.createTestAccount();
-  console.log(`Ethereal Test Account generated: ${testAccount.user}`);
+  logger.info(`Ethereal Test Account generated: ${testAccount.user}`);
 
   return nodemailer.createTransport({
     host: "smtp.ethereal.email",
@@ -41,19 +42,17 @@ const sendEmail = async ({ to, subject, html }) => {
       html,
     });
 
-    console.log(`Message sent: ${info.messageId}`);
+    logger.info(`Message sent: ${info.messageId}`);
     
     // Preview URL will only be available if using ethereal
     const previewUrl = nodemailer.getTestMessageUrl(info);
     if (previewUrl) {
-      console.log(`\n=============================================`);
-      console.log(`✉️  EMAIL PREVIEW URL: ${previewUrl}`);
-      console.log(`=============================================\n`);
+      logger.info(`EMAIL PREVIEW URL: ${previewUrl}`);
     }
 
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("Error sending email:", error);
+    logger.error("Error sending email", { error: error.message });
     return { success: false, error };
   }
 };
