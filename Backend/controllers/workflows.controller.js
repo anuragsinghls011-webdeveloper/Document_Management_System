@@ -10,10 +10,11 @@ exports.renderBuilder = async (req, res) => {
 // API: Create a new workflow
 exports.createWorkflow = async (req, res) => {
   try {
-    const { name, description, nodes, edges } = req.body;
+    const { name, description, department, nodes, edges } = req.body;
     const workflow = new Workflow({
       name: name || "Untitled Workflow",
       description,
+      department: department || "General",
       nodes: nodes || [],
       edges: edges || [],
       createdBy: req.user ? req.user.id : null
@@ -28,7 +29,9 @@ exports.createWorkflow = async (req, res) => {
 // API: Get all workflows
 exports.getWorkflows = async (req, res) => {
   try {
-    const workflows = await Workflow.find().sort("-createdAt");
+    const { department } = req.query;
+    const query = department && department !== 'All' ? { department } : {};
+    const workflows = await Workflow.find(query).sort("-createdAt");
     res.json({ success: true, workflows });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -49,10 +52,10 @@ exports.getWorkflow = async (req, res) => {
 // API: Update workflow (save design)
 exports.updateWorkflow = async (req, res) => {
   try {
-    const { name, description, nodes, edges } = req.body;
+    const { name, description, department, nodes, edges } = req.body;
     const workflow = await Workflow.findByIdAndUpdate(
       req.params.id, 
-      { name, description, nodes, edges },
+      { name, description, department: department || "General", nodes, edges },
       { new: true }
     );
     if (!workflow) return res.status(404).json({ success: false, message: "Workflow not found" });

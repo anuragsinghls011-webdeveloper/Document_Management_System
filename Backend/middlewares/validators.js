@@ -129,9 +129,16 @@ const validateWorkflowCreate = [
     .trim()
     .isLength({ max: 1000 })
     .withMessage('Description must not exceed 1000 characters'),
-  body('steps')
-    .isArray({ min: 1 })
-    .withMessage('At least one workflow step is required'),
+  body('department')
+    .optional()
+    .isIn(["General", "Finance", "HR", "Legal", "Engineering"])
+    .withMessage('Invalid department'),
+  body('nodes')
+    .isArray()
+    .withMessage('Nodes must be an array'),
+  body('edges')
+    .isArray()
+    .withMessage('Edges must be an array'),
   handleValidation
 ];
 
@@ -152,10 +159,18 @@ const validateWorkflowUpdate = [
     .trim()
     .isLength({ max: 1000 })
     .withMessage('Description must not exceed 1000 characters'),
-  body('steps')
+  body('department')
     .optional()
-    .isArray({ min: 1 })
-    .withMessage('Steps must be a non-empty array'),
+    .isIn(["General", "Finance", "HR", "Legal", "Engineering"])
+    .withMessage('Invalid department'),
+  body('nodes')
+    .optional()
+    .isArray()
+    .withMessage('Nodes must be an array'),
+  body('edges')
+    .optional()
+    .isArray()
+    .withMessage('Edges must be an array'),
   handleValidation
 ];
 

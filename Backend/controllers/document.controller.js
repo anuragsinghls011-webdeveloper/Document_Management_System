@@ -268,7 +268,14 @@ exports.getDocuments = async (req, res) => {
   try {
     const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const baseQuery = isAdmin ? {} : { userId };
+    const baseQuery = isAdmin ? {} : {
+      $or: [
+        { userId: userId },
+        { routedTo: userId },
+        { currentApprover: userId },
+        { "approvalChain.userId": userId }
+      ]
+    };
 
     const docs = await Document.find(baseQuery)
       .populate("routedTo", "username email role")
@@ -286,7 +293,14 @@ exports.myDocuments = async (req, res) => {
   try {
     const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const baseQuery = isAdmin ? {} : { userId };
+    const baseQuery = isAdmin ? {} : {
+      $or: [
+        { userId: userId },
+        { routedTo: userId },
+        { currentApprover: userId },
+        { "approvalChain.userId": userId }
+      ]
+    };
 
     const docs = await Document.find(baseQuery)
       .populate("routedTo", "username email role")
@@ -304,7 +318,14 @@ exports.stats = async (req, res) => {
   try {
     const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const baseQuery = isAdmin ? {} : { userId };
+    const baseQuery = isAdmin ? {} : {
+      $or: [
+        { userId: userId },
+        { routedTo: userId },
+        { currentApprover: userId },
+        { "approvalChain.userId": userId }
+      ]
+    };
 
     const [total, today, pending, archived, monthlyAgg] = await Promise.all([
       Document.countDocuments(baseQuery),
@@ -317,7 +338,14 @@ exports.stats = async (req, res) => {
       Document.countDocuments({ ...baseQuery, status: "pending" }),
       Document.countDocuments({ ...baseQuery, status: "archived" }),
       Document.aggregate([
-        { $match: isAdmin ? {} : { userId } },
+        { $match: isAdmin ? {} : {
+          $or: [
+            { userId: userId },
+            { routedTo: userId },
+            { currentApprover: userId },
+            { "approvalChain.userId": userId }
+          ]
+        } },
         {
           $group: {
             _id: { $month: "$createdAt" },
@@ -362,7 +390,14 @@ exports.search = async (req, res) => {
     date = typeof date === 'string' ? date : (Array.isArray(date) ? date[0] : (date ? String(date) : ''));
     department = typeof department === 'string' ? department : (Array.isArray(department) ? department[0] : (department ? String(department) : ''));
 
-    const query = isAdmin ? {} : { userId };
+    const query = isAdmin ? {} : {
+      $or: [
+        { userId: userId },
+        { routedTo: userId },
+        { currentApprover: userId },
+        { "approvalChain.userId": userId }
+      ]
+    };
 
     if (q && q.trim() !== "") {
       const qRegex = new RegExp(escapeRegex(q.trim()), "i");
@@ -420,7 +455,14 @@ exports.recent = async (req, res) => {
   try {
     const isAdmin = req.userRole === "admin";
     const userId = new mongoose.Types.ObjectId(req.user.id);
-    const baseQuery = isAdmin ? {} : { userId };
+    const baseQuery = isAdmin ? {} : {
+      $or: [
+        { userId: userId },
+        { routedTo: userId },
+        { currentApprover: userId },
+        { "approvalChain.userId": userId }
+      ]
+    };
 
     const docs = await Document.find(baseQuery)
       .sort({ createdAt: -1 })

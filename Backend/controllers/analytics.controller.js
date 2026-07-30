@@ -8,7 +8,14 @@ exports.getAnalyticsData = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user.id);
     const isAdmin = req.userRole === "admin";
-    const baseQuery = isAdmin ? {} : { userId };
+    const baseQuery = isAdmin ? {} : {
+      $or: [
+        { userId: userId },
+        { routedTo: userId },
+        { currentApprover: userId },
+        { "approvalChain.userId": userId }
+      ]
+    };
 
     // 1. Total Uploads
     const totalUploads = await Document.countDocuments({ ...baseQuery });
@@ -33,7 +40,14 @@ exports.getAnalyticsData = async (req, res) => {
 
     // 6. Top Extracted Keywords
     const topKeywordsAgg = await Document.aggregate([
-      { $match: isAdmin ? {} : { userId } },
+      { $match: isAdmin ? {} : {
+        $or: [
+          { userId: userId },
+          { routedTo: userId },
+          { currentApprover: userId },
+          { "approvalChain.userId": userId }
+        ]
+      } },
       { $unwind: "$keywords" },
       { $group: { _id: "$keywords", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
@@ -50,7 +64,14 @@ exports.getAnalyticsData = async (req, res) => {
     sixMonthsAgo.setHours(0, 0, 0, 0);
 
     const uploadsAgg = await Document.aggregate([
-      { $match: { ...(isAdmin ? {} : { userId }), createdAt: { $gte: sixMonthsAgo } } },
+      { $match: { ...(isAdmin ? {} : {
+        $or: [
+          { userId: userId },
+          { routedTo: userId },
+          { currentApprover: userId },
+          { "approvalChain.userId": userId }
+        ]
+      }), createdAt: { $gte: sixMonthsAgo } } },
       { $group: {
           _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
           count: { $sum: 1 }
@@ -75,7 +96,14 @@ exports.getAnalyticsData = async (req, res) => {
 
     // 8. Documents by Type
     const typeAgg = await Document.aggregate([
-      { $match: isAdmin ? {} : { userId } },
+      { $match: isAdmin ? {} : {
+        $or: [
+          { userId: userId },
+          { routedTo: userId },
+          { currentApprover: userId },
+          { "approvalChain.userId": userId }
+        ]
+      } },
       { $group: { _id: "$fileType", count: { $sum: 1 } } }
     ]);
 

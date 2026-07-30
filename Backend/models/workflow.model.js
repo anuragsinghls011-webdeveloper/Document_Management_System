@@ -32,6 +32,11 @@ const edgeSchema = new mongoose.Schema({
 const workflowSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   description: { type: String, trim: true, default: "" },
+  department: { 
+    type: String, 
+    enum: ["General", "Finance", "HR", "Legal", "Engineering"], 
+    default: "General" 
+  },
   version: { type: Number, default: 1 },
   status: { 
     type: String, 

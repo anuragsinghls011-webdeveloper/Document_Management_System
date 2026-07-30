@@ -298,7 +298,7 @@
             );
         };
 
-        const ConfigPanel = ({ selectedNode, updateNodeData }) => {
+        const ConfigPanel = ({ selectedNode, updateNodeData, deleteNode }) => {
             if (!selectedNode) {
                 return (
                     <div className="w-80 bg-dark-800 border-l border-slate-700/50 flex flex-col h-full p-6 items-center justify-center text-center shrink-0">
@@ -321,7 +321,8 @@
                         <h2 className="text-lg font-semibold text-slate-200">Configuration</h2>
                         <span className="text-xs px-2 py-1 bg-slate-700 rounded text-slate-300 uppercase">{data.type}</span>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                    <div className="flex-1 overflow-y-auto p-5 flex flex-col">
+                        <div className="space-y-5 flex-1">
 
                         {/* Common Field */}
                         <div className="space-y-1.5">
@@ -400,6 +401,18 @@
                             </div>
                         )}
 
+                        </div>
+                        
+                        {data.type !== 'start' && (
+                            <div className="pt-6 mt-6 border-t border-slate-700/50 shrink-0">
+                                <button 
+                                    onClick={() => deleteNode(selectedNode.id)}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/30 rounded transition"
+                                >
+                                    <i className="bx bx-trash"></i> Delete Node
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
@@ -411,8 +424,42 @@
             const [edges, setEdges, onEdgesChange] = useEdgesState([]);
             const [reactFlowInstance, setReactFlowInstance] = useState(null);
             const [workflowName, setWorkflowName] = useState("Untitled Workflow");
+            const [workflowDepartment, setWorkflowDepartment] = useState("General");
             const [workflowId, setWorkflowId] = useState(null);
             const [isSaving, setIsSaving] = useState(false);
+            const [showLoadModal, setShowLoadModal] = useState(false);
+            const [workflowsList, setWorkflowsList] = useState([]);
+
+            const fetchWorkflows = async () => {
+                try {
+                    const res = await fetch('/api/workflows');
+                    const data = await res.json();
+                    if (data.success) {
+                        setWorkflowsList(data.workflows);
+                    }
+                } catch (err) {
+                    console.error("Error fetching workflows:", err);
+                }
+            };
+
+            const loadWorkflow = async (id) => {
+                try {
+                    const res = await fetch(`/api/workflows/${id}`);
+                    const data = await res.json();
+                    if (data.success && data.workflow) {
+                        const wf = data.workflow;
+                        setWorkflowName(wf.name || "Untitled Workflow");
+                        setWorkflowDepartment(wf.department || "General");
+                        setWorkflowId(wf._id);
+                        setNodes(wf.nodes || []);
+                        setEdges(wf.edges || []);
+                        setShowLoadModal(false);
+                    }
+                } catch (err) {
+                    console.error("Error loading workflow:", err);
+                    alert("Failed to load workflow.");
+                }
+            };
 
             const onConnect = useCallback(
                 (params) => setEdges((eds) => addEdge({ ...params, type: 'smoothstep', animated: true, markerEnd: { type: MarkerType.ArrowClosed } }, eds)),
@@ -462,6 +509,11 @@
                 );
             };
 
+            const deleteNode = (nodeId) => {
+                setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+                setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+            };
+
             const selectedNode = nodes.find(n => n.selected);
 
             const saveWorkflow = async (isPublish = false, silent = false) => {
@@ -469,6 +521,7 @@
                 try {
                     const payload = {
                         name: workflowName,
+                        department: workflowDepartment,
                         nodes: reactFlowInstance.getNodes(),
                         edges: reactFlowInstance.getEdges()
                     };
@@ -534,9 +587,23 @@
                                 onChange={e => setWorkflowName(e.target.value)}
                                 className="bg-transparent text-lg font-semibold text-slate-200 border-b border-transparent focus:border-brand-500 focus:outline-none px-1 py-0.5 w-64"
                             />
+                            <select
+                                value={workflowDepartment}
+                                onChange={e => setWorkflowDepartment(e.target.value)}
+                                className="bg-dark-900 border border-slate-700 rounded px-2 py-1 text-sm text-slate-300 focus:outline-none focus:border-brand-500"
+                            >
+                                <option value="General">General Dept</option>
+                                <option value="Finance">Finance</option>
+                                <option value="HR">HR</option>
+                                <option value="Legal">Legal</option>
+                                <option value="Engineering">Engineering</option>
+                            </select>
                             {workflowId && <span className="text-xs text-brand-500 px-2 py-1 bg-brand-500/10 rounded">Saved</span>}
                         </div>
                         <div className="flex items-center gap-3">
+                            <button onClick={() => { setShowLoadModal(true); fetchWorkflows(); }} className="px-4 py-1.5 text-sm font-medium text-slate-300 bg-slate-800 border border-slate-600 hover:bg-slate-700 rounded flex items-center gap-2 transition">
+                                <i className="bx bx-folder-open"></i> Load Workflow
+                            </button>
                             <button onClick={() => executeWorkflow()} className="px-4 py-1.5 text-sm font-medium text-slate-300 bg-slate-700 hover:bg-slate-600 rounded flex items-center gap-2 transition">
                                 <i className="bx bx-play"></i> Test Execution
                             </button>
@@ -571,7 +638,47 @@
                             </ReactFlow>
                         </div>
 
-                        <ConfigPanel selectedNode={selectedNode} updateNodeData={updateNodeData} />
+                        <ConfigPanel selectedNode={selectedNode} updateNodeData={updateNodeData} deleteNode={deleteNode} />
+
+                        {/* Load Workflow Modal */}
+                        {showLoadModal && (
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+                                <div className="bg-dark-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[80vh]">
+                                    <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-dark-900">
+                                        <h3 className="text-lg font-semibold text-slate-200">Load Workflow</h3>
+                                        <button onClick={() => setShowLoadModal(false)} className="text-slate-400 hover:text-slate-200">
+                                            <i className="bx bx-x text-2xl"></i>
+                                        </button>
+                                    </div>
+                                    <div className="p-4 overflow-y-auto flex-1">
+                                        {workflowsList.length === 0 ? (
+                                            <div className="text-center py-8 text-slate-500">
+                                                <i className="bx bx-folder-open text-4xl mb-2 opacity-50"></i>
+                                                <p>No workflows found in the database.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-3">
+                                                {workflowsList.map(wf => (
+                                                    <div key={wf._id} className="bg-dark-900 border border-slate-700 rounded-lg p-4 flex items-center justify-between hover:border-brand-500 transition-colors">
+                                                        <div>
+                                                            <h4 className="font-semibold text-slate-200">{wf.name}</h4>
+                                                            <div className="flex gap-3 text-xs text-slate-500 mt-1">
+                                                                <span className="flex items-center gap-1"><i className="bx bx-building"></i> {wf.department}</span>
+                                                                <span className="flex items-center gap-1"><i className="bx bx-git-branch"></i> {wf.status}</span>
+                                                                <span className="flex items-center gap-1"><i className="bx bx-calendar"></i> {new Date(wf.createdAt).toLocaleDateString()}</span>
+                                                            </div>
+                                                        </div>
+                                                        <button onClick={() => loadWorkflow(wf._id)} className="px-3 py-1.5 text-sm font-medium text-brand-400 bg-brand-500/10 hover:bg-brand-500/20 rounded transition">
+                                                            Load
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
