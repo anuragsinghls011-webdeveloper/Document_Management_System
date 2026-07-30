@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "node --check app.js"
+    "test": "node --check app.js",
+    "workers": "node workers.js"
   },
   "keywords": [],
   "author": "",
@@ -38,7 +39,8 @@
     "nodemon": "^3.1.11",
     "pdf-parse": "^1.1.1",
     "tesseract.js": "^7.0.0",
-    "uuid": "^14.0.1"
+    "uuid": "^14.0.1",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",

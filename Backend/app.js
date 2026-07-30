@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const helmet = require("helmet");
+const logger = require("./config/logger").createChildLogger("App");
 
 const userRouter = require("./routes/user.routes");
 const adminRoutes = require("./routes/admin.routes");
@@ -52,7 +53,10 @@ const globalLimiter = rateLimit({
 });
 app.use(globalLimiter);
 
-app.use(morgan('dev'));
+// Structured HTTP logging via Winston instead of raw console output
+app.use(morgan(isProduction ? 'combined' : 'dev', {
+  stream: require("./config/logger").morganStream
+}));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
@@ -97,7 +101,7 @@ app.use((err, req, res, next) => {
     }
   }
 
-  console.error("UNHANDLED ERROR", err);
+  logger.error("Unhandled error", { error: err.message, stack: err.stack, status: err.status });
   res.status(err.status || 500).json({ message: err.message || "Internal server error" });
 });
 
@@ -108,29 +112,31 @@ if (require.main === module) {
   connectDB()
     .then(() => {
       app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+        logger.info(`Server running on port ${PORT}`);
 
         // Auto-fix stuck documents on startup
         const { reanalyzeStuckDocuments } = require("./controllers/document.controller");
         reanalyzeStuckDocuments().catch(err =>
-          console.error("Startup reanalyze failed:", err)
+          logger.error("Startup reanalyze failed", { error: err.message })
         );
 
         // Start BullMQ workflow workers if Redis is configured.
         // Workers run in-process for simplicity. For production scale,
-        // consider running them as separate Node.js processes.
+        // run them as a separate process: node workers.js
         if (process.env.REDIS_HOST) {
           try {
             const { startRoutingWorker } = require('./src/workers/routingWorker');
             const { startEscalationWorker } = require('./src/workers/escalationWorker');
+            const { startEnrichmentWorker } = require('./src/workers/enrichmentWorker');
             startRoutingWorker();
             startEscalationWorker();
-            console.log('Workflow engine workers started (routing + escalation)');
+            startEnrichmentWorker();
+            logger.info('Workflow engine workers started (routing + escalation + enrichment)');
           } catch (err) {
-            console.error('Failed to start workflow workers:', err.message);
+            logger.error('Failed to start workflow workers', { error: err.message });
           }
         } else {
-          console.log('REDIS_HOST not set — workflow engine workers not started');
+          logger.info('REDIS_HOST not set — workflow engine workers not started (enrichment will run in-process)');
         }
 
         // Start email watcher if configured (EMAIL_PROVIDER env var)
@@ -139,17 +145,17 @@ if (require.main === module) {
         if (process.env.EMAIL_PROVIDER) {
           const emailWatcher = require("./services/emailWatcher");
           emailWatcher.start().catch(err =>
-            console.error("Email watcher startup failed:", err.message)
+            logger.error("Email watcher startup failed", { error: err.message })
           );
 
           // Graceful shutdown: stop the email watcher before the process exits
           // so we don't leave dangling IMAP connections or half-processed emails.
           const shutdown = async (signal) => {
-            console.log(`\n${signal} received — shutting down email watcher...`);
+            logger.info(`${signal} received — shutting down email watcher...`);
             try {
               await emailWatcher.stop();
             } catch (err) {
-              console.error("Email watcher shutdown error:", err.message);
+              logger.error("Email watcher shutdown error", { error: err.message });
             }
             process.exit(0);
           };
@@ -159,10 +165,9 @@ if (require.main === module) {
       });
     })
     .catch((error) => {
-      console.error("Failed to start server:", error.message);
+      logger.error("Failed to start server", { error: error.message });
       process.exit(1);
     });
 }
 
 module.exports = app;
-

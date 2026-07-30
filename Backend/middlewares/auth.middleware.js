@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
+const logger = require("../config/logger").createChildLogger("Auth");
 
 module.exports = async (req, res, next) => {
   const token = req.cookies?.token;
@@ -25,7 +26,7 @@ module.exports = async (req, res, next) => {
 
     next();
   } catch (err) {
-    console.error("AUTH ERROR ", err);
+    logger.error("Auth error", { error: err.message });
     res.status(401).send("Invalid token");
   }
 };

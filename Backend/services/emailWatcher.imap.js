@@ -190,6 +190,10 @@ async function connect() {
     // emitLogs: false is implicit when logger is false
   });
 
+  client.on('error', (err) => {
+    console.error(`[IMAP] Client error: ${err.message}`);
+  });
+
   try {
     await client.connect();
     console.info(`[IMAP] Connected successfully as ${config.imap.user}`);

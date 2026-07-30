@@ -2,6 +2,7 @@ const Tesseract = require("tesseract.js");
 const path = require("path");
 const fs = require("fs");
 const pdfParse = require("pdf-parse");
+const logger = require("../config/logger").createChildLogger("OCR");
 
 function isTextLikeFile(ext) {
   return [".txt", ".md", ".html", ".htm", ".csv", ".json", ".xml", ".log"].includes(ext);
@@ -47,7 +48,8 @@ module.exports = async function extractText(filePath) {
     return `[Binary file content cannot be fully extracted for OCR. File type: ${ext}]`;
 
   } catch (err) {
-    console.error("OCR SERVICE ERROR ", err.message);
+    logger.error("OCR service error", { error: err.message, filePath });
     return ""; 
   }
 };
+

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
+const logger = require('./logger').createChildLogger('Database');
 
 function connectDB() {
     if (!process.env.MONGO_URI) {
@@ -12,11 +13,11 @@ function connectDB() {
             maxPoolSize: 10
         })
         .then(() => {
-            console.log("Database connected successfully");
-            console.log("DB NAME:", mongoose.connection.name);
+            logger.info("Database connected successfully");
+            logger.info(`DB NAME: ${mongoose.connection.name}`);
         })
         .catch((error) => {
-            console.error("Database connection failed:", error.message);
+            logger.error("Database connection failed", { error: error.message });
             throw error;
         });
 }

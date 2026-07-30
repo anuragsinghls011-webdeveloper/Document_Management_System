@@ -22,6 +22,9 @@ const ProcessedEmail = require('../models/processedEmail.model');
 const Document = require('../models/document.model');
 const Activity = require('../models/activity.model');
 const User = require('../models/user.model');
+const { createChildLogger } = require('../config/logger');
+
+const logger = createChildLogger('EmailIngestion');
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -284,7 +287,7 @@ async function getOrCreateBotUser() {
       role: 'admin',
     });
 
-    console.log(`[EmailIngestion] Created system bot user: ${botUsername} (${botEmail})`);
+    logger.info(`[EmailIngestion] Created system bot user: ${botUsername} (${botEmail})`);
   }
 
   _cachedBotUser = botUser;
@@ -373,7 +376,7 @@ async function ingestAttachment({ filePath, originalName, sender, subject, recei
   const absolutePath = path.join(__dirname, '..', filePath);
   queueDocumentEnrichment(doc._id, absolutePath, originalName);
 
-  console.log(`[EmailIngestion] Ingested: "${originalName}" (${fileType}) from ${sender || 'unknown'} → Document ${doc._id}`);
+  logger.info(`[EmailIngestion] Ingested: "${originalName}" (${fileType}) from ${sender || 'unknown'} → Document ${doc._id}`);
 
   return doc;
 }
@@ -406,19 +409,19 @@ async function processEmail(email) {
 
   // ─── Step 1: Dedup Check ─────────────────────────────────────────────
   if (!email.messageId) {
-    console.warn(`${logPrefix} Email has no messageId — skipping to prevent untrackable duplicates`);
+    logger.warn(`${logPrefix} Email has no messageId — skipping to prevent untrackable duplicates`);
     return result;
   }
 
   if (await isDuplicate(email.messageId)) {
-    console.info(`${logPrefix} Already processed messageId="${email.messageId}" — skipping`);
+    logger.info(`${logPrefix} Already processed messageId="${email.messageId}" — skipping`);
     result.processed = true; // Already handled
     return result;
   }
 
   // ─── Step 2: Validate Attachments Exist ──────────────────────────────
   if (!email.attachments || email.attachments.length === 0) {
-    console.info(`${logPrefix} No attachments in email from ${email.sender || 'unknown'} — skipping`);
+    logger.info(`${logPrefix} No attachments in email from ${email.sender || 'unknown'} — skipping`);
     // Still mark as processed so we don't re-check it
     await markAsProcessed({
       messageId: email.messageId,
@@ -433,7 +436,7 @@ async function processEmail(email) {
     return result;
   }
 
-  console.info(`${logPrefix} Processing email from ${email.sender || 'unknown'} | Subject: "${(email.subject || '').substring(0, 100)}" | ${email.attachments.length} attachment(s)`);
+  logger.info(`${logPrefix} Processing email from ${email.sender || 'unknown'} | Subject: "${(email.subject || '').substring(0, 100)}" | ${email.attachments.length} attachment(s)`);
 
   // ─── Step 3: Process Each Attachment ─────────────────────────────────
   for (const attachment of email.attachments) {
@@ -442,7 +445,7 @@ async function processEmail(email) {
 
       // Validate file type
       if (!isAllowedFileType(resolvedName, attachment.mimeType)) {
-        console.warn(`${logPrefix} Skipping attachment "${resolvedName}" — file type not allowed`);
+        logger.warn(`${logPrefix} Skipping attachment "${resolvedName}" — file type not allowed`);
         result.skipped++;
         continue;
       }
@@ -450,7 +453,7 @@ async function processEmail(email) {
       // Validate file size
       const size = attachment.size || (attachment.content ? attachment.content.length : 0);
       if (!isWithinSizeLimit(size)) {
-        console.warn(
+        logger.warn(
           `${logPrefix} Skipping attachment "${resolvedName}" — ` +
           `size ${(size / 1024 / 1024).toFixed(2)}MB exceeds limit of ${config.maxAttachmentSizeMB}MB`
         );
@@ -460,7 +463,7 @@ async function processEmail(email) {
 
       // Validate content exists
       if (!attachment.content || attachment.content.length === 0) {
-        console.warn(`${logPrefix} Skipping attachment "${resolvedName}" — empty content`);
+        logger.warn(`${logPrefix} Skipping attachment "${resolvedName}" — empty content`);
         result.skipped++;
         continue;
       }
@@ -470,7 +473,7 @@ async function processEmail(email) {
       const existingDoc = await Document.findOne({ fileHash });
 
       if (existingDoc) {
-        console.warn(`${logPrefix} Skipping attachment "${resolvedName}" — duplicate file detected (hash match)`);
+        logger.warn(`${logPrefix} Skipping attachment "${resolvedName}" — duplicate file detected (hash match)`);
         
         const botUser = await getOrCreateBotUser();
         await Activity.create({
@@ -501,7 +504,7 @@ async function processEmail(email) {
       result.documentIds.push(doc._id.toString());
     } catch (err) {
       // Individual attachment failure should NOT stop processing the rest
-      console.error(
+      logger.error(
         `${logPrefix} Failed to process attachment "${attachment.filename || 'unnamed'}": ${err.message}`
       );
       result.errors++;
@@ -521,7 +524,7 @@ async function processEmail(email) {
 
   result.processed = true;
 
-  console.info(
+  logger.info(
     `${logPrefix} Done: ${result.documentIds.length} ingested, ${result.skipped} skipped, ${result.errors} errors`
   );
 
