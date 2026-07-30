@@ -22,7 +22,7 @@ module.exports = async function extractText(filePath) {
     const ext = path.extname(filePath).toLowerCase();
 
     if (ext === ".pdf") {
-      const dataBuffer = fs.readFileSync(filePath);
+      const dataBuffer = await fs.promises.readFile(filePath);
       const pdfData = await pdfParse(dataBuffer);
       return pdfData.text || "";
     }

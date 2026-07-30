@@ -207,8 +207,8 @@ exports.upload = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.user.id);
 
     for (const file of req.files) {
-      // Calculate file hash
-      const fileBuffer = fs.readFileSync(file.path);
+      // Calculate file hash asynchronously to avoid blocking the event loop
+      const fileBuffer = await fs.promises.readFile(file.path);
       const fileHash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
 
       // Check for duplicate
@@ -224,8 +224,10 @@ exports.upload = async (req, res) => {
           comment: `Blocked identical file: ${existingDoc.fileName}`
         });
 
-        // Remove the duplicate uploaded file
-        fs.unlinkSync(file.path);
+        // Remove the duplicate uploaded file asynchronously
+        await fs.promises.unlink(file.path).catch(err => 
+          logger.warn(`Failed to unlink duplicate file ${file.path}`, { error: err.message })
+        );
         continue;
       }
 
@@ -447,12 +449,16 @@ exports.deleteDocument = async (req, res) => {
       return res.status(404).json({ message: "Document not found" });
     }
 
-    // Optionally delete the file from disk (fs.unlink)
-    const fs = require("fs");
+    // Delete the file from disk asynchronously
+    const fsPromises = require("fs").promises;
     const filePath = path.join(__dirname, "..", doc.filePath);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    
+    fsPromises.unlink(filePath).catch(err => {
+      // Ignore ENOENT (file doesn't exist)
+      if (err.code !== 'ENOENT') {
+        logger.error("Failed to delete file from disk", { filePath, error: err.message });
+      }
+    });
 
     res.json({ message: "Document deleted successfully" });
   } catch (err) {

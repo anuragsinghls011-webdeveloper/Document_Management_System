@@ -10,7 +10,7 @@ function connectDB() {
     return mongoose
         .connect(process.env.MONGO_URI, {
             serverSelectionTimeoutMS: 10000,
-            maxPoolSize: 10
+            maxPoolSize: 50 // Increased for high concurrency
         })
         .then(() => {
             logger.info("Database connected successfully");

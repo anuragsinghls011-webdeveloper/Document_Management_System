@@ -106,68 +106,102 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
+const cluster = require('cluster');
+const os = require('os');
+
 if (require.main === module) {
   validateConfig();
 
-  connectDB()
-    .then(() => {
-      app.listen(PORT, () => {
-        logger.info(`Server running on port ${PORT}`);
+  const numCPUs = os.availableParallelism ? os.availableParallelism() : os.cpus().length;
 
-        // Auto-fix stuck documents on startup
-        const { reanalyzeStuckDocuments } = require("./controllers/document.controller");
-        reanalyzeStuckDocuments().catch(err =>
-          logger.error("Startup reanalyze failed", { error: err.message })
-        );
+  if (isProduction && cluster.isPrimary) {
+    logger.info(`Primary cluster process ${process.pid} is running`);
+    logger.info(`Starting ${numCPUs} API workers to handle concurrent users...`);
 
-        // Start BullMQ workflow workers if Redis is configured.
-        // Workers run in-process for simplicity. For production scale,
-        // run them as a separate process: node workers.js
-        if (process.env.REDIS_HOST) {
-          try {
-            const { startRoutingWorker } = require('./src/workers/routingWorker');
-            const { startEscalationWorker } = require('./src/workers/escalationWorker');
-            const { startEnrichmentWorker } = require('./src/workers/enrichmentWorker');
-            startRoutingWorker();
-            startEscalationWorker();
-            startEnrichmentWorker();
-            logger.info('Workflow engine workers started (routing + escalation + enrichment)');
-          } catch (err) {
-            logger.error('Failed to start workflow workers', { error: err.message });
-          }
-        } else {
-          logger.info('REDIS_HOST not set — workflow engine workers not started (enrichment will run in-process)');
-        }
+    // Fork Express API workers
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork();
+    }
 
-        // Start email watcher if configured (EMAIL_PROVIDER env var)
-        // Runs in background — does not block server startup.
-        // If EMAIL_PROVIDER is empty/unset, this is a no-op.
-        if (process.env.EMAIL_PROVIDER) {
-          const emailWatcher = require("./services/emailWatcher");
-          emailWatcher.start().catch(err =>
-            logger.error("Email watcher startup failed", { error: err.message })
-          );
-
-          // Graceful shutdown: stop the email watcher before the process exits
-          // so we don't leave dangling IMAP connections or half-processed emails.
-          const shutdown = async (signal) => {
-            logger.info(`${signal} received — shutting down email watcher...`);
-            try {
-              await emailWatcher.stop();
-            } catch (err) {
-              logger.error("Email watcher shutdown error", { error: err.message });
-            }
-            process.exit(0);
-          };
-          process.on("SIGTERM", () => shutdown("SIGTERM"));
-          process.on("SIGINT", () => shutdown("SIGINT"));
-        }
-      });
-    })
-    .catch((error) => {
-      logger.error("Failed to start server", { error: error.message });
-      process.exit(1);
+    cluster.on('exit', (worker, code, signal) => {
+      logger.warn(`Worker ${worker.process.pid} died. Restarting to maintain capacity...`);
+      cluster.fork();
     });
+
+    // --- Background Services (Run ONLY in Primary Process) ---
+    
+    // Auto-fix stuck documents on startup
+    const { reanalyzeStuckDocuments } = require("./controllers/document.controller");
+    reanalyzeStuckDocuments().catch(err =>
+      logger.error("Startup reanalyze failed", { error: err.message })
+    );
+
+    // Start BullMQ workflow workers if Redis is configured.
+    if (process.env.REDIS_HOST) {
+      try {
+        const { startRoutingWorker } = require('./src/workers/routingWorker');
+        const { startEscalationWorker } = require('./src/workers/escalationWorker');
+        const { startEnrichmentWorker } = require('./src/workers/enrichmentWorker');
+        startRoutingWorker();
+        startEscalationWorker();
+        startEnrichmentWorker();
+        logger.info('Workflow engine workers started in primary process (routing + escalation + enrichment)');
+      } catch (err) {
+        logger.error('Failed to start workflow workers', { error: err.message });
+      }
+    } else {
+      logger.info('REDIS_HOST not set — workflow engine workers not started (enrichment will run in-process on workers)');
+    }
+
+    // Start email watcher if configured
+    if (process.env.EMAIL_PROVIDER) {
+      const emailWatcher = require("./services/emailWatcher");
+      emailWatcher.start().catch(err =>
+        logger.error("Email watcher startup failed", { error: err.message })
+      );
+
+      const shutdown = async (signal) => {
+        logger.info(`${signal} received — shutting down email watcher...`);
+        try {
+          await emailWatcher.stop();
+        } catch (err) {
+          logger.error("Email watcher shutdown error", { error: err.message });
+        }
+        process.exit(0);
+      };
+      process.on("SIGTERM", () => shutdown("SIGTERM"));
+      process.on("SIGINT", () => shutdown("SIGINT"));
+    }
+
+  } else {
+    // --- API Worker Process (or single-process dev mode) ---
+    connectDB()
+      .then(() => {
+        app.listen(PORT, () => {
+          logger.info(`API Server (Worker ${process.pid}) running on port ${PORT}`);
+          
+          // If in dev mode (no cluster), we need to start background services here
+          if (!isProduction) {
+            const { reanalyzeStuckDocuments } = require("./controllers/document.controller");
+            reanalyzeStuckDocuments().catch(e => logger.error("Reanalyze failed", { error: e.message }));
+            
+            if (process.env.REDIS_HOST) {
+              require('./src/workers/routingWorker').startRoutingWorker();
+              require('./src/workers/escalationWorker').startEscalationWorker();
+              require('./src/workers/enrichmentWorker').startEnrichmentWorker();
+              logger.info('Workflow engine workers started in dev mode');
+            }
+            if (process.env.EMAIL_PROVIDER) {
+              require("./services/emailWatcher").start().catch(e => logger.error("Email watcher failed", { error: e.message }));
+            }
+          }
+        });
+      })
+      .catch((error) => {
+        logger.error(`Worker ${process.pid} failed to start`, { error: error.message });
+        process.exit(1);
+      });
+  }
 }
 
 module.exports = app;
