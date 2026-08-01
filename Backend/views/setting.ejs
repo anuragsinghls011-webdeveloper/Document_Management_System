@@ -994,7 +994,8 @@
         });
 
         // ─── Cloud Storage Settings (Admin Only) ────────────────────────────
-        <% if (locals.user && locals.user.role === 'admin') { %>
+        const __userRole = '<%= (locals.user && locals.user.role) ? locals.user.role : "" %>';
+        if (__userRole === 'admin') {
         let selectedProvider = null;
         let currentConfig = null;
 
@@ -1335,7 +1336,7 @@
 
         // Load config on page ready
         loadStorageConfig();
-        <% } %>
+        } // end admin-only cloud storage block
     </script>
 </body>
 </html>
