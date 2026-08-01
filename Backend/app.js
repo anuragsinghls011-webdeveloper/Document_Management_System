@@ -16,6 +16,7 @@ const documentsRoute = require('./routes/documents.routes');
 const workflowsRoute = require('./routes/workflows.routes');
 const analyticsRoutes = require('./routes/analytics.routes');
 const approvalsApiRoutes = require('./routes/approvals.routes');
+const storageRoutes = require('./routes/storage.routes');
 const workflowApiRoutes = require('./src/routes/workflowRoutes');
 const auth = require("./middlewares/auth.middleware");
 const adminOnly = require("./middlewares/admin.middleware");
@@ -80,6 +81,7 @@ app.use("/api/workflow", workflowApiRoutes); // Workflow approval engine routes
 app.use("/api/analytics", analyticsRoutes);
 app.use("/", workflowsRoute); // workflows APIs and view
 app.use("/", activityRoutes);
+app.use("/api/settings", storageRoutes);
 app.use("/admin", adminRoutes);
 
 app.get('/', (req, res) => {

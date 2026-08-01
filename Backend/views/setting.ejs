@@ -212,6 +212,427 @@
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* ─── Cloud Storage Card Styles ─────────────────────────────────── */
+        .settings-card:nth-child(4) { animation-delay: 0.3s; }
+
+        .storage-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 0.75rem;
+            border: 1px solid var(--surface-border);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .status-pill.connected {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .status-pill.disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .status-pill.not-configured {
+            background: rgba(161, 161, 170, 0.1);
+            color: var(--text-muted);
+            border: 1px solid rgba(161, 161, 170, 0.2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .status-provider-name {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        .status-provider-name strong {
+            color: var(--text-main);
+        }
+
+        /* Provider Selector Cards */
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .provider-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.5rem 1rem;
+            border-radius: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid var(--surface-border);
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+            overflow: hidden;
+        }
+
+        .provider-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 1rem;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        .provider-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .provider-card:hover::before {
+            opacity: 1;
+        }
+
+        .provider-card.active {
+            transform: translateY(-3px);
+        }
+
+        /* Provider-specific glow colors */
+        .provider-card.gcs::before {
+            background: radial-gradient(circle at center, rgba(66, 133, 244, 0.08), transparent 70%);
+        }
+        .provider-card.gcs.active {
+            border-color: #4285f4;
+            box-shadow: 0 0 30px rgba(66, 133, 244, 0.15), 0 0 60px rgba(66, 133, 244, 0.05);
+        }
+        .provider-card.gcs.active::before { opacity: 1; }
+
+        .provider-card.s3::before {
+            background: radial-gradient(circle at center, rgba(255, 153, 0, 0.08), transparent 70%);
+        }
+        .provider-card.s3.active {
+            border-color: #ff9900;
+            box-shadow: 0 0 30px rgba(255, 153, 0, 0.15), 0 0 60px rgba(255, 153, 0, 0.05);
+        }
+        .provider-card.s3.active::before { opacity: 1; }
+
+        .provider-card.azure::before {
+            background: radial-gradient(circle at center, rgba(0, 188, 212, 0.08), transparent 70%);
+        }
+        .provider-card.azure.active {
+            border-color: #00bcd4;
+            box-shadow: 0 0 30px rgba(0, 188, 212, 0.15), 0 0 60px rgba(0, 188, 212, 0.05);
+        }
+        .provider-card.azure.active::before { opacity: 1; }
+
+        .provider-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: transform 0.3s ease;
+        }
+
+        .provider-card:hover .provider-icon {
+            transform: scale(1.1);
+        }
+
+        .provider-icon.gcs-icon {
+            background: rgba(66, 133, 244, 0.12);
+            color: #4285f4;
+        }
+        .provider-icon.s3-icon {
+            background: rgba(255, 153, 0, 0.12);
+            color: #ff9900;
+        }
+        .provider-icon.azure-icon {
+            background: rgba(0, 188, 212, 0.12);
+            color: #00bcd4;
+        }
+
+        .provider-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .provider-card p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .provider-check {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .provider-card.active .provider-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .provider-card.gcs .provider-check {
+            background: #4285f4;
+            color: white;
+        }
+        .provider-card.s3 .provider-check {
+            background: #ff9900;
+            color: white;
+        }
+        .provider-card.azure .provider-check {
+            background: #00bcd4;
+            color: white;
+        }
+
+        /* Config Form */
+        .config-form-wrapper {
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s ease;
+        }
+
+        .config-form {
+            display: none;
+            animation: fadeSlideIn 0.4s ease forwards;
+        }
+
+        .config-form.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .config-form .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .config-form .form-group label i {
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .form-control-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--surface-border);
+            border-radius: 0.75rem;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-control-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-control select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        /* Buttons row */
+        .storage-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--surface-border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-success:hover { background: #059669; }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-migrate {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-migrate:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Migration Progress */
+        .migration-section {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 0.75rem;
+            border: 1px solid var(--surface-border);
+        }
+
+        .migration-section h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .migration-section h3 i {
+            color: var(--secondary-color);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: var(--surface-border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.75rem 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .provider-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -328,6 +749,157 @@
                 </div>
                 
             </div>
+
+            <% if (locals.user && locals.user.role === 'admin') { %>
+            <!-- Cloud Storage Configuration (Admin Only) -->
+            <div class="settings-card" id="storageCard">
+                <div class="card-header">
+                    <i class='bx bx-cloud-upload'></i>
+                    <h2>Cloud Storage</h2>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="storage-status-bar">
+                    <div class="status-provider-name" id="storageProviderLabel">
+                        Provider: <strong id="currentProviderName">Loading...</strong>
+                    </div>
+                    <div class="status-pill not-configured" id="storageStatusPill">
+                        <span class="status-dot"></span>
+                        <span id="storageStatusText">Not Configured</span>
+                    </div>
+                </div>
+
+                <!-- Provider Selector -->
+                <div class="provider-grid">
+                    <div class="provider-card gcs" id="providerGCS" onclick="selectProvider('gcs')">
+                        <div class="provider-check"><i class='bx bx-check'></i></div>
+                        <div class="provider-icon gcs-icon"><i class='bx bxl-google'></i></div>
+                        <h3>Google Cloud</h3>
+                        <p>Cloud Storage buckets</p>
+                    </div>
+                    <div class="provider-card s3" id="providerS3" onclick="selectProvider('s3')">
+                        <div class="provider-check"><i class='bx bx-check'></i></div>
+                        <div class="provider-icon s3-icon"><i class='bx bx-server'></i></div>
+                        <h3>AWS S3</h3>
+                        <p>Simple Storage Service</p>
+                    </div>
+                    <div class="provider-card azure" id="providerAzure" onclick="selectProvider('azure')">
+                        <div class="provider-check"><i class='bx bx-check'></i></div>
+                        <div class="provider-icon azure-icon"><i class='bx bx-data'></i></div>
+                        <h3>Azure Blob</h3>
+                        <p>Blob Storage containers</p>
+                    </div>
+                </div>
+
+                <!-- Dynamic Config Forms -->
+                <div class="config-form-wrapper">
+                    <!-- GCS Config -->
+                    <div class="config-form" id="configGCS">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class='bx bx-package'></i> Project ID</label>
+                                <input type="text" id="gcsProjectId" class="form-control" placeholder="my-gcp-project">
+                            </div>
+                            <div class="form-group">
+                                <label><i class='bx bx-bucket'></i> Bucket Name</label>
+                                <input type="text" id="gcsBucketName" class="form-control" placeholder="my-documents-bucket">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class='bx bx-key'></i> Service Account JSON</label>
+                            <textarea id="gcsCredentials" class="form-control-textarea" placeholder='Paste your service account JSON key here...'></textarea>
+                        </div>
+                    </div>
+
+                    <!-- S3 Config -->
+                    <div class="config-form" id="configS3">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class='bx bx-globe'></i> Region</label>
+                                <select id="s3Region" class="form-control">
+                                    <option value="">Select region...</option>
+                                    <option value="us-east-1">US East (N. Virginia)</option>
+                                    <option value="us-east-2">US East (Ohio)</option>
+                                    <option value="us-west-1">US West (N. California)</option>
+                                    <option value="us-west-2">US West (Oregon)</option>
+                                    <option value="eu-west-1">EU (Ireland)</option>
+                                    <option value="eu-west-2">EU (London)</option>
+                                    <option value="eu-central-1">EU (Frankfurt)</option>
+                                    <option value="ap-south-1">Asia Pacific (Mumbai)</option>
+                                    <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+                                    <option value="ap-northeast-1">Asia Pacific (Tokyo)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class='bx bx-bucket'></i> Bucket Name</label>
+                                <input type="text" id="s3BucketName" class="form-control" placeholder="my-s3-bucket">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class='bx bx-id-card'></i> Access Key ID</label>
+                                <input type="password" id="s3AccessKeyId" class="form-control" placeholder="AKIA...">
+                            </div>
+                            <div class="form-group">
+                                <label><i class='bx bx-lock-alt'></i> Secret Access Key</label>
+                                <input type="password" id="s3SecretAccessKey" class="form-control" placeholder="Enter secret key">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Azure Config -->
+                    <div class="config-form" id="configAzure">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class='bx bx-user'></i> Account Name</label>
+                                <input type="text" id="azureAccountName" class="form-control" placeholder="mystorageaccount">
+                            </div>
+                            <div class="form-group">
+                                <label><i class='bx bx-folder'></i> Container Name</label>
+                                <input type="text" id="azureContainerName" class="form-control" placeholder="documents">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class='bx bx-key'></i> Account Key</label>
+                            <input type="password" id="azureAccountKey" class="form-control" placeholder="Enter storage account key">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="storage-actions" id="storageActions" style="display: none;">
+                    <button class="btn-success" id="btnTestConnection" onclick="testStorageConnection()">
+                        <i class='bx bx-plug'></i> Test Connection
+                    </button>
+                    <button class="btn-primary" id="btnSaveStorage" onclick="saveStorageConfig()">
+                        <i class='bx bx-save'></i> Save Configuration
+                    </button>
+                    <button class="btn-danger" id="btnDisconnect" onclick="disconnectStorage()">
+                        <i class='bx bx-unlink'></i> Disconnect
+                    </button>
+                </div>
+
+                <!-- Migration Section -->
+                <div class="migration-section" id="migrationSection" style="display: none;">
+                    <h3><i class='bx bx-transfer'></i> Migrate Existing Documents</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
+                        Move all locally-stored documents to the connected cloud provider. This process runs in the background.
+                    </p>
+                    <button class="btn-migrate" id="btnMigrate" onclick="startMigration()">
+                        <i class='bx bx-cloud-upload'></i> Start Migration
+                    </button>
+                    <div id="migrationProgress" style="display: none; margin-top: 1rem;">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="migrationBar" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-stats">
+                            <span id="migrationProgressText">0 of 0 documents</span>
+                            <span id="migrationPercent">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
             
         </div>
     </main>
@@ -420,6 +992,350 @@
                 btn.disabled = false;
             }
         });
+
+        // ─── Cloud Storage Settings (Admin Only) ────────────────────────────
+        <% if (locals.user && locals.user.role === 'admin') { %>
+        let selectedProvider = null;
+        let currentConfig = null;
+
+        const PROVIDER_NAMES = {
+            local: 'Local Disk',
+            gcs: 'Google Cloud Storage',
+            s3: 'AWS S3',
+            azure: 'Azure Blob Storage'
+        };
+
+        // Load storage config on page load
+        async function loadStorageConfig() {
+            try {
+                const resp = await fetch('/api/settings/storage');
+                const data = await resp.json();
+                
+                if (data.success) {
+                    currentConfig = data.config;
+                    updateStorageUI(data.config);
+                }
+            } catch (err) {
+                console.error('Failed to load storage config:', err);
+            }
+        }
+
+        function updateStorageUI(config) {
+            const providerName = document.getElementById('currentProviderName');
+            const statusPill = document.getElementById('storageStatusPill');
+            const statusText = document.getElementById('storageStatusText');
+
+            providerName.textContent = PROVIDER_NAMES[config.provider] || 'Local Disk';
+
+            // Update status pill
+            statusPill.className = 'status-pill';
+            if (config.isActive && config.lastTestStatus === 'success') {
+                statusPill.classList.add('connected');
+                statusText.textContent = 'Connected';
+            } else if (config.isActive && config.lastTestStatus === 'failed') {
+                statusPill.classList.add('disconnected');
+                statusText.textContent = 'Connection Failed';
+            } else {
+                statusPill.classList.add('not-configured');
+                statusText.textContent = 'Not Configured';
+            }
+
+            // Select the current provider card if active
+            if (config.isActive && config.provider !== 'local') {
+                selectProvider(config.provider, true);
+
+                // Fill in the saved (non-secret) values
+                if (config.provider === 'gcs') {
+                    document.getElementById('gcsProjectId').value = config.gcs.projectId || '';
+                    document.getElementById('gcsBucketName').value = config.gcs.bucketName || '';
+                    if (config.gcs.hasCredentials) {
+                        document.getElementById('gcsCredentials').placeholder = '••••••• (credentials saved — enter new to replace)';
+                    }
+                } else if (config.provider === 's3') {
+                    document.getElementById('s3Region').value = config.s3.region || '';
+                    document.getElementById('s3BucketName').value = config.s3.bucketName || '';
+                    if (config.s3.hasAccessKey) {
+                        document.getElementById('s3AccessKeyId').placeholder = '••••••• (key saved)';
+                    }
+                    if (config.s3.hasSecretKey) {
+                        document.getElementById('s3SecretAccessKey').placeholder = '••••••• (secret saved)';
+                    }
+                } else if (config.provider === 'azure') {
+                    document.getElementById('azureAccountName').value = config.azure.accountName || '';
+                    document.getElementById('azureContainerName').value = config.azure.containerName || '';
+                    if (config.azure.hasAccountKey) {
+                        document.getElementById('azureAccountKey').placeholder = '••••••• (key saved)';
+                    }
+                }
+
+                // Show migration section
+                document.getElementById('migrationSection').style.display = 'block';
+            }
+
+            // Handle migration progress
+            if (config.migrationStatus === 'running') {
+                showMigrationProgress(config.migrationProgress);
+                pollMigrationStatus();
+            }
+        }
+
+        function selectProvider(provider, isLoading = false) {
+            selectedProvider = provider;
+
+            // Toggle provider card active states
+            document.querySelectorAll('.provider-card').forEach(card => card.classList.remove('active'));
+            const cardMap = { gcs: 'providerGCS', s3: 'providerS3', azure: 'providerAzure' };
+            document.getElementById(cardMap[provider])?.classList.add('active');
+
+            // Toggle config forms
+            document.querySelectorAll('.config-form').forEach(form => form.classList.remove('active'));
+            const formMap = { gcs: 'configGCS', s3: 'configS3', azure: 'configAzure' };
+            document.getElementById(formMap[provider])?.classList.add('active');
+
+            // Show action buttons
+            document.getElementById('storageActions').style.display = 'flex';
+
+            if (!isLoading) {
+                // Reset status when switching providers
+                const statusPill = document.getElementById('storageStatusPill');
+                statusPill.className = 'status-pill not-configured';
+                document.getElementById('storageStatusText').textContent = 'Not Configured';
+                document.getElementById('currentProviderName').textContent = PROVIDER_NAMES[provider];
+            }
+        }
+
+        function getProviderCredentials() {
+            switch (selectedProvider) {
+                case 'gcs':
+                    return {
+                        projectId: document.getElementById('gcsProjectId').value.trim(),
+                        bucketName: document.getElementById('gcsBucketName').value.trim(),
+                        credentials: document.getElementById('gcsCredentials').value.trim()
+                    };
+                case 's3':
+                    return {
+                        region: document.getElementById('s3Region').value,
+                        bucketName: document.getElementById('s3BucketName').value.trim(),
+                        accessKeyId: document.getElementById('s3AccessKeyId').value.trim(),
+                        secretAccessKey: document.getElementById('s3SecretAccessKey').value.trim()
+                    };
+                case 'azure':
+                    return {
+                        accountName: document.getElementById('azureAccountName').value.trim(),
+                        containerName: document.getElementById('azureContainerName').value.trim(),
+                        accountKey: document.getElementById('azureAccountKey').value.trim()
+                    };
+                default:
+                    return {};
+            }
+        }
+
+        async function testStorageConnection() {
+            if (!selectedProvider) {
+                return Toast.fire({ icon: 'warning', title: 'Select a provider first' });
+            }
+
+            const credentials = getProviderCredentials();
+            const btn = document.getElementById('btnTestConnection');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Testing...";
+            btn.disabled = true;
+
+            try {
+                const resp = await fetch('/api/settings/storage/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ provider: selectedProvider, credentials })
+                });
+
+                const data = await resp.json();
+
+                if (data.success) {
+                    Toast.fire({ icon: 'success', title: data.message });
+                    const statusPill = document.getElementById('storageStatusPill');
+                    statusPill.className = 'status-pill connected';
+                    document.getElementById('storageStatusText').textContent = 'Connected';
+                } else {
+                    Toast.fire({ icon: 'error', title: data.message || 'Connection test failed' });
+                    const statusPill = document.getElementById('storageStatusPill');
+                    statusPill.className = 'status-pill disconnected';
+                    document.getElementById('storageStatusText').textContent = 'Connection Failed';
+                }
+            } catch (err) {
+                Toast.fire({ icon: 'error', title: 'Network error during connection test' });
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function saveStorageConfig() {
+            if (!selectedProvider) {
+                return Toast.fire({ icon: 'warning', title: 'Select a provider first' });
+            }
+
+            const credentials = getProviderCredentials();
+            const btn = document.getElementById('btnSaveStorage');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Saving...";
+            btn.disabled = true;
+
+            const body = { provider: selectedProvider };
+            body[selectedProvider] = credentials;
+
+            try {
+                const resp = await fetch('/api/settings/storage', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await resp.json();
+
+                if (data.success) {
+                    Toast.fire({ icon: 'success', title: data.message });
+                    document.getElementById('migrationSection').style.display = 'block';
+                    loadStorageConfig(); // Refresh UI
+                } else {
+                    Toast.fire({ icon: 'error', title: data.message || 'Failed to save config' });
+                }
+            } catch (err) {
+                Toast.fire({ icon: 'error', title: 'Network error saving configuration' });
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function disconnectStorage() {
+            const result = await Swal.fire({
+                title: 'Disconnect Storage?',
+                text: 'This will revert to local disk storage. Existing cloud files will remain accessible.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#27272a',
+                confirmButtonText: 'Yes, disconnect',
+                background: '#18181b',
+                color: '#f4f4f5'
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                const resp = await fetch('/api/settings/storage', { method: 'DELETE' });
+                const data = await resp.json();
+
+                if (data.success) {
+                    Toast.fire({ icon: 'success', title: 'Disconnected — using local storage' });
+
+                    // Reset UI
+                    selectedProvider = null;
+                    document.querySelectorAll('.provider-card').forEach(c => c.classList.remove('active'));
+                    document.querySelectorAll('.config-form').forEach(f => f.classList.remove('active'));
+                    document.getElementById('storageActions').style.display = 'none';
+                    document.getElementById('migrationSection').style.display = 'none';
+
+                    const statusPill = document.getElementById('storageStatusPill');
+                    statusPill.className = 'status-pill not-configured';
+                    document.getElementById('storageStatusText').textContent = 'Not Configured';
+                    document.getElementById('currentProviderName').textContent = 'Local Disk';
+                } else {
+                    Toast.fire({ icon: 'error', title: data.message || 'Failed to disconnect' });
+                }
+            } catch (err) {
+                Toast.fire({ icon: 'error', title: 'Network error' });
+            }
+        }
+
+        async function startMigration() {
+            const result = await Swal.fire({
+                title: 'Migrate Documents?',
+                text: 'This will upload all locally-stored documents to the cloud provider. The process runs in the background.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#6366f1',
+                cancelButtonColor: '#27272a',
+                confirmButtonText: 'Start Migration',
+                background: '#18181b',
+                color: '#f4f4f5'
+            });
+
+            if (!result.isConfirmed) return;
+
+            const btn = document.getElementById('btnMigrate');
+            btn.disabled = true;
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Starting...";
+
+            try {
+                const resp = await fetch('/api/settings/storage/migrate', { method: 'POST' });
+                const data = await resp.json();
+
+                if (data.success) {
+                    Toast.fire({ icon: 'success', title: 'Migration started' });
+                    document.getElementById('migrationProgress').style.display = 'block';
+                    pollMigrationStatus();
+                } else {
+                    Toast.fire({ icon: 'error', title: data.message || 'Failed to start migration' });
+                    btn.disabled = false;
+                    btn.innerHTML = "<i class='bx bx-cloud-upload'></i> Start Migration";
+                }
+            } catch (err) {
+                Toast.fire({ icon: 'error', title: 'Network error' });
+                btn.disabled = false;
+                btn.innerHTML = "<i class='bx bx-cloud-upload'></i> Start Migration";
+            }
+        }
+
+        function showMigrationProgress(progress) {
+            document.getElementById('migrationProgress').style.display = 'block';
+            const total = progress.total || 0;
+            const completed = (progress.completed || 0) + (progress.failed || 0);
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('migrationBar').style.width = percent + '%';
+            document.getElementById('migrationProgressText').textContent = `${progress.completed || 0} of ${total} documents (${progress.failed || 0} failed)`;
+            document.getElementById('migrationPercent').textContent = percent + '%';
+        }
+
+        let migrationPollInterval = null;
+
+        function pollMigrationStatus() {
+            if (migrationPollInterval) clearInterval(migrationPollInterval);
+
+            migrationPollInterval = setInterval(async () => {
+                try {
+                    const resp = await fetch('/api/settings/storage/migration-status');
+                    const data = await resp.json();
+
+                    if (data.success) {
+                        showMigrationProgress(data.progress);
+
+                        if (data.status === 'completed') {
+                            clearInterval(migrationPollInterval);
+                            migrationPollInterval = null;
+                            Toast.fire({ icon: 'success', title: 'Migration completed!' });
+                            const btn = document.getElementById('btnMigrate');
+                            btn.disabled = false;
+                            btn.innerHTML = "<i class='bx bx-cloud-upload'></i> Start Migration";
+                        } else if (data.status === 'failed') {
+                            clearInterval(migrationPollInterval);
+                            migrationPollInterval = null;
+                            Toast.fire({ icon: 'warning', title: 'Migration completed with errors' });
+                            const btn = document.getElementById('btnMigrate');
+                            btn.disabled = false;
+                            btn.innerHTML = "<i class='bx bx-cloud-upload'></i> Retry Migration";
+                        }
+                    }
+                } catch (err) {
+                    console.error('Migration poll error:', err);
+                }
+            }, 3000);
+        }
+
+        // Load config on page ready
+        loadStorageConfig();
+        <% } %>
     </script>
 </body>
 </html>
