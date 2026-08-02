@@ -70,8 +70,7 @@ const documentSchema = new mongoose.Schema(
     },
 
     fileHash: {
-      type: String,
-      sparse: true
+      type: String
     },
 
     filePath: {
@@ -236,7 +235,7 @@ documentSchema.index({
 
 documentSchema.index({ userId: 1, createdAt: -1 });
 documentSchema.index({ userId: 1, status: 1, createdAt: -1 });
-documentSchema.index({ fileHash: 1 });
+documentSchema.index({ fileHash: 1 }, { sparse: true });
 // Index for escalation worker queries: find docs pending approval for a specific approver
 documentSchema.index({ status: 1, currentApprover: 1 });
 documentSchema.index({ status: 1, 'approvalChain.userId': 1 });

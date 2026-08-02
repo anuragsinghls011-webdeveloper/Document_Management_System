@@ -179,7 +179,7 @@ if (require.main === module) {
     // --- API Worker Process (or single-process dev mode) ---
     connectDB()
       .then(() => {
-        app.listen(PORT, () => {
+        const server = app.listen(PORT, () => {
           logger.info(`API Server (Worker ${process.pid}) running on port ${PORT}`);
           
           // If in dev mode (no cluster), we need to start background services here
@@ -196,6 +196,19 @@ if (require.main === module) {
             if (process.env.EMAIL_PROVIDER) {
               require("./services/emailWatcher").start().catch(e => logger.error("Email watcher failed", { error: e.message }));
             }
+          }
+        });
+
+        server.on('error', (err) => {
+          if (err.code === 'EADDRINUSE') {
+            logger.warn(`Port ${PORT} is already in use — retrying on port ${Number(PORT) + 1}...`);
+            server.close();
+            app.listen(Number(PORT) + 1, () => {
+              logger.info(`API Server (Worker ${process.pid}) running on fallback port ${Number(PORT) + 1}`);
+            });
+          } else {
+            logger.error('Server error', { error: err.message });
+            process.exit(1);
           }
         });
       })

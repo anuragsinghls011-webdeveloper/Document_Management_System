@@ -111,7 +111,28 @@ const createChildLogger = (name) => {
     level: logger.level,
     format: isProduction ? prodFormat : devFormat,
     defaultMeta: { service: 'docuflow', module: name },
-    transports: logger.transports,
+    transports: [
+      new winston.transports.Console(),
+      new winston.transports.File({
+        filename: path.join(logsDir, 'error.log'),
+        level: 'error',
+        maxsize: 10 * 1024 * 1024,
+        maxFiles: 5,
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.json()
+        )
+      }),
+      new winston.transports.File({
+        filename: path.join(logsDir, 'combined.log'),
+        maxsize: 10 * 1024 * 1024,
+        maxFiles: 5,
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.json()
+        )
+      })
+    ],
     exitOnError: false
   });
 };

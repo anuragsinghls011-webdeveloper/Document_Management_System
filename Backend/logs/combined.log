@@ -368,3 +368,132 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"DB NAME: driveDB","module":"Database","service":"docuflow","timestamp":"2026-07-31 00:50:13"}
 {"level":"\u001b[32minfo\u001b[39m","message":"API Server (Worker 8296) running on port 3000","module":"App","service":"docuflow","timestamp":"2026-07-31 00:50:13"}
 {"level":"\u001b[32minfo\u001b[39m","message":"✓ No stuck documents found.","module":"DocumentController","service":"docuflow","timestamp":"2026-07-31 00:50:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-01 23:57:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-01 23:59:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"DB NAME: driveDB","module":"Database","service":"docuflow","timestamp":"2026-08-01 23:59:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"API Server (Worker 20324) running on port 3000","module":"App","service":"docuflow","timestamp":"2026-08-01 23:59:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✓ No stuck documents found.","module":"DocumentController","service":"docuflow","timestamp":"2026-08-01 23:59:52"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:00:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"DB NAME: driveDB","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:00:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"API Server (Worker 17624) running on port 3000","module":"App","service":"docuflow","timestamp":"2026-08-02 00:00:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✓ No stuck documents found.","module":"DocumentController","service":"docuflow","timestamp":"2026-08-02 00:00:04"}
+{"level":"\u001b[32minfo\u001b[39m","message":"[EmailIngestion][imap] No attachments in email from editors-noreply@linkedin.com — skipping","module":"EmailIngestion","service":"docuflow","timestamp":"2026-08-02 00:00:09"}
+{"level":"\u001b[32minfo\u001b[39m","message":"[EmailIngestion][imap] No attachments in email from messages-noreply@linkedin.com — skipping","module":"EmailIngestion","service":"docuflow","timestamp":"2026-08-02 00:00:10"}
+{"level":"\u001b[32minfo\u001b[39m","message":"[EmailIngestion][imap] No attachments in email from no-reply@n.dribbble.com — skipping","module":"EmailIngestion","service":"docuflow","timestamp":"2026-08-02 00:00:11"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:00:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"API Server (Worker 17644) running on port 3000","module":"App","service":"docuflow","timestamp":"2026-08-02 00:00:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"DB NAME: driveDB","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:00:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✓ No stuck documents found.","module":"DocumentController","service":"docuflow","timestamp":"2026-08-02 00:00:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"[EmailIngestion][imap] No attachments in email from noreply@email.openai.com — skipping","module":"EmailIngestion","service":"docuflow","timestamp":"2026-08-02 00:00:21"}
+{"level":"\u001b[32minfo\u001b[39m","message":"[EmailIngestion][imap] No attachments in email from updates@alerts.foundit.in — skipping","module":"EmailIngestion","service":"docuflow","timestamp":"2026-08-02 00:00:22"}
+{"level":"\u001b[32minfo\u001b[39m","message":"[EmailIngestion][imap] No attachments in email from invitations@linkedin.com — skipping","module":"EmailIngestion","service":"docuflow","timestamp":"2026-08-02 00:00:23"}
+{"level":"\u001b[32minfo\u001b[39m","message":"[EmailIngestion][imap] No attachments in email from jobs-noreply@linkedin.com — skipping","module":"EmailIngestion","service":"docuflow","timestamp":"2026-08-02 00:00:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"[EmailIngestion][imap] No attachments in email from notifications-noreply@linkedin.com — skipping","module":"EmailIngestion","service":"docuflow","timestamp":"2026-08-02 00:00:26"}
+{"level":"\u001b[32minfo\u001b[39m","message":"[EmailIngestion][imap] No attachments in email from mongodb-atlas@mongodb.com — skipping","module":"EmailIngestion","service":"docuflow","timestamp":"2026-08-02 00:00:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:00:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:01:40"}
+{"level":"\u001b[32minfo\u001b[39m","message":"API Server (Worker 10488) running on port 3000","module":"App","service":"docuflow","timestamp":"2026-08-02 00:01:40"}
+{"level":"\u001b[32minfo\u001b[39m","message":"DB NAME: driveDB","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:01:40"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✓ No stuck documents found.","module":"DocumentController","service":"docuflow","timestamp":"2026-08-02 00:01:41"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:02:19"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:03:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"API Server (Worker 5832) running on port 3000","module":"App","service":"docuflow","timestamp":"2026-08-02 00:03:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:03:54"}
+{"level":"\u001b[33mwarn\u001b[39m","message":"Port 3000 is already in use — retrying on port 3001...","module":"App","service":"docuflow","timestamp":"2026-08-02 00:03:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"DB NAME: driveDB","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:03:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"API Server (Worker 19612) running on fallback port 3001","module":"App","service":"docuflow","timestamp":"2026-08-02 00:03:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"DB NAME: driveDB","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:03:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✓ No stuck documents found.","module":"DocumentController","service":"docuflow","timestamp":"2026-08-02 00:03:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:05:12"}
+{"level":"\u001b[33mwarn\u001b[39m","message":"Port 3000 is already in use — retrying on port 3001...","module":"App","service":"docuflow","timestamp":"2026-08-02 00:05:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:06:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"API Server (Worker 20488) running on port 4000","module":"App","service":"docuflow","timestamp":"2026-08-02 00:06:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"DB NAME: driveDB","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:06:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✓ No stuck documents found.","module":"DocumentController","service":"docuflow","timestamp":"2026-08-02 00:06:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET / \u001b[32m200\u001b[0m 29.629 ms - 37756\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:07:09"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /favicon.ico \u001b[33m404\u001b[0m 1.278 ms - 29\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:07:10"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /login \u001b[32m200\u001b[0m 4.071 ms - 19804\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:07:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m401\u001b[0m 151.403 ms - 33\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:07:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET / \u001b[32m200\u001b[0m 8.066 ms - 37756\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:07:49"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /favicon.ico \u001b[33m404\u001b[0m 1.074 ms - 29\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:07:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /login \u001b[32m200\u001b[0m 5.110 ms - 19804\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:07:53"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /register \u001b[32m200\u001b[0m 7.099 ms - 23529\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:08:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /register \u001b[33m400\u001b[0m 15.356 ms - 307\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:08:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /register \u001b[33m400\u001b[0m 9.633 ms - 49\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:09:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /login \u001b[36m304\u001b[0m 4.267 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:09:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /forgot-password \u001b[32m200\u001b[0m 5.637 ms - 17161\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:09:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"No SMTP credentials found in .env. Creating Ethereal test account...","module":"Email","service":"docuflow","timestamp":"2026-08-02 00:09:41"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Ethereal Test Account generated: k6eqvbwzjlnrpfvx@ethereal.email","module":"Email","service":"docuflow","timestamp":"2026-08-02 00:09:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Message sent: <2bee9de8-9d2f-7a14-2b86-14a232b58a36@docuflow.test>","module":"Email","service":"docuflow","timestamp":"2026-08-02 00:09:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /forgot-password \u001b[32m200\u001b[0m 5002.200 ms - 94\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:09:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"EMAIL PREVIEW URL: https://ethereal.email/message/am49coe.DCateCveam49dj9JACjbwlW.AAAAAaovMnRod-cAgb29z7qJg4o","module":"Email","service":"docuflow","timestamp":"2026-08-02 00:09:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /login \u001b[36m304\u001b[0m 4.214 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:11:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m401\u001b[0m 63.243 ms - 33\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:12:01"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m401\u001b[0m 61.560 ms - 33\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:12:10"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m401\u001b[0m 65.468 ms - 33\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:12:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m401\u001b[0m 61.717 ms - 33\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:12:31"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m429\u001b[0m 2.158 ms - 62\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:12:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m429\u001b[0m 0.793 ms - 62\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:12:44"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m429\u001b[0m 0.829 ms - 62\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:12:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m429\u001b[0m 1.321 ms - 62\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:13:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m429\u001b[0m 0.572 ms - 62\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:13:04"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m429\u001b[0m 0.740 ms - 62\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:13:04"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m429\u001b[0m 1.529 ms - 62\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:13:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[33m429\u001b[0m 1.279 ms - 62\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:13:19"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:13:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"API Server (Worker 17752) running on port 4000","module":"App","service":"docuflow","timestamp":"2026-08-02 00:13:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"DB NAME: driveDB","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:13:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✓ No stuck documents found.","module":"DocumentController","service":"docuflow","timestamp":"2026-08-02 00:13:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET / \u001b[32m200\u001b[0m 19.918 ms - 37756\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:14:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /favicon.ico \u001b[33m404\u001b[0m 1.821 ms - 29\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:14:44"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /register \u001b[32m200\u001b[0m 6.547 ms - 23529\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:14:47"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /register \u001b[33m400\u001b[0m 74.942 ms - 39\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:15:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /register \u001b[32m200\u001b[0m 147.221 ms - 36\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:15:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /login \u001b[32m200\u001b[0m 5.825 ms - 19804\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:15:41"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mPOST /login \u001b[32m200\u001b[0m 73.999 ms - 81\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:15:53"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /dashboard \u001b[32m200\u001b[0m 27.947 ms - 39491\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:15:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /dashboard/stats \u001b[32m200\u001b[0m 152.202 ms - 13859\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:15:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/documents \u001b[32m200\u001b[0m 52.013 ms - 121932\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:15:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /settings \u001b[32m200\u001b[0m 12.891 ms - 46445\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:16:01"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /dashboard \u001b[36m304\u001b[0m 11.101 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:16:09"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /dashboard/stats \u001b[36m304\u001b[0m 21.560 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:16:09"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/documents \u001b[36m304\u001b[0m 31.326 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:16:09"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /settings \u001b[36m304\u001b[0m 12.954 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:16:21"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /analytics \u001b[32m200\u001b[0m 13.870 ms - 37458\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:16:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/analytics/data \u001b[32m200\u001b[0m 84.350 ms - 733\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:16:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /approvals \u001b[32m200\u001b[0m 13.142 ms - 23957\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:00"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/approvals/pending \u001b[32m200\u001b[0m 28.160 ms - 37234\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:00"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /admin/pending-docs?id=6a6aecd1321636168b4e3f6f \u001b[32m200\u001b[0m 16.061 ms - 26045\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /assets/css/enterprise.css \u001b[32m200\u001b[0m 6.880 ms - 24173\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /assets/js/enterprise.js \u001b[32m200\u001b[0m 6.913 ms - 9583\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /admin/document/6a6aecd1321636168b4e3f6f \u001b[32m200\u001b[0m 38.612 ms - 1638\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /workflows \u001b[32m200\u001b[0m 10.061 ms - 34881\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /documents \u001b[32m200\u001b[0m 13.032 ms - 62147\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:20"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/documents?all=true \u001b[32m200\u001b[0m 32.035 ms - 121932\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:20"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /dashboard \u001b[36m304\u001b[0m 10.639 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:25"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /dashboard/stats \u001b[36m304\u001b[0m 21.551 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:26"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/documents \u001b[36m304\u001b[0m 29.324 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:26"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /settings \u001b[36m304\u001b[0m 13.104 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:41"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /analytics \u001b[36m304\u001b[0m 11.697 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/analytics/data \u001b[32m200\u001b[0m 50.178 ms - 732\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /dashboard \u001b[36m304\u001b[0m 9.236 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /dashboard/stats \u001b[36m304\u001b[0m 17.305 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/documents \u001b[36m304\u001b[0m 35.620 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /documents \u001b[36m304\u001b[0m 12.342 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/documents?all=true \u001b[36m304\u001b[0m 28.419 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:17:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /settings \u001b[36m304\u001b[0m 10.472 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:00"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /analytics \u001b[36m304\u001b[0m 10.417 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/analytics/data \u001b[32m200\u001b[0m 48.241 ms - 733\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /settings \u001b[36m304\u001b[0m 12.840 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /analytics \u001b[36m304\u001b[0m 7.993 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/analytics/data \u001b[32m200\u001b[0m 54.502 ms - 732\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /approvals \u001b[36m304\u001b[0m 7.803 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:23"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/approvals/pending \u001b[36m304\u001b[0m 21.893 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:23"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /workflows \u001b[36m304\u001b[0m 10.138 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:25"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /documents \u001b[36m304\u001b[0m 11.837 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /api/documents?all=true \u001b[36m304\u001b[0m 24.821 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[0mGET /settings \u001b[36m304\u001b[0m 10.751 ms - -\u001b[0m","module":"HTTP","service":"docuflow","timestamp":"2026-08-02 00:18:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Database connected successfully","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:19:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"API Server (Worker 8024) running on port 4000","module":"App","service":"docuflow","timestamp":"2026-08-02 00:19:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"DB NAME: driveDB","module":"Database","service":"docuflow","timestamp":"2026-08-02 00:19:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✓ No stuck documents found.","module":"DocumentController","service":"docuflow","timestamp":"2026-08-02 00:19:59"}
