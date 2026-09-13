@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -28,6 +29,10 @@ const rateLimit = require("express-rate-limit");
 
 const app = express();
 const isProduction = process.env.NODE_ENV === "production";
+const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 function validateConfig() {
   const required = ["MONGO_URI", "JWT_SECRET"];
@@ -41,9 +46,19 @@ function validateConfig() {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.set("trust proxy", isProduction ? 1 : 0);
+app.disable("x-powered-by");
 
 // Global Security Middleware
-app.use(cors());
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, false);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+}));
 app.use(mongoSanitize());
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -63,8 +78,19 @@ app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 app.use(cookieParser());
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/assets", express.static(path.join(__dirname, "public")));
+
+app.get("/health/live", (req, res) => {
+  res.status(200).json({ status: "ok", service: "document-management-system" });
+});
+
+app.get("/health/ready", (req, res) => {
+  const dbReady = mongoose.connection.readyState === 1;
+  if (!dbReady) {
+    return res.status(503).json({ status: "degraded", database: "disconnected" });
+  }
+  return res.status(200).json({ status: "ready", database: "connected" });
+});
 
 app.use("/", userRouter);
 app.get("/dashboard", auth, (req, res) => res.render("dashboard"));

@@ -70,7 +70,7 @@ router.post(
         });
       }
 
-      const { username, email, password, role } = req.body;
+      const { username, email, password } = req.body;
       const confirmPassword = req.body['confirm-password'];
 
       if (password !== confirmPassword) {
@@ -99,7 +99,7 @@ router.post(
         username,
         email: email.toLowerCase(),
         password: hashedPassword,
-        role: role || "viewer",
+        role: "viewer",
       });
 
       await newUser.save(); 
@@ -209,38 +209,35 @@ router.get("/forgot-password", (req, res) => {
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const normalizedEmail = String(email || "").toLowerCase().trim();
+    const user = normalizedEmail ? await User.findOne({ email: normalizedEmail }) : null;
     
-    if (!user) {
-      if (req.headers['accept']?.includes('application/json')) {
-        return res.status(404).json({ message: "No account with that email address exists." });
-      }
-      return res.status(404).send("No account with that email address exists.");
+    if (user) {
+      const rawToken = crypto.randomBytes(32).toString("hex");
+      const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+      user.resetPasswordToken = hashedToken;
+      user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+      await user.save();
+
+      const resetUrl = `${req.protocol}://${req.get("host")}/reset-password/${rawToken}`;
+      const message = `
+        <p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
+        <p>Please click on the following link, or paste this into your browser to complete the process:</p>
+        <a href="${resetUrl}">${resetUrl}</a>
+        <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+      `;
+
+      await sendEmail({
+        to: user.email,
+        subject: "Password Reset Request",
+        html: message,
+      });
     }
-
-    const token = crypto.randomBytes(32).toString("hex");
-    user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-    await user.save();
-
-    const resetUrl = `${req.protocol}://${req.get("host")}/reset-password/${token}`;
-    const message = `
-      <p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
-      <p>Please click on the following link, or paste this into your browser to complete the process:</p>
-      <a href="${resetUrl}">${resetUrl}</a>
-      <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
-    `;
-
-    await sendEmail({
-      to: user.email,
-      subject: "Password Reset Request",
-      html: message,
-    });
 
     if (req.headers['accept']?.includes('application/json')) {
-      return res.json({ success: true, message: "An email has been sent to your address with further instructions." });
+      return res.json({ success: true, message: "If an account exists for that email, reset instructions have been sent." });
     }
-    res.send("An email has been sent to your address with further instructions.");
+    res.send("If an account exists for that email, reset instructions have been sent.");
 
   } catch (err) {
     logger.error("Forgot password error", { error: err.message });
@@ -253,8 +250,9 @@ router.post("/forgot-password", async (req, res) => {
 
 router.get("/reset-password/:token", async (req, res) => {
   try {
+    const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
     const user = await User.findOne({
-      resetPasswordToken: req.params.token,
+      resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
@@ -280,8 +278,9 @@ router.post("/reset-password/:token", async (req, res) => {
       return res.status(400).send("Password must be at least 8 characters long.");
     }
 
+    const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
     const user = await User.findOne({
-      resetPasswordToken: req.params.token,
+      resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
@@ -309,7 +308,7 @@ router.post("/reset-password/:token", async (req, res) => {
     }
     res.redirect("/login");
   } catch (err) {
-    console.error("Reset password error:", err);
+    logger.error("Reset password error", { error: err.message });
     if (req.headers['accept']?.includes('application/json')) {
       return res.status(500).json({ message: "Error resetting password." });
     }

@@ -122,6 +122,11 @@ The `Document` record stores the relative file path as:
 
 - `uploads/<stored-filename>`
 
+Uploaded files are served through authenticated endpoints:
+
+- `GET /api/documents/:id/view`
+- `GET /api/documents/:id/download`
+
 ### Admin approvals
 
 Admin-only UI route:
@@ -152,6 +157,7 @@ All endpoints below assume the server runs at `http://localhost:3000`.
 - Authenticated requests rely on the `token` cookie.
 - Protected routes use `Backend/middlewares/auth.middleware.js`.
 - Admin-only routes additionally use `Backend/middlewares/admin.middleware.js` (requires `role === "admin"` in the JWT).
+- New users are always created with the default `viewer` role (elevation requires admin-side updates).
 
 ### Document routes (`/documents`)
 
@@ -182,6 +188,11 @@ All endpoints below assume the server runs at `http://localhost:3000`.
 ### Dashboard routes (`/dashboard`)
 
 - `GET /dashboard/stats` (auth) → `{ totalDocuments, approvedDocuments, pendingDocuments }`
+
+### System health endpoints
+
+- `GET /health/live` → process liveness
+- `GET /health/ready` → readiness (includes MongoDB connection state)
 
 ## Data Models (MongoDB)
 
