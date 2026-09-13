@@ -43,8 +43,8 @@ router.get('/register',(req,res)=>{
 router.post(
   "/register",
 
-  body("username").trim().isLength({ min: 3 }).withMessage("Username must be at least 3 characters long"),
-  body("email").trim().isEmail().withMessage("Enter a valid email address"),
+  body("username").isString().trim().isLength({ min: 3 }).withMessage("Username must be at least 3 characters long"),
+  body("email").isString().trim().isEmail().withMessage("Enter a valid email address"),
   body("password")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters long")
@@ -72,6 +72,8 @@ router.post(
 
       const { username, email, password } = req.body;
       const confirmPassword = req.body['confirm-password'];
+      const normalizedUsername = typeof username === "string" ? username.trim() : "";
+      const normalizedEmail = typeof email === "string" ? email.toLowerCase().trim() : "";
 
       if (password !== confirmPassword) {
         return res.status(400).json({
@@ -79,14 +81,18 @@ router.post(
         });
       }
 
-      const existingEmail = await User.findOne({ email: email.toLowerCase() });
+      if (!normalizedUsername || !normalizedEmail) {
+        return res.status(400).json({ message: "Invalid input data" });
+      }
+
+      const existingEmail = await User.findOne({ email: normalizedEmail });
       if (existingEmail) {
         return res.status(400).json({
           message: "User with this email already exists",
         });
       }
 
-      const existingUsername = await User.findOne({ username });
+      const existingUsername = await User.findOne({ username: normalizedUsername });
       if (existingUsername) {
         return res.status(400).json({
           message: "Username is already taken",
@@ -96,8 +102,8 @@ router.post(
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const newUser = new User({
-        username,
-        email: email.toLowerCase(),
+        username: normalizedUsername,
+        email: normalizedEmail,
         password: hashedPassword,
         role: "viewer",
       });
