@@ -293,7 +293,7 @@
         document.getElementById('statusHint').textContent = String(doc.status || 'pending').replace(/_/g, ' ');
         document.getElementById('confidenceHint').textContent = `${doc.confidence || 92}% confidence`;
 
-        const openFile = () => window.open(`/${doc.filePath}`, '_blank');
+        const openFile = () => window.open(`/api/documents/${doc._id}/view`, '_blank');
         document.getElementById('viewDocumentBtn').onclick = openFile;
         document.getElementById('previewPlaceholder').style.cursor = 'pointer';
         document.getElementById('previewPlaceholder').onclick = openFile;
